@@ -1,0 +1,20 @@
+{
+  "setting": {
+    "name": "Settings",
+    "app": {
+      "name": "App Settings",
+      "theme": {
+        "name": "Theme",
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "local": "Language"
+    },
+    "openAI": {
+      "name": "OpenAI Settings",
+      "baseUrl": "Server URL",
+      "key": "OpenAI Key"
+    }
+  }
+}

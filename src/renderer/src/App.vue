@@ -1,13 +1,47 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { startDarkThemeListener, toggleTheme } from '@renderer/utils/themeUtil'
-import UserInfo from '@renderer/components/UserInfo.vue'
+import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
+import Setting from '@renderer/components/Setting.vue'
 import AssistantList from '@renderer/components/AssistantList.vue'
 import ChatWindow from '@renderer/components/ChatWindow.vue'
+import { useSettingStore } from '@renderer/store/setting'
+import { onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const settingStore = useSettingStore()
+const { locale } = useI18n()
+
+// 主题设置监听
+let stopDarkThemeListener
+watch(
+  () => settingStore.app.themeModel,
+  () => {
+    updateTheme()
+  }
+)
+const updateTheme = () => {
+  if (stopDarkThemeListener) {
+    stopDarkThemeListener()
+  }
+  if (settingStore.app.themeModel === 0) {
+    stopDarkThemeListener = startDarkThemeListener()
+  } else {
+    changeTheme(settingStore.app.themeModel === 2)
+  }
+}
+
+// 语言设置监听
+watch(
+  () => settingStore.app.locale,
+  (lang) => {
+    locale.value = lang
+  }
+)
 
 onMounted(() => {
-  // 监听主题
-  startDarkThemeListener()
+  // 更新主题
+  updateTheme()
+  // 设置语言
+  locale.value = settingStore.app.locale
 })
 </script>
 
@@ -15,10 +49,10 @@ onMounted(() => {
   <div class="app">
     <div class="app-body-left">
       <AssistantList class="assistant-list" />
-      <UserInfo class="user-info" />
+      <Setting class="setting" />
     </div>
     <div class="app-body-right">
-      <ChatWindow class="chat-window" @click="toggleTheme()" />
+      <ChatWindow class="chat-window" />
     </div>
   </div>
 </template>
@@ -40,16 +74,15 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding: 15px;
+    padding: 10px;
     background-color: var(--color-fill-1);
 
     .assistant-list {
       flex-grow: 1;
     }
 
-    .user-info {
+    .setting {
       flex-shrink: 0;
-      height: 50px;
     }
   }
 
@@ -60,7 +93,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding: 15px;
+    padding: 10px;
 
     .chat-window {
       flex-grow: 1;

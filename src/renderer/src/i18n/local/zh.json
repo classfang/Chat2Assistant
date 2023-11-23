@@ -1,0 +1,20 @@
+{
+  "setting": {
+    "name": "设置",
+    "app": {
+      "name": "应用设置",
+      "theme": {
+        "name": "主题",
+        "system": "系统",
+        "light": "明亮",
+        "dark": "黑暗"
+      },
+      "local": "语言"
+    },
+    "openAI": {
+      "name": "OpenAI设置",
+      "baseUrl": "服务器地址",
+      "key": "OpenAI Key"
+    }
+  }
+}

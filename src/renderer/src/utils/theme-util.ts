@@ -14,13 +14,19 @@ export const startDarkThemeListener = () => {
 
   // 初始加载时执行一次以设置初始主题
   handleColorSchemeChange(darkThemeMq)
+
+  // 添加移除事件监听的方法
+  const stopDarkThemeListener = () => {
+    darkThemeMq.removeEventListener('change', handleColorSchemeChange)
+  }
+
+  return stopDarkThemeListener
 }
 
-export const toggleTheme = () => {
-  const arcoTheme = document.body.getAttribute('arco-theme')
-  if (arcoTheme === 'dark') {
-    document.body.removeAttribute('arco-theme')
-  } else {
+export const changeTheme = (isDark: boolean) => {
+  if (isDark) {
     document.body.setAttribute('arco-theme', 'dark')
+  } else {
+    document.body.removeAttribute('arco-theme')
   }
 }
