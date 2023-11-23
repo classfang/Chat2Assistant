@@ -1,0 +1,169 @@
+<script setup lang="ts">
+import { Message, Modal } from '@arco-design/web-vue'
+import { copyObj } from '@renderer/utils/object-util'
+import { reactive, toRefs } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+const props = defineProps({
+  assistant: {
+    type: Object as () => Assistant,
+    default: () => {}
+  },
+  isActive: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const data = reactive({
+  editModalVisible: false,
+  editForm: {
+    name: '',
+    instruction: '',
+    provider: '',
+    model: ''
+  }
+})
+const { editModalVisible, editForm } = toRefs(data)
+
+const emits = defineEmits(['update', 'delete'])
+
+const edit = () => {
+  data.editForm = copyObj(props.assistant)
+  data.editModalVisible = true
+}
+
+const handleEditModalBeforeOk = async () => {
+  await new Promise<void>((resolve, reject) => {
+    if (!data.editForm.name) {
+      Message.error(`${t('assistantList.name')} ${t('common.required')}`)
+      reject()
+    }
+
+    emits('update', data.editForm)
+
+    resolve()
+  })
+  return true
+}
+
+const deleteConfirm = () => {
+  Modal.confirm({
+    title: t('common.deleteConfirm'),
+    content: t('common.deleteConfirmContent'),
+    okText: t('common.ok'),
+    cancelText: t('common.cancel'),
+    onOk: () => {
+      emits('delete')
+    }
+  })
+}
+</script>
+
+<template>
+  <div class="assistant-item" :class="{ 'assistant-item-active': isActive }">
+    <a-avatar v-if="assistant.provider === 'OpenAI'">
+      <img alt="avatar" src="@renderer/assets/images/openai.png" />
+    </a-avatar>
+    <div class="assistant-item-name">{{ assistant.name }}</div>
+    <a-popover v-if="isActive" position="br" :content-style="{ padding: '5px' }">
+      <icon-more style="font-size: 15px; font-weight: 500" />
+      <template #content>
+        <a-space direction="vertical" fill>
+          <a-button
+            type="text"
+            style="width: 100%; color: var(--color-text-1)"
+            size="small"
+            @click="edit"
+            >{{ $t('common.edit') }}</a-button
+          >
+          <a-button
+            type="text"
+            style="width: 100%"
+            status="danger"
+            size="small"
+            @click="deleteConfirm"
+            >{{ $t('common.delete') }}</a-button
+          >
+        </a-space>
+      </template>
+    </a-popover>
+
+    <!-- 新增助手Modal -->
+    <a-modal
+      v-model:visible="editModalVisible"
+      :ok-text="$t('common.ok')"
+      :cancel-text="$t('common.cancel')"
+      title-align="start"
+      width="80vw"
+      :on-before-ok="handleEditModalBeforeOk"
+    >
+      <template #title> {{ $t('assistantList.new') }} </template>
+      <div style="height: 60vh; overflow-y: auto">
+        <a-form :model="editForm">
+          <a-form-item field="name" :label="$t('assistantList.name')">
+            <a-input
+              v-model="editForm.name"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.name')"
+            />
+          </a-form-item>
+          <a-form-item field="instruction" :label="$t('assistantList.instruction')">
+            <a-textarea
+              v-model="editForm.instruction"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.instruction')"
+              allow-clear
+            />
+          </a-form-item>
+          <a-form-item field="provider" :label="$t('assistantList.provider')">
+            <a-select v-model="editForm.provider">
+              <a-option value="OpenAI">{{ $t('bigModelProvider.openAI') }}</a-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item field="model" :label="$t('assistantList.model')">
+            <a-select v-model="editForm.model">
+              <a-option value="gpt-4-vision-preview">gpt-4-vision-preview</a-option>
+              <a-option value="gpt-4-1106-preview">gpt-4-1106-preview</a-option>
+              <a-option value="gpt-4">gpt-4</a-option>
+              <a-option value="gpt-4-32k">gpt-4-32k</a-option>
+              <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
+              <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
+            </a-select>
+          </a-form-item>
+        </a-form>
+      </div>
+    </a-modal>
+  </div>
+</template>
+
+<style lang="less" scoped>
+.assistant-item {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: var(--color-fill-2);
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &:hover {
+    background-color: var(--color-fill-3);
+  }
+
+  .assistant-item-name {
+    flex-grow: 1;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.assistant-item-active {
+  background-color: var(--color-fill-3);
+}
+</style>

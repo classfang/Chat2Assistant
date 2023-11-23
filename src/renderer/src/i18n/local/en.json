@@ -3,7 +3,11 @@
     "ok": "Confirm",
     "cancel": "Cancel",
     "pleaseEnter": "Please Enter",
-    "required": "is required"
+    "required": "is required",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Do you want to delete it?",
+    "deleteConfirmContent": "After being deleted, it cannot be restored."
   },
   "setting": {
     "name": "Settings",

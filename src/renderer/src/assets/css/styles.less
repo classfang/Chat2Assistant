@@ -13,3 +13,50 @@ body {
     'Open Sans',
     sans-serif;
 }
+
+* {
+  // 内容不允许选中
+  user-select: none;
+}
+
+.select-text {
+  user-select: text;
+
+  * {
+    user-select: text;
+  }
+}
+
+img {
+  // 图片不允许拖拽
+  -webkit-user-drag: none;
+}
+
+// 全局滚动条样式
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  position: absolute;
+}
+
+::-webkit-scrollbar-button {
+  width: 4px;
+  height: 0;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: var(--color-fill-4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-fill-4);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-fill-4);
+}

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
-import Setting from '@renderer/components/Setting.vue'
 import AssistantList from '@renderer/components/AssistantList.vue'
 import ChatWindow from '@renderer/components/ChatWindow.vue'
 import { useSettingStore } from '@renderer/store/setting'
@@ -49,7 +48,6 @@ onMounted(() => {
   <div class="app">
     <div class="app-body-left">
       <AssistantList class="assistant-list" />
-      <Setting class="setting" />
     </div>
     <div class="app-body-right">
       <ChatWindow class="chat-window" />
@@ -73,16 +71,10 @@ onMounted(() => {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    padding: 10px;
-    background-color: var(--color-fill-1);
+    border-right: 1px solid var(--color-border-1);
 
     .assistant-list {
       flex-grow: 1;
-    }
-
-    .setting {
-      flex-shrink: 0;
     }
   }
 

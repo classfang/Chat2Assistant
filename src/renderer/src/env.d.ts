@@ -8,8 +8,10 @@ declare module '*.vue' {
 }
 
 type BigModelProvider = 'OpenAI' | 'Spark'
+type ChatRole = 'User' | 'Assistant'
 
 interface Assistant {
+  id: number
   name: string
   instruction: string
   provider: BigModelProvider
@@ -17,4 +19,12 @@ interface Assistant {
   createTime: number
   lastUpdateTime: number
   lastUseTime: number
+}
+
+interface ChatMessage {
+  id: number
+  assistantId: number
+  role: ChatRole
+  content: string
+  createTime: number
 }
