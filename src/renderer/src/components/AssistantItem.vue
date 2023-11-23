@@ -64,7 +64,7 @@ const deleteConfirm = () => {
 
 <template>
   <div class="assistant-item" :class="{ 'assistant-item-active': isActive }">
-    <a-avatar v-if="assistant.provider === 'OpenAI'">
+    <a-avatar v-if="assistant.provider === 'OpenAI'" shape="square">
       <img alt="avatar" src="@renderer/assets/images/openai.png" />
     </a-avatar>
     <div class="assistant-item-name">{{ assistant.name }}</div>
