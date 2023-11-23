@@ -84,7 +84,7 @@ const assistantItemDelete = (id: number) => {
 <template>
   <div class="assistant-list">
     <div class="assistant-header">
-      <a-button class="assistant-new-btn" type="primary" @click="newModalVisible = true">
+      <a-button class="assistant-new-btn" @click="newModalVisible = true">
         <template #icon>
           <icon-plus />
         </template>
@@ -158,7 +158,7 @@ const assistantItemDelete = (id: number) => {
 .assistant-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   overflow: hidden;
   box-sizing: border-box;
   padding-bottom: 10px;
@@ -170,7 +170,6 @@ const assistantItemDelete = (id: number) => {
     display: flex;
     gap: 5px;
     align-items: center;
-    opacity: 0.8;
 
     .assistant-new-btn {
       flex-grow: 1;

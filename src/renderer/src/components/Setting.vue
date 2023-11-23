@@ -12,7 +12,7 @@ const { modalVisible } = toRefs(data)
 
 <template>
   <div class="setting">
-    <a-button class="setting-btn" type="primary" @click="modalVisible = true">
+    <a-button class="setting-btn" @click="modalVisible = true">
       <icon-settings />
     </a-button>
 
