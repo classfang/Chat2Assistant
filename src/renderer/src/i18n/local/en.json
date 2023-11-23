@@ -1,4 +1,10 @@
 {
+  "common": {
+    "ok": "Confirm",
+    "cancel": "Cancel",
+    "pleaseEnter": "Please Enter",
+    "required": "is required"
+  },
   "setting": {
     "name": "Settings",
     "app": {
@@ -16,5 +22,16 @@
       "baseUrl": "Server URL",
       "key": "OpenAI Key"
     }
+  },
+  "bigModelProvider": {
+    "openAI": "OpenAI",
+    "spark": "IFlytek Spark"
+  },
+  "assistantList": {
+    "new": "New Assistant",
+    "name": "Name",
+    "instruction": "Instruction",
+    "provider": "Provider",
+    "model": "Model"
   }
 }

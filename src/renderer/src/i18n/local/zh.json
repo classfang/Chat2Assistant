@@ -1,4 +1,10 @@
 {
+  "common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "pleaseEnter": "请输入",
+    "required": "不能为空"
+  },
   "setting": {
     "name": "设置",
     "app": {
@@ -16,5 +22,16 @@
       "baseUrl": "服务器地址",
       "key": "OpenAI Key"
     }
+  },
+  "bigModelProvider": {
+    "openAI": "OpenAI",
+    "spark": "讯飞星火"
+  },
+  "assistantList": {
+    "new": "新增助手",
+    "name": "名称",
+    "instruction": "指令",
+    "provider": "提供商",
+    "model": "模型"
   }
 }

@@ -6,3 +6,15 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+type BigModelProvider = 'OpenAI' | 'Spark'
+
+interface Assistant {
+  name: string
+  instruction: string
+  provider: BigModelProvider
+  model: string
+  createTime: number
+  lastUpdateTime: number
+  lastUseTime: number
+}

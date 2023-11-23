@@ -11,9 +11,15 @@ const { modalVisible } = toRefs(data)
 </script>
 
 <template>
-  <div class="setting" @click="modalVisible = true">
-    <icon-settings />
-    <div>{{ $t('setting.name') }}</div>
+  <div class="setting">
+    <a-button type="text" @click="modalVisible = true">
+      <template #icon>
+        <icon-settings style="color: var(--color-text-1)" />
+      </template>
+      <template #default>
+        <span style="color: var(--color-text-1)">{{ $t('setting.name') }}</span>
+      </template>
+    </a-button>
   </div>
 
   <!-- 设置Modal -->
@@ -57,20 +63,4 @@ const { modalVisible } = toRefs(data)
   </a-modal>
 </template>
 
-<style lang="less" scoped>
-.setting {
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  box-sizing: border-box;
-  padding: 10px;
-  border-radius: var(--border-radius-medium);
-
-  &:hover {
-    background-color: var(--color-fill-3);
-  }
-}
-</style>
+<style lang="less" scoped></style>
