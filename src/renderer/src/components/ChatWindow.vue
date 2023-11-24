@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAssistantStore } from '@renderer/store/assistant'
+import { useSystemStore } from '@renderer/store/system'
 import { onMounted, reactive, ref, toRefs, watch } from 'vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useI18n } from 'vue-i18n'
@@ -8,6 +9,7 @@ import { Message } from '@arco-design/web-vue'
 import OpenAI from 'openai'
 import { encodeChat } from 'gpt-tokenizer'
 
+const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
 const settingStore = useSettingStore()
 const { t } = useI18n()
@@ -17,10 +19,10 @@ const chatMessageListRef = ref()
 const data = reactive({
   currentAssistant: undefined as undefined | Assistant,
   question: '',
-  loading: false,
-  waitAnswer: false
+  waitAnswer: false,
+  sessionId: new Date().getTime()
 })
-const { currentAssistant, question, loading, waitAnswer } = toRefs(data)
+const { currentAssistant, question, waitAnswer } = toRefs(data)
 
 // 深度监听当前助手修改
 watch(
@@ -46,22 +48,27 @@ const getCurrentAssistant = () => {
 
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
-  if (data.loading || !data.question.trim() || event?.isComposing || !data.currentAssistant) {
+  if (
+    systemStore.chatWindowLoading ||
+    !data.question.trim() ||
+    event?.isComposing ||
+    !data.currentAssistant
+  ) {
     return
   }
 
   // 大模型调用
   try {
-    await useBigModel()
+    await useBigModel(data.sessionId)
   } catch (e) {
     console.log('big model error: ', e)
     Message.error(e ? e + '' : t('chatWindow.openAIError'))
-    data.loading = false
+    systemStore.chatWindowLoading = false
     data.waitAnswer = false
   }
 }
 
-const useBigModel = async () => {
+const useBigModel = async (sessionId: number) => {
   // 大模型调用
   if (data.currentAssistant?.provider === 'OpenAI') {
     // 检查配置
@@ -75,7 +82,7 @@ const useBigModel = async () => {
     data.question = ''
 
     // 开启等待
-    data.loading = true
+    systemStore.chatWindowLoading = true
     data.waitAnswer = true
 
     data.currentAssistant.chatMessageList.push({
@@ -123,6 +130,9 @@ const useBigModel = async () => {
       stream: true,
       max_tokens: data.currentAssistant.maxTokens
     })
+    if (sessionId != data.sessionId) {
+      return
+    }
     data.currentAssistant.chatMessageList.push({
       id: new Date().getTime(),
       role: 'assistant' as ChatRole,
@@ -132,6 +142,9 @@ const useBigModel = async () => {
     scrollToBottom()
     data.waitAnswer = false
     for await (const chunk of stream) {
+      if (sessionId != data.sessionId) {
+        return
+      }
       console.log(`OpenAi【消息】: ${JSON.stringify(chunk.choices[0])}`)
       data.currentAssistant.chatMessageList[
         data.currentAssistant.chatMessageList.length - 1
@@ -141,13 +154,19 @@ const useBigModel = async () => {
   }
 
   // 关闭等待
-  data.loading = false
+  systemStore.chatWindowLoading = false
 }
 
 const scrollToBottom = () => {
   setTimeout(() => {
     chatMessageListRef.value.scrollTop = chatMessageListRef.value.scrollHeight
   }, 0)
+}
+
+const stopAnswer = () => {
+  data.sessionId = new Date().getTime()
+  systemStore.chatWindowLoading = false
+  data.waitAnswer = false
 }
 
 onMounted(() => {
@@ -189,7 +208,7 @@ onMounted(() => {
               v-if="
                 index === currentAssistant.chatMessageList.length - 1 &&
                 msg.role === 'assistant' &&
-                loading
+                systemStore.chatWindowLoading
               "
               class="chat-message-loading"
               >丨</span
@@ -211,11 +230,25 @@ onMounted(() => {
           class="chat-input-textarea"
           :placeholder="$t('chatWindow.chatInputPlaceholder')"
           :auto-size="{
-            minRows: 5,
-            maxRows: 5
+            minRows: 4,
+            maxRows: 4
           }"
           @keydown.enter.prevent="sendQuestion"
         />
+        <div class="chat-input-bottom">
+          <a-button v-if="!systemStore.chatWindowLoading" size="small" @click="sendQuestion()">
+            <a-space :size="5">
+              <icon-send :size="15" />
+              <span>{{ $t('chatWindow.send') }}</span>
+            </a-space>
+          </a-button>
+          <a-button v-if="systemStore.chatWindowLoading" size="small" @click="stopAnswer()">
+            <a-space :size="5">
+              <icon-record-stop :size="15" />
+              <span>{{ $t('chatWindow.stop') }}</span>
+            </a-space>
+          </a-button>
+        </div>
       </div>
     </template>
     <div v-else class="chat-window-empty">
@@ -302,6 +335,13 @@ onMounted(() => {
     .chat-input-textarea {
       border: none;
       background-color: var(--color-bg-1);
+    }
+
+    .chat-input-bottom {
+      box-sizing: border-box;
+      padding: 15px;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 

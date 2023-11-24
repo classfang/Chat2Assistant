@@ -48,6 +48,8 @@
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
     "openAIConfgMiss": "OpenAI is not configured",
-    "openAIError": "OpenAI call error, please check your configuration"
+    "openAIError": "OpenAI call error, please check your configuration",
+    "stop": "Stop",
+    "send": "Send"
   }
 }

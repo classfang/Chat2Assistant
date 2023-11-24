@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useSettingStore } from '@renderer/store/setting'
 import { reactive, toRefs } from 'vue'
+import { useSystemStore } from '@renderer/store/system'
 
+const systemStore = useSystemStore()
 const settingStore = useSettingStore()
 
 const data = reactive({
@@ -12,7 +14,7 @@ const { modalVisible } = toRefs(data)
 
 <template>
   <div class="setting">
-    <a-button class="setting-btn" @click="modalVisible = true">
+    <a-button class="setting-btn" @click="modalVisible = !systemStore.chatWindowLoading">
       <icon-settings />
     </a-button>
 

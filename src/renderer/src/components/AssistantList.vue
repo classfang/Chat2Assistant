@@ -6,7 +6,9 @@ import { useI18n } from 'vue-i18n'
 import { copyObj } from '@renderer/utils/object-util'
 import AssistantItem from '@renderer/components/AssistantItem.vue'
 import Setting from '@renderer/components/Setting.vue'
+import { useSystemStore } from '@renderer/store/system'
 
+const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
 const { t } = useI18n()
 
@@ -62,6 +64,9 @@ const handleNewModalClose = () => {
 }
 
 const assistantItemActive = (assistant: Assistant) => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
   assistantStore.currentAssistantId = assistant.id
 }
 

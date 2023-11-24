@@ -4,6 +4,9 @@ import { copyObj } from '@renderer/utils/object-util'
 import { reactive, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
+import { useSystemStore } from '@renderer/store/system'
+
+const systemStore = useSystemStore()
 
 const { t } = useI18n()
 
@@ -35,6 +38,9 @@ const { editModalVisible, editForm } = toRefs(data)
 const emits = defineEmits(['update', 'clear', 'delete'])
 
 const edit = () => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
   data.editForm = copyObj(props.assistant)
   data.editModalVisible = true
 }
@@ -54,6 +60,9 @@ const handleEditModalBeforeOk = async () => {
 }
 
 const clearConfirm = () => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
   Modal.confirm({
     title: t('common.clearConfirm'),
     content: t('common.clearConfirmContent'),
@@ -66,6 +75,9 @@ const clearConfirm = () => {
 }
 
 const deleteConfirm = () => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
   Modal.confirm({
     title: t('common.deleteConfirm'),
     content: t('common.deleteConfirmContent'),
