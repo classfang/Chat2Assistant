@@ -178,12 +178,12 @@ onMounted(() => {
             >
           </div>
         </div>
-        <div v-if="waitAnswer" class="chat-message">
+        <div v-if="!waitAnswer" class="chat-message">
           <div class="chat-message-avatar">
             <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
           </div>
           <div class="chat-message-content">
-            <a-spin />
+            <a-spin :size="15" />
           </div>
         </div>
       </div>
