@@ -1,5 +1,6 @@
 {
   "common": {
+    "slogan": "人工智能时代已然到来",
     "ok": "确定",
     "cancel": "取消",
     "pleaseEnter": "请输入",
@@ -37,5 +38,8 @@
     "instruction": "指令",
     "provider": "提供商",
     "model": "模型"
+  },
+  "chatWindow": {
+    "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）"
   }
 }

@@ -1,5 +1,6 @@
 {
   "common": {
+    "slogan": "The era of artificial intelligence has dawned.",
     "ok": "Confirm",
     "cancel": "Cancel",
     "pleaseEnter": "Please Enter",
@@ -37,5 +38,8 @@
     "instruction": "Instruction",
     "provider": "Provider",
     "model": "Model"
+  },
+  "chatWindow": {
+    "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)"
   }
 }

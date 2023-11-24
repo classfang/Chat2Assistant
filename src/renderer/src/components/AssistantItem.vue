@@ -68,7 +68,7 @@ const deleteConfirm = () => {
       <img alt="avatar" src="@renderer/assets/images/openai.png" />
     </a-avatar>
     <div class="assistant-item-name">{{ assistant.name }}</div>
-    <a-popover v-if="isActive" position="br" :content-style="{ padding: '5px' }">
+    <a-popover v-if="isActive" position="br" trigger="click" :content-style="{ padding: '5px' }">
       <icon-more style="font-size: 15px; font-weight: 500" />
       <template #content>
         <a-space direction="vertical" fill>
@@ -142,7 +142,7 @@ const deleteConfirm = () => {
   width: 100%;
   box-sizing: border-box;
   padding: 10px;
-  background-color: var(--color-fill-2);
+  background-color: var(--color-fill-1);
   border-radius: var(--border-radius-small);
   cursor: pointer;
   display: flex;
@@ -150,7 +150,7 @@ const deleteConfirm = () => {
   gap: 10px;
 
   &:hover {
-    background-color: var(--color-fill-3);
+    background-color: var(--color-fill-2);
   }
 
   .assistant-item-name {
@@ -164,6 +164,6 @@ const deleteConfirm = () => {
 }
 
 .assistant-item-active {
-  background-color: var(--color-fill-3);
+  background-color: var(--color-fill-3) !important;
 }
 </style>
