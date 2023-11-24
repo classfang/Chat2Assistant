@@ -233,6 +233,7 @@ onMounted(() => {
             minRows: 4,
             maxRows: 4
           }"
+          allow-clear
           @keydown.enter.prevent="sendQuestion"
         />
         <div class="chat-input-bottom">
@@ -339,7 +340,7 @@ onMounted(() => {
 
     .chat-input-bottom {
       box-sizing: border-box;
-      padding: 15px;
+      padding: 5px 15px 15px 15px;
       display: flex;
       justify-content: flex-end;
     }
