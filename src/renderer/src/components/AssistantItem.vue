@@ -29,7 +29,7 @@ const data = reactive({
 })
 const { editModalVisible, editForm } = toRefs(data)
 
-const emits = defineEmits(['update', 'delete'])
+const emits = defineEmits(['update', 'clear', 'delete'])
 
 const edit = () => {
   data.editForm = copyObj(props.assistant)
@@ -48,6 +48,18 @@ const handleEditModalBeforeOk = async () => {
     resolve()
   })
   return true
+}
+
+const clearConfirm = () => {
+  Modal.confirm({
+    title: t('common.clearConfirm'),
+    content: t('common.clearConfirmContent'),
+    okText: t('common.ok'),
+    cancelText: t('common.cancel'),
+    onOk: () => {
+      emits('clear')
+    }
+  })
 }
 
 const deleteConfirm = () => {
@@ -77,6 +89,14 @@ const deleteConfirm = () => {
             size="small"
             @click="edit"
             >{{ $t('common.edit') }}</a-button
+          >
+          <a-button
+            type="text"
+            style="width: 100%"
+            status="danger"
+            size="small"
+            @click="clearConfirm"
+            >{{ $t('common.clear') }}</a-button
           >
           <a-button
             type="text"

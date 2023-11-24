@@ -8,11 +8,9 @@ store.use(
   createPersistedState({
     storage: {
       setItem: (key: string, value: string) => {
-        console.log(key, value)
         electronStore.setStr(key, value)
       },
       getItem: (key: string) => {
-        console.log(key, electronStore.getStrSync(key))
         return electronStore.getStrSync(key)
       }
     }

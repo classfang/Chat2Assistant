@@ -5,6 +5,7 @@ import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
+import OpenAI from 'openai'
 
 const assistantStore = useAssistantStore()
 const settingStore = useSettingStore()
@@ -15,9 +16,10 @@ const chatMessageListRef = ref()
 const data = reactive({
   currentAssistant: undefined as undefined | Assistant,
   question: '',
-  loading: false
+  loading: false,
+  waitAnswer: false
 })
-const { currentAssistant, question } = toRefs(data)
+const { currentAssistant, question, loading, waitAnswer } = toRefs(data)
 
 watch(
   () => assistantStore.currentAssistantId,
@@ -31,42 +33,92 @@ const fetchChatMessageList = () => {
     data.currentAssistant = assistantStore.assistantList.find(
       (a) => a.id === assistantStore.currentAssistantId
     )
-    if (data.currentAssistant && !data.currentAssistant.chatMessageList) {
-      data.currentAssistant.chatMessageList = []
-    }
   } else {
     data.currentAssistant = undefined
   }
   scrollToBottom()
 }
 
-const sendQuestion = (event?: KeyboardEvent) => {
+const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
   if (data.loading || !data.question.trim() || event?.isComposing || !data.currentAssistant) {
     return
   }
 
-  // 处理并清空问题输入
-  const question = data.question.trim()
-  data.question = ''
+  // 大模型调用
+  try {
+    await useBigModel()
+  } catch (e) {
+    Message.error(t('chatWindow.openAIError'))
+    data.loading = false
+    data.waitAnswer = false
+  }
+}
 
-  // 开启等待
-  data.loading = true
-
-  data.currentAssistant?.chatMessageList?.push({
-    id: new Date().getTime(),
-    role: 'user',
-    content: question,
-    createTime: new Date().getTime()
-  })
-  scrollToBottom()
-
+const useBigModel = async () => {
   // 大模型调用
   if (data.currentAssistant?.provider === 'OpenAI') {
     // 检查配置
     if (!settingStore.openAI.baseUrl || !settingStore.openAI.key) {
       Message.error(t('chatWindow.openAIConfgMiss'))
       return
+    }
+
+    // 处理并清空问题输入
+    const question = data.question.trim()
+    data.question = ''
+
+    // 开启等待
+    data.loading = true
+    data.waitAnswer = true
+
+    data.currentAssistant.chatMessageList.push({
+      id: new Date().getTime(),
+      role: 'user',
+      content: question,
+      createTime: new Date().getTime()
+    })
+    scrollToBottom()
+
+    // OpenAI对话
+    const openai = new OpenAI({
+      apiKey: settingStore.openAI.key,
+      baseURL: settingStore.openAI.baseUrl,
+      dangerouslyAllowBrowser: true
+    })
+    const messages = data.currentAssistant.chatMessageList
+      .map((m) => {
+        return {
+          role: m.role,
+          content: m.content
+        }
+      })
+      .slice(-5)
+    messages.unshift({
+      role: 'system',
+      content: data.currentAssistant.instruction
+    })
+    const stream = await openai.chat.completions.create({
+      messages: messages,
+      model: data.currentAssistant.model,
+      stream: true,
+      // TODO gpt-4-vision-preview 模型有bug，必须手动指定4096
+      max_tokens: data.currentAssistant.model === 'gpt-4-vision-preview' ? 4096 : null
+    })
+    data.currentAssistant.chatMessageList.push({
+      id: new Date().getTime(),
+      role: 'assistant' as ChatRole,
+      content: '',
+      createTime: new Date().getTime()
+    })
+    scrollToBottom()
+    data.waitAnswer = false
+    for await (const chunk of stream) {
+      console.log(`OpenAi【消息】: ${JSON.stringify(chunk.choices[0])}`)
+      data.currentAssistant.chatMessageList[
+        data.currentAssistant.chatMessageList.length - 1
+      ].content += chunk.choices[0].delta.content ?? ''
+      scrollToBottom()
     }
   }
 
@@ -98,7 +150,11 @@ onMounted(() => {
         </div>
       </div>
       <div ref="chatMessageListRef" class="chat-message-list">
-        <div v-for="msg in currentAssistant.chatMessageList" :key="msg.id" class="chat-message">
+        <div
+          v-for="(msg, index) in currentAssistant.chatMessageList"
+          :key="msg.id"
+          class="chat-message"
+        >
           <div class="chat-message-avatar">
             <a-avatar v-if="msg.role === 'user'" shape="square" :size="30">
               <icon-user />
@@ -109,7 +165,26 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <div class="chat-message-content">{{ msg.content }}</div>
+          <div class="chat-message-content">
+            {{ msg.content }}
+            <span
+              v-if="
+                index === currentAssistant.chatMessageList.length - 1 &&
+                msg.role === 'assistant' &&
+                loading
+              "
+              class="chat-message-loading"
+              >丨</span
+            >
+          </div>
+        </div>
+        <div v-if="waitAnswer" class="chat-message">
+          <div class="chat-message-avatar">
+            <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
+          </div>
+          <div class="chat-message-content">
+            <a-spin />
+          </div>
         </div>
       </div>
       <div class="chat-input">
@@ -172,8 +247,6 @@ onMounted(() => {
       display: flex;
       align-items: flex-start;
       gap: 15px;
-      .chat-message-avatar {
-      }
 
       .chat-message-content {
         white-space: pre-wrap;
@@ -181,6 +254,25 @@ onMounted(() => {
         background-color: var(--color-fill-1);
         padding: 10px;
         border-radius: var(--border-radius-small);
+        min-height: 1rem;
+
+        .chat-message-loading {
+          font-weight: 500;
+          color: rgb(var(--primary-6));
+          animation: alternate-hide-show 900ms ease-in-out infinite;
+        }
+
+        @keyframes alternate-hide-show {
+          0%,
+          50%,
+          100% {
+            opacity: 1;
+          }
+          60%,
+          90% {
+            opacity: 0;
+          }
+        }
       }
     }
   }

@@ -41,7 +41,8 @@ const handleNewModalBeforeOk = async () => {
         id: new Date().getTime(),
         createTime: new Date().getTime(),
         lastUpdateTime: new Date().getTime(),
-        lastUseTime: new Date().getTime()
+        lastUseTime: new Date().getTime(),
+        chatMessageList: []
       })
     )
     refreshAssistantListSort()
@@ -66,7 +67,6 @@ const assistantItemActive = (assistant: Assistant) => {
 
 const assistantItemUpdate = (newAssistant: Assistant) => {
   const index = assistantStore.assistantList.findIndex((a) => a.id === newAssistant.id)
-  console.log(newAssistant)
   if (index < 0) {
     return
   }
@@ -103,6 +103,7 @@ const assistantItemDelete = (id: number) => {
         @click="assistantItemActive(a)"
         @delete="assistantItemDelete(a.id)"
         @update="assistantItemUpdate"
+        @clear="a.chatMessageList = []"
       />
     </div>
 

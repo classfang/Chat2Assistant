@@ -8,12 +8,15 @@
     "edit": "编辑",
     "delete": "删除",
     "deleteConfirm": "确认删除吗？",
-    "deleteConfirmContent": "删除后将无法恢复。"
+    "deleteConfirmContent": "删除后将无法恢复。",
+    "clear": "清空",
+    "clearConfirm": "确认清空聊天记录吗？",
+    "clearConfirmContent": "聊天记录清空后将无法恢复。"
   },
   "setting": {
     "name": "设置",
     "app": {
-      "name": "应用设置",
+      "name": "应用",
       "theme": {
         "name": "主题",
         "system": "系统",
@@ -23,7 +26,7 @@
       "local": "语言"
     },
     "openAI": {
-      "name": "OpenAI设置",
+      "name": "OpenAI",
       "baseUrl": "服务器地址",
       "key": "OpenAI Key"
     }
@@ -41,6 +44,7 @@
   },
   "chatWindow": {
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",
-    "openAIConfgMiss": "OpenAI未配置"
+    "openAIConfgMiss": "OpenAI未配置",
+    "openAIError": "OpenAI调用错误，请检查你的配置"
   }
 }

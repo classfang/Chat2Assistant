@@ -8,12 +8,15 @@
     "edit": "Edit",
     "delete": "Delete",
     "deleteConfirm": "Do you want to delete it?",
-    "deleteConfirmContent": "After being deleted, it cannot be restored."
+    "deleteConfirmContent": "After being deleted, it cannot be restored.",
+    "clear": "Clear",
+    "clearConfirm": "Are you sure to clear your chat history?",
+    "clearConfirmContent": "Chat history will not be restored after clearing."
   },
   "setting": {
     "name": "Settings",
     "app": {
-      "name": "App Settings",
+      "name": "Application",
       "theme": {
         "name": "Theme",
         "system": "System",
@@ -23,7 +26,7 @@
       "local": "Language"
     },
     "openAI": {
-      "name": "OpenAI Settings",
+      "name": "OpenAI",
       "baseUrl": "Server URL",
       "key": "OpenAI Key"
     }
@@ -41,6 +44,7 @@
   },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
-    "openAIConfgMiss": "OpenAI is not configured"
+    "openAIConfgMiss": "OpenAI is not configured",
+    "openAIError": "OpenAI call error, please check your configuration"
   }
 }
