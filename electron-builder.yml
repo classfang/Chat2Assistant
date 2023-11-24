@@ -1,5 +1,5 @@
 appId: cn.junki.app
-productName: chat2assistant
+productName: Chat2Assistant
 directories:
   buildResources: build
 files:
