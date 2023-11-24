@@ -124,7 +124,7 @@ const assistantItemDelete = (id: number) => {
             <a-input
               v-model="newForm.name"
               :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.name')"
-              :max-length="15"
+              :max-length="20"
             />
           </a-form-item>
           <a-form-item field="instruction" :label="$t('assistantList.instruction')">
