@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAssistantStore } from '@renderer/store/assistant'
-import { nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import { onMounted, reactive, ref, toRefs, watch } from 'vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
@@ -145,9 +145,9 @@ const useBigModel = async () => {
 }
 
 const scrollToBottom = () => {
-  nextTick(() => {
+  setTimeout(() => {
     chatMessageListRef.value.scrollTop = chatMessageListRef.value.scrollHeight
-  })
+  }, 0)
 }
 
 onMounted(() => {
