@@ -56,12 +56,12 @@ const handleNewModalClose = () => {
     name: '',
     instruction: '',
     provider: 'OpenAI',
-    model: ''
+    model: 'gpt-3.5-turbo'
   }
 }
 
 const assistantItemActive = (assistant: Assistant) => {
-  assistantStore.currentAssistant = assistant
+  assistantStore.currentAssistantId = assistant.id
 }
 
 const assistantItemUpdate = (newAssistant: Assistant) => {
@@ -71,13 +71,12 @@ const assistantItemUpdate = (newAssistant: Assistant) => {
     return
   }
   assistantStore.assistantList[index] = newAssistant
-  assistantStore.currentAssistant = assistantStore.assistantList[index]
   refreshAssistantListSort()
 }
 
 const assistantItemDelete = (id: number) => {
   assistantStore.assistantList = assistantStore.assistantList.filter((a) => a.id != id)
-  assistantStore.currentAssistant = null
+  assistantStore.currentAssistantId = null
 }
 </script>
 
@@ -99,7 +98,7 @@ const assistantItemDelete = (id: number) => {
         v-for="a in assistantStore.assistantList"
         :key="a.id"
         :assistant="a"
-        :is-active="assistantStore.currentAssistant?.id === a.id"
+        :is-active="assistantStore.currentAssistantId === a.id"
         class="assistant-item"
         @click="assistantItemActive(a)"
         @delete="assistantItemDelete(a.id)"
@@ -124,6 +123,7 @@ const assistantItemDelete = (id: number) => {
             <a-input
               v-model="newForm.name"
               :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.name')"
+              :max-length="15"
             />
           </a-form-item>
           <a-form-item field="instruction" :label="$t('assistantList.instruction')">
@@ -158,7 +158,7 @@ const assistantItemDelete = (id: number) => {
 .assistant-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   overflow: hidden;
   box-sizing: border-box;
   padding-bottom: 10px;
@@ -166,14 +166,14 @@ const assistantItemDelete = (id: number) => {
   .assistant-header {
     flex-shrink: 0;
     box-sizing: border-box;
-    padding: 10px 10px 0 10px;
+    padding: 15px 15px 0 15px;
     display: flex;
     gap: 5px;
     align-items: center;
 
     .assistant-new-btn {
       flex-grow: 1;
-      padding: 5px;
+      padding: 10px;
     }
 
     .setting-btn {
@@ -188,7 +188,7 @@ const assistantItemDelete = (id: number) => {
     flex-direction: column;
     gap: 10px;
     box-sizing: border-box;
-    padding: 0 10px;
+    padding: 0 15px;
   }
 }
 </style>

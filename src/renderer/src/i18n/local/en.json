@@ -40,6 +40,7 @@
     "model": "Model"
   },
   "chatWindow": {
-    "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)"
+    "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
+    "openAIConfgMiss": "OpenAI is not configured"
   }
 }

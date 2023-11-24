@@ -40,6 +40,7 @@
     "model": "模型"
   },
   "chatWindow": {
-    "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）"
+    "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",
+    "openAIConfgMiss": "OpenAI未配置"
   }
 }

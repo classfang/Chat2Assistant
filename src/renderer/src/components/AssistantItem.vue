@@ -3,6 +3,7 @@ import { Message, Modal } from '@arco-design/web-vue'
 import { copyObj } from '@renderer/utils/object-util'
 import { reactive, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 
 const { t } = useI18n()
 
@@ -64,12 +65,10 @@ const deleteConfirm = () => {
 
 <template>
   <div class="assistant-item" :class="{ 'assistant-item-active': isActive }">
-    <a-avatar v-if="assistant.provider === 'OpenAI'" shape="square">
-      <img alt="avatar" src="@renderer/assets/images/openai.png" />
-    </a-avatar>
+    <AssistantAvatar :provider="assistant.provider" class="assistant-item-avatar" />
     <div class="assistant-item-name">{{ assistant.name }}</div>
     <a-popover v-if="isActive" position="br" trigger="click" :content-style="{ padding: '5px' }">
-      <icon-more style="font-size: 15px; font-weight: 500" />
+      <icon-more style="font-size: 15px; font-weight: 500; flex-shrink: 0" />
       <template #content>
         <a-space direction="vertical" fill>
           <a-button
@@ -107,6 +106,7 @@ const deleteConfirm = () => {
             <a-input
               v-model="editForm.name"
               :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.name')"
+              :max-length="15"
             />
           </a-form-item>
           <a-form-item field="instruction" :label="$t('assistantList.instruction')">
@@ -141,16 +141,20 @@ const deleteConfirm = () => {
 .assistant-item {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px;
+  padding: 15px;
   background-color: var(--color-fill-1);
   border-radius: var(--border-radius-small);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 
   &:hover {
     background-color: var(--color-fill-2);
+  }
+
+  .assistant-item-avatar {
+    flex-shrink: 0;
   }
 
   .assistant-item-name {

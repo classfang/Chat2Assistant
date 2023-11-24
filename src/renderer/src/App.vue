@@ -84,8 +84,6 @@ onMounted(() => {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    padding: 10px;
 
     .chat-window {
       flex-grow: 1;
