@@ -10,14 +10,19 @@ import Setting from '@renderer/components/Setting.vue'
 const assistantStore = useAssistantStore()
 const { t } = useI18n()
 
+const newFormDefault = {
+  name: '',
+  instruction: '',
+  provider: 'OpenAI',
+  model: 'gpt-3.5-turbo',
+  maxTokens: 1024,
+  inputMaxTokens: 1024,
+  contextSize: 1
+}
+
 const data = reactive({
   newModalVisible: false,
-  newForm: {
-    name: '',
-    instruction: '',
-    provider: 'OpenAI',
-    model: 'gpt-3.5-turbo'
-  }
+  newForm: copyObj(newFormDefault)
 })
 const { newModalVisible, newForm } = toRefs(data)
 
@@ -53,12 +58,7 @@ const handleNewModalBeforeOk = async () => {
 }
 
 const handleNewModalClose = () => {
-  data.newForm = {
-    name: '',
-    instruction: '',
-    provider: 'OpenAI',
-    model: 'gpt-3.5-turbo'
-  }
+  data.newForm = copyObj(newFormDefault)
 }
 
 const assistantItemActive = (assistant: Assistant) => {
@@ -119,7 +119,7 @@ const assistantItemDelete = (id: number) => {
     >
       <template #title> {{ $t('assistantList.new') }} </template>
       <div style="height: 60vh; overflow-y: auto">
-        <a-form :model="newForm">
+        <a-form :model="newForm" layout="vertical">
           <a-form-item field="name" :label="$t('assistantList.name')">
             <a-input
               v-model="newForm.name"
@@ -148,6 +148,27 @@ const assistantItemDelete = (id: number) => {
               <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
               <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
             </a-select>
+          </a-form-item>
+          <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
+            <a-input-number
+              v-model="newForm.maxTokens"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"
+              :min="1"
+            />
+          </a-form-item>
+          <a-form-item field="inputMaxTokens" :label="$t('assistantList.inputMaxTokens')">
+            <a-input-number
+              v-model="newForm.inputMaxTokens"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.inputMaxTokens')"
+              :min="1"
+            />
+          </a-form-item>
+          <a-form-item field="contextSize" :label="$t('assistantList.contextSize')">
+            <a-input-number
+              v-model="newForm.contextSize"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.contextSize')"
+              :min="0"
+            />
           </a-form-item>
         </a-form>
       </div>

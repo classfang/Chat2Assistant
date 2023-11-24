@@ -40,7 +40,10 @@
     "name": "名称",
     "instruction": "指令",
     "provider": "提供商",
-    "model": "模型"
+    "model": "模型",
+    "maxTokens": "生成最大Token数",
+    "inputMaxTokens": "输入最大Token数",
+    "contextSize": "上下文大小"
   },
   "chatWindow": {
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",

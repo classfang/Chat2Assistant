@@ -40,7 +40,10 @@
     "name": "Name",
     "instruction": "Instruction",
     "provider": "Provider",
-    "model": "Model"
+    "model": "Model",
+    "maxTokens": "Generated Max Tokens",
+    "inputMaxTokens": "Input Max Tokens",
+    "contextSize": "Context Size"
   },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",

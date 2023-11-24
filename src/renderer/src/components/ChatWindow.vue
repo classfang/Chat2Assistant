@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
 import OpenAI from 'openai'
+import { encodeChat } from 'gpt-tokenizer'
 
 const assistantStore = useAssistantStore()
 const settingStore = useSettingStore()
@@ -21,14 +22,18 @@ const data = reactive({
 })
 const { currentAssistant, question, loading, waitAnswer } = toRefs(data)
 
+// 深度监听当前助手修改
 watch(
-  () => assistantStore.currentAssistantId,
+  () => [assistantStore.currentAssistantId, assistantStore.assistantList],
   () => {
-    fetchChatMessageList()
+    getCurrentAssistant()
+  },
+  {
+    deep: true
   }
 )
 
-const fetchChatMessageList = () => {
+const getCurrentAssistant = () => {
   if (assistantStore.currentAssistantId) {
     data.currentAssistant = assistantStore.assistantList.find(
       (a) => a.id === assistantStore.currentAssistantId
@@ -49,7 +54,8 @@ const sendQuestion = async (event?: KeyboardEvent) => {
   try {
     await useBigModel()
   } catch (e) {
-    Message.error(t('chatWindow.openAIError'))
+    console.log('big model error: ', e)
+    Message.error(e ? e + '' : t('chatWindow.openAIError'))
     data.loading = false
     data.waitAnswer = false
   }
@@ -93,17 +99,29 @@ const useBigModel = async () => {
           content: m.content
         }
       })
-      .slice(-5)
+      .slice(-1 - data.currentAssistant.contextSize)
     messages.unshift({
       role: 'system',
       content: data.currentAssistant.instruction
     })
+    // 估算Token，如果超出了上限制则移除上下文一条消息
+    while (
+      messages.length > 2 &&
+      encodeChat(messages, data.currentAssistant.model).length >
+        data.currentAssistant.inputMaxTokens
+    ) {
+      messages.shift()
+      messages.shift()
+      messages.unshift({
+        role: 'system',
+        content: data.currentAssistant.instruction
+      })
+    }
     const stream = await openai.chat.completions.create({
       messages: messages,
       model: data.currentAssistant.model,
       stream: true,
-      // TODO gpt-4-vision-preview 模型有bug，必须手动指定4096
-      max_tokens: data.currentAssistant.model === 'gpt-4-vision-preview' ? 4096 : null
+      max_tokens: data.currentAssistant.maxTokens
     })
     data.currentAssistant.chatMessageList.push({
       id: new Date().getTime(),
@@ -133,7 +151,7 @@ const scrollToBottom = () => {
 }
 
 onMounted(() => {
-  fetchChatMessageList()
+  getCurrentAssistant()
 })
 </script>
 
@@ -165,7 +183,7 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <div class="chat-message-content">
+          <div class="chat-message-content select-text">
             {{ msg.content }}
             <span
               v-if="

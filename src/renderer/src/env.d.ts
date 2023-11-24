@@ -7,6 +7,11 @@ declare module '*.vue' {
   export default component
 }
 
+declare module 'gpt-tokenizer' {
+  const encodeChat
+  export { encodeChat }
+}
+
 type BigModelProvider = 'OpenAI' | 'Spark'
 type ChatRole = 'user' | 'assistant' | 'system'
 
@@ -16,6 +21,9 @@ interface Assistant {
   instruction: string
   provider: BigModelProvider
   model: string
+  inputMaxTokens: number
+  maxTokens: number
+  contextSize: number
   createTime: number
   lastUpdateTime: number
   lastUseTime: number

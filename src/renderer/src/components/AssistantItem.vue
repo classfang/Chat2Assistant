@@ -24,7 +24,10 @@ const data = reactive({
     name: '',
     instruction: '',
     provider: '',
-    model: ''
+    model: '',
+    maxTokens: 0,
+    inputMaxTokens: 0,
+    contextSize: 0
   }
 })
 const { editModalVisible, editForm } = toRefs(data)
@@ -121,7 +124,7 @@ const deleteConfirm = () => {
     >
       <template #title> {{ $t('assistantList.new') }} </template>
       <div style="height: 60vh; overflow-y: auto">
-        <a-form :model="editForm">
+        <a-form :model="editForm" layout="vertical">
           <a-form-item field="name" :label="$t('assistantList.name')">
             <a-input
               v-model="editForm.name"
@@ -150,6 +153,27 @@ const deleteConfirm = () => {
               <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
               <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
             </a-select>
+          </a-form-item>
+          <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
+            <a-input-number
+              v-model="editForm.maxTokens"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"
+              :min="1"
+            />
+          </a-form-item>
+          <a-form-item field="inputMaxTokens" :label="$t('assistantList.inputMaxTokens')">
+            <a-input-number
+              v-model="editForm.inputMaxTokens"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.inputMaxTokens')"
+              :min="1"
+            />
+          </a-form-item>
+          <a-form-item field="contextSize" :label="$t('assistantList.contextSize')">
+            <a-input-number
+              v-model="editForm.contextSize"
+              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.contextSize')"
+              :min="0"
+            />
           </a-form-item>
         </a-form>
       </div>
