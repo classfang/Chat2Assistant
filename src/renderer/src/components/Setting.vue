@@ -54,6 +54,22 @@ const { modalVisible } = toRefs(data)
               </a-space>
             </a-space>
           </a-tab-pane>
+          <a-tab-pane key="3" :title="$t('setting.spark.name')">
+            <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.spark.appId') }}</div>
+                <a-input v-model="settingStore.spark.appId" size="small" />
+              </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.spark.secret') }}</div>
+                <a-input-password v-model="settingStore.spark.secret" size="small" />
+              </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.spark.key') }}</div>
+                <a-input-password v-model="settingStore.spark.key" size="small" />
+              </a-space>
+            </a-space>
+          </a-tab-pane>
         </a-tabs>
       </div>
     </a-modal>

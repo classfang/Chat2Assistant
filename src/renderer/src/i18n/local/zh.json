@@ -29,6 +29,12 @@
       "name": "OpenAI",
       "baseUrl": "服务器地址",
       "key": "OpenAI Key"
+    },
+    "spark": {
+      "name": "讯飞星火",
+      "appId": "APPID",
+      "secret": "APISecret",
+      "key": "APIKey"
     }
   },
   "bigModelProvider": {

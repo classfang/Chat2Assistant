@@ -29,11 +29,17 @@
       "name": "OpenAI",
       "baseUrl": "Server URL",
       "key": "OpenAI Key"
+    },
+    "spark": {
+      "name": "iFLYTEK Spark",
+      "appId": "APPID",
+      "secret": "APISecret",
+      "key": "APIKey"
     }
   },
   "bigModelProvider": {
     "openAI": "OpenAI",
-    "spark": "IFlytek Spark"
+    "spark": "iFLYTEK Spark"
   },
   "assistantList": {
     "new": "New Assistant",

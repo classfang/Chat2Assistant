@@ -12,6 +12,11 @@ export const useSettingStore = defineStore({
     openAI: {
       baseUrl: 'https://api.openai.com/v1',
       key: ''
+    },
+    spark: {
+      appId: '',
+      secret: '',
+      key: ''
     }
   }),
   persist: true
