@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { appConfig, mainWindowConfig } from './config'
@@ -93,4 +94,31 @@ ipcMain.handle('deleteStoreValue', (_event, key) => {
 // 获取版本信息
 ipcMain.handle('getAppVersion', () => {
   return app.getVersion()
+})
+
+// 保存网络文件
+ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) => {
+  // 创建保存目录
+  const savePath = join(app.getPath('userData'), 'temp')
+  try {
+    fs.mkdirSync(savePath)
+  } catch (e) {
+    console.log('创建目录失败：', e)
+  }
+
+  // 请求文件
+  const fetchResp = await fetch(url)
+  const blob = await fetchResp.blob()
+
+  // 将blob写入文件
+  const filePath = join(savePath, fileName)
+
+  const fileStream = await fs.createWriteStream(filePath)
+  const buffer = Buffer.from(await blob.arrayBuffer())
+
+  // 将buffer写入文件流
+  fileStream.write(buffer)
+  fileStream.end()
+
+  return filePath
 })

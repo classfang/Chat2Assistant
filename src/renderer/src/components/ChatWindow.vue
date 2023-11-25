@@ -153,11 +153,19 @@ const useBigModel = async (sessionId: string) => {
         return
       }
       console.log(`OpenAi【消息】: ${JSON.stringify(imagesResponse)}`)
+      let imageUrl = imagesResponse.data[0].url ?? ''
+      if (imageUrl) {
+        imageUrl = await window.electron.ipcRenderer.invoke(
+          'saveFileByUrl',
+          imagesResponse.data[0].url,
+          `${randomUUID()}.png`
+        )
+      }
       data.currentAssistant.chatMessageList.push({
         id: randomUUID(),
         type: 'img',
         role: 'assistant' as ChatRole,
-        content: imagesResponse.data[0].url ?? '',
+        content: `file://${imageUrl}`,
         createTime: nowTimestamp()
       })
       scrollToBottom()
