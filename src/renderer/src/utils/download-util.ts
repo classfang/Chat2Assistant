@@ -15,3 +15,14 @@ export const downloadFile = (url: string, fileName: string) => {
       console.error('文件下载失败:', error)
     })
 }
+
+export const downloadTextFile = (fileName: string, fileContent: string) => {
+  const blob = new Blob([fileContent], { type: 'text/plain' })
+  const link = document.createElement('a')
+  link.href = window.URL.createObjectURL(blob)
+  link.download = fileName
+  link.style.display = 'none'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
