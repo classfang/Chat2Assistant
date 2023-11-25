@@ -115,7 +115,7 @@ ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) =>
   // 将blob写入文件
   const filePath = join(tempPath, fileName)
 
-  const fileStream = await fs.createWriteStream(filePath)
+  const fileStream = fs.createWriteStream(filePath)
   const buffer = Buffer.from(await blob.arrayBuffer())
 
   // 将buffer写入文件流
