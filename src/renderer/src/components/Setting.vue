@@ -2,6 +2,7 @@
 import { useSettingStore } from '@renderer/store/setting'
 import { onMounted, reactive, toRefs } from 'vue'
 import { useSystemStore } from '@renderer/store/system'
+import { openInBrowser } from '@renderer/utils/window-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -11,10 +12,6 @@ const data = reactive({
   appVersion: '--'
 })
 const { modalVisible, appVersion } = toRefs(data)
-
-const downloadVersionBtnClick = () => {
-  window.open('https://github.com/classfang/Chat2Assistant/releases')
-}
 
 onMounted(() => {
   window.electron.ipcRenderer.invoke('getAppVersion').then((v) => {
@@ -62,9 +59,11 @@ onMounted(() => {
                 <div>
                   <a-space :size="20">
                     <div>{{ $t('setting.app.currentVersion') }} {{ appVersion }}</div>
-                    <a-button size="mini" @click="downloadVersionBtnClick()">{{
-                      $t('setting.app.downloadVersion')
-                    }}</a-button>
+                    <a-button
+                      size="mini"
+                      @click="openInBrowser('https://github.com/classfang/Chat2Assistant/releases')"
+                      >{{ $t('setting.app.downloadVersion') }}</a-button
+                    >
                   </a-space>
                 </div>
               </a-space>
@@ -72,6 +71,10 @@ onMounted(() => {
           </a-tab-pane>
           <a-tab-pane key="2" :title="$t('setting.openAI.name')">
             <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.officialWebsite') }}</div>
+                <a-link @click="openInBrowser('https://openai.com')">https://openai.com</a-link>
+              </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.openAI.baseUrl') }}</div>
                 <a-input v-model="settingStore.openAI.baseUrl" size="small" />
@@ -84,6 +87,12 @@ onMounted(() => {
           </a-tab-pane>
           <a-tab-pane key="3" :title="$t('setting.spark.name')">
             <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.officialWebsite') }}</div>
+                <a-link @click="openInBrowser('https://xinghuo.xfyun.cn')"
+                  >https://xinghuo.xfyun.cn/</a-link
+                >
+              </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.spark.appId') }}</div>
                 <a-input v-model="settingStore.spark.appId" size="small" />

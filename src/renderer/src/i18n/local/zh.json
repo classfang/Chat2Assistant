@@ -15,6 +15,7 @@
   },
   "setting": {
     "name": "设置",
+    "officialWebsite": "官网地址",
     "app": {
       "name": "应用",
       "theme": {
