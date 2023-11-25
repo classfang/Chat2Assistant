@@ -55,8 +55,6 @@ onMounted(() => {
                 <a-select v-model="settingStore.app.locale" size="small">
                   <a-option value="zh">中文</a-option>
                   <a-option value="en">English</a-option>
-                  <a-option value="fr">Français</a-option>
-                  <a-option value="ja">日本語</a-option>
                 </a-select>
               </a-space>
               <a-space direction="vertical" :size="10">

@@ -1,14 +1,10 @@
 import { createI18n } from 'vue-i18n'
 import en from '@renderer/i18n/local/en.json'
 import zh from '@renderer/i18n/local/zh.json'
-import fr from '@renderer/i18n/local/fr.json'
-import ja from '@renderer/i18n/local/ja.json'
 
 const messages = {
   en,
-  zh,
-  fr,
-  ja
+  zh
 }
 
 const i18n = createI18n({
