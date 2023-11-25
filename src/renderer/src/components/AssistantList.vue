@@ -124,6 +124,7 @@ const assistantItemDelete = (id: number) => {
       v-model:visible="newModalVisible"
       :ok-text="$t('common.ok')"
       :cancel-text="$t('common.cancel')"
+      unmount-on-close
       title-align="start"
       width="80vw"
       :on-before-ok="handleNewModalBeforeOk"

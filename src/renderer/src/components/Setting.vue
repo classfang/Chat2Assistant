@@ -30,7 +30,13 @@ onMounted(() => {
     </a-button>
 
     <!-- 设置Modal -->
-    <a-modal v-model:visible="modalVisible" :footer="false" title-align="start" width="80vw">
+    <a-modal
+      v-model:visible="modalVisible"
+      :footer="false"
+      unmount-on-close
+      title-align="start"
+      width="80vw"
+    >
       <template #title> {{ $t('setting.name') }} </template>
       <div style="height: 60vh; overflow-y: auto">
         <a-tabs position="left">

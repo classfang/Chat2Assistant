@@ -122,6 +122,7 @@ const deleteConfirm = () => {
       v-model:visible="editModalVisible"
       :ok-text="$t('common.ok')"
       :cancel-text="$t('common.cancel')"
+      unmount-on-close
       title-align="start"
       width="80vw"
       :on-before-ok="handleEditModalBeforeOk"
