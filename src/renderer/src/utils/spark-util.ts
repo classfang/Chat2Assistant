@@ -1,4 +1,4 @@
-import * as CryptoJS from 'crypto-js'
+import CryptoJS from 'crypto-js'
 
 export const getSparkHostUrl = (model: string) => {
   return `wss://spark-api.xf-yun.com/${model}/chat`
