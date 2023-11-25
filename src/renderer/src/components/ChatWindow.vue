@@ -212,7 +212,7 @@ const useBigModel = async (sessionId: string) => {
         getSparkWsRequestParam(
           settingStore.spark.appId,
           data.currentAssistant.model,
-          data.currentAssistant.chatMessageList
+          getBigModelMessages()
         )
       )
     }
@@ -275,7 +275,7 @@ const getBigModelMessages = () => {
     role: 'system',
     content: data.currentAssistant.instruction
   })
-  // 估算Token，如果超出了上限制则移除上下文一条消息
+  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
   while (
     messages.length > 2 &&
     encodeChat(messages, 'gpt-4-0314').length > data.currentAssistant.inputMaxTokens
@@ -287,7 +287,6 @@ const getBigModelMessages = () => {
       content: data.currentAssistant.instruction
     })
   }
-  console.log(messages)
   return messages
 }
 
