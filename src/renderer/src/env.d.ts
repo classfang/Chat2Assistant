@@ -18,7 +18,7 @@ type ChatMsgType = 'text' | 'img'
 type ChatRole = 'user' | 'assistant' | 'system'
 
 interface Assistant {
-  id: number
+  id: string
   type: AssistantType
   name: string
   instruction: string
@@ -35,7 +35,7 @@ interface Assistant {
 }
 
 interface ChatMessage {
-  id: number
+  id: string
   type: ChatMsgType
   role: ChatRole
   content: string

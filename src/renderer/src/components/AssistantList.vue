@@ -7,6 +7,8 @@ import { copyObj } from '@renderer/utils/object-util'
 import AssistantItem from '@renderer/components/AssistantItem.vue'
 import Setting from '@renderer/components/Setting.vue'
 import { useSystemStore } from '@renderer/store/system'
+import { nowTimestamp } from '@renderer/utils/date-util'
+import { randomUUID } from '@renderer/utils/id-util'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
@@ -47,10 +49,10 @@ const handleNewModalBeforeOk = async () => {
     assistantStore.assistantList.push(
       copyObj({
         ...data.newForm,
-        id: new Date().getTime(),
-        createTime: new Date().getTime(),
-        lastUpdateTime: new Date().getTime(),
-        lastUseTime: new Date().getTime(),
+        id: randomUUID(),
+        createTime: nowTimestamp(),
+        lastUpdateTime: nowTimestamp(),
+        lastUseTime: nowTimestamp(),
         chatMessageList: []
       })
     )
@@ -86,7 +88,7 @@ const assistantItemUpdate = (newAssistant: Assistant) => {
   refreshAssistantListSort()
 }
 
-const assistantItemDelete = (id: number) => {
+const assistantItemDelete = (id: string) => {
   assistantStore.assistantList = assistantStore.assistantList.filter((a) => a.id != id)
   assistantStore.currentAssistantId = null
 }

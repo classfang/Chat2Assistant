@@ -4,7 +4,7 @@ export const useAssistantStore = defineStore({
   id: 'assistant',
   state: () => ({
     assistantList: [] as Assistant[],
-    currentAssistantId: null as null | number
+    currentAssistantId: null as null | string
   }),
   persist: true
 })

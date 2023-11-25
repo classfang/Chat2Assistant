@@ -10,6 +10,8 @@ import OpenAI from 'openai'
 import { encodeChat } from 'gpt-tokenizer'
 import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
 import { downloadFile } from '@renderer/utils/download-util'
+import { nowTimestamp } from '@renderer/utils/date-util'
+import { randomUUID } from '@renderer/utils/id-util'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
@@ -22,7 +24,7 @@ const data = reactive({
   currentAssistant: undefined as undefined | Assistant,
   question: '',
   waitAnswer: false,
-  sessionId: new Date().getTime()
+  sessionId: randomUUID()
 })
 const { currentAssistant, question, waitAnswer } = toRefs(data)
 
@@ -70,7 +72,7 @@ const sendQuestion = async (event?: KeyboardEvent) => {
   }
 }
 
-const useBigModel = async (sessionId: number) => {
+const useBigModel = async (sessionId: string) => {
   if (!data.currentAssistant) {
     return
   }
@@ -91,11 +93,11 @@ const useBigModel = async (sessionId: number) => {
     data.waitAnswer = true
 
     data.currentAssistant.chatMessageList.push({
-      id: new Date().getTime(),
+      id: randomUUID(),
       type: 'text',
       role: 'user',
       content: question,
-      createTime: new Date().getTime()
+      createTime: nowTimestamp()
     })
     scrollToBottom()
 
@@ -116,11 +118,11 @@ const useBigModel = async (sessionId: number) => {
         return
       }
       data.currentAssistant.chatMessageList.push({
-        id: new Date().getTime(),
+        id: randomUUID(),
         type: 'text',
         role: 'assistant' as ChatRole,
         content: '',
-        createTime: new Date().getTime()
+        createTime: nowTimestamp()
       })
       scrollToBottom()
       data.waitAnswer = false
@@ -152,11 +154,11 @@ const useBigModel = async (sessionId: number) => {
       }
       console.log(`OpenAi【消息】: ${JSON.stringify(imagesResponse)}`)
       data.currentAssistant.chatMessageList.push({
-        id: new Date().getTime(),
+        id: randomUUID(),
         type: 'img',
         role: 'assistant' as ChatRole,
         content: imagesResponse.data[0].url ?? '',
-        createTime: new Date().getTime()
+        createTime: nowTimestamp()
       })
       scrollToBottom()
       data.waitAnswer = false
@@ -180,11 +182,11 @@ const useBigModel = async (sessionId: number) => {
     data.waitAnswer = true
 
     data.currentAssistant.chatMessageList.push({
-      id: new Date().getTime(),
+      id: randomUUID(),
       type: 'text',
       role: 'user',
       content: question,
-      createTime: new Date().getTime()
+      createTime: nowTimestamp()
     })
     scrollToBottom()
 
@@ -212,11 +214,11 @@ const useBigModel = async (sessionId: number) => {
       console.log(`星火服务器【消息】: ${message.data}`)
       if (data.waitAnswer) {
         data.currentAssistant.chatMessageList.push({
-          id: new Date().getTime(),
+          id: randomUUID(),
           type: 'text',
           role: 'assistant' as ChatRole,
           content: '',
-          createTime: new Date().getTime()
+          createTime: nowTimestamp()
         })
         scrollToBottom()
         data.waitAnswer = false
@@ -286,7 +288,7 @@ const scrollToBottom = () => {
 }
 
 const stopAnswer = () => {
-  data.sessionId = new Date().getTime()
+  data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
   data.waitAnswer = false
 }
