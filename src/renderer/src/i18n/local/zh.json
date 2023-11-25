@@ -27,7 +27,9 @@
       "local": "语言",
       "version": "版本",
       "currentVersion": "当前版本",
-      "downloadVersion": "下载新版"
+      "downloadVersion": "下载新版",
+      "cache": "缓存",
+      "cachePath": "缓存目录"
     },
     "openAI": {
       "name": "OpenAI",

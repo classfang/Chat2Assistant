@@ -27,7 +27,9 @@
       "local": "Language",
       "version": "Version",
       "currentVersion": "Current Version",
-      "downloadVersion": "Download new version"
+      "downloadVersion": "Download new version",
+      "cache": "Cache",
+      "cachePath": "Cache directory"
     },
     "openAI": {
       "name": "OpenAI",

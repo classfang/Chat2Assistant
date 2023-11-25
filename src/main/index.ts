@@ -6,6 +6,9 @@ import icon from '../../resources/icon.png?asset'
 import { appConfig, mainWindowConfig } from './config'
 import Store from 'electron-store'
 
+// 临时缓存目录
+const tempPath = join(app.getPath('userData'), 'temp')
+
 function createWindow(): void {
   // 创建主窗口
   const mainWindow = new BrowserWindow({
@@ -99,9 +102,8 @@ ipcMain.handle('getAppVersion', () => {
 // 保存网络文件
 ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) => {
   // 创建保存目录
-  const savePath = join(app.getPath('userData'), 'temp')
   try {
-    fs.mkdirSync(savePath)
+    fs.mkdirSync(tempPath)
   } catch (e) {
     console.log('创建目录失败：', e)
   }
@@ -111,7 +113,7 @@ ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) =>
   const blob = await fetchResp.blob()
 
   // 将blob写入文件
-  const filePath = join(savePath, fileName)
+  const filePath = join(tempPath, fileName)
 
   const fileStream = await fs.createWriteStream(filePath)
   const buffer = Buffer.from(await blob.arrayBuffer())
@@ -121,4 +123,9 @@ ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) =>
   fileStream.end()
 
   return filePath
+})
+
+// 打开缓存目录
+ipcMain.handle('openCacheDir', () => {
+  shell.openPath(tempPath)
 })

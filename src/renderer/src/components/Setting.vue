@@ -13,6 +13,10 @@ const data = reactive({
 })
 const { modalVisible, appVersion } = toRefs(data)
 
+const openCacheDir = () => {
+  window.electron.ipcRenderer.invoke('openCacheDir')
+}
+
 onMounted(() => {
   window.electron.ipcRenderer.invoke('getAppVersion').then((v) => {
     data.appVersion = `v${v}`
@@ -53,6 +57,12 @@ onMounted(() => {
                   <a-option value="zh">中文</a-option>
                   <a-option value="en">English</a-option>
                 </a-select>
+              </a-space>
+              <a-space direction="vertical" :size="10">
+                <div>{{ $t('setting.app.cache') }}</div>
+                <a-button size="mini" @click="openCacheDir()">{{
+                  $t('setting.app.cachePath')
+                }}</a-button>
               </a-space>
               <a-space direction="vertical" :size="10">
                 <div>{{ $t('setting.app.version') }}</div>
