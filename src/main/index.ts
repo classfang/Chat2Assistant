@@ -89,3 +89,8 @@ ipcMain.handle('setStoreValue', (_event, key, value) => {
 ipcMain.handle('deleteStoreValue', (_event, key) => {
   store.delete(key)
 })
+
+// 获取版本信息
+ipcMain.handle('getAppVersion', () => {
+  return app.getVersion()
+})

@@ -23,7 +23,10 @@
         "light": "明亮",
         "dark": "黑暗"
       },
-      "local": "语言"
+      "local": "语言",
+      "version": "版本",
+      "currentVersion": "当前版本",
+      "downloadVersion": "下载新版"
     },
     "openAI": {
       "name": "OpenAI",

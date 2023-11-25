@@ -1,15 +1,26 @@
 <script setup lang="ts">
 import { useSettingStore } from '@renderer/store/setting'
-import { reactive, toRefs } from 'vue'
+import { onMounted, reactive, toRefs } from 'vue'
 import { useSystemStore } from '@renderer/store/system'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
 
 const data = reactive({
-  modalVisible: false
+  modalVisible: false,
+  appVersion: '--'
 })
-const { modalVisible } = toRefs(data)
+const { modalVisible, appVersion } = toRefs(data)
+
+const downloadVersionBtnClick = () => {
+  window.open('https://github.com/classfang/Chat2Assistant/releases')
+}
+
+onMounted(() => {
+  window.electron.ipcRenderer.invoke('getAppVersion').then((v) => {
+    data.appVersion = `v${v}`
+  })
+})
 </script>
 
 <template>
@@ -39,6 +50,17 @@ const { modalVisible } = toRefs(data)
                   <a-option value="zh">中文</a-option>
                   <a-option value="en">English</a-option>
                 </a-select>
+              </a-space>
+              <a-space direction="vertical" :size="10">
+                <div>{{ $t('setting.app.version') }}</div>
+                <div>
+                  <a-space :size="20">
+                    <div>{{ $t('setting.app.currentVersion') }} {{ appVersion }}</div>
+                    <a-button size="mini" @click="downloadVersionBtnClick()">{{
+                      $t('setting.app.downloadVersion')
+                    }}</a-button>
+                  </a-space>
+                </div>
               </a-space>
             </a-space>
           </a-tab-pane>

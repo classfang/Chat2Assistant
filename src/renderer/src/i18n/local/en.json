@@ -23,7 +23,10 @@
         "light": "Light",
         "dark": "Dark"
       },
-      "local": "Language"
+      "local": "Language",
+      "version": "Version",
+      "currentVersion": "Current Version",
+      "downloadVersion": "Download new version"
     },
     "openAI": {
       "name": "OpenAI",
