@@ -8,6 +8,7 @@ import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
 import OpenAI from 'openai'
 import { encodeChat } from 'gpt-tokenizer'
+import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
@@ -69,8 +70,11 @@ const sendQuestion = async (event?: KeyboardEvent) => {
 }
 
 const useBigModel = async (sessionId: number) => {
+  if (!data.currentAssistant) {
+    return
+  }
   // 大模型调用
-  if (data.currentAssistant?.provider === 'OpenAI') {
+  if (data.currentAssistant.provider === 'OpenAI') {
     // 检查配置
     if (!settingStore.openAI.baseUrl || !settingStore.openAI.key) {
       Message.error(t('chatWindow.openAIConfgMiss'))
@@ -99,33 +103,8 @@ const useBigModel = async (sessionId: number) => {
       baseURL: settingStore.openAI.baseUrl,
       dangerouslyAllowBrowser: true
     })
-    const messages = data.currentAssistant.chatMessageList
-      .map((m) => {
-        return {
-          role: m.role,
-          content: m.content
-        }
-      })
-      .slice(-1 - data.currentAssistant.contextSize)
-    messages.unshift({
-      role: 'system',
-      content: data.currentAssistant.instruction
-    })
-    // 估算Token，如果超出了上限制则移除上下文一条消息
-    while (
-      messages.length > 2 &&
-      encodeChat(messages, data.currentAssistant.model).length >
-        data.currentAssistant.inputMaxTokens
-    ) {
-      messages.shift()
-      messages.shift()
-      messages.unshift({
-        role: 'system',
-        content: data.currentAssistant.instruction
-      })
-    }
     const stream = await openai.chat.completions.create({
-      messages: messages,
+      messages: getBigModelMessages(),
       model: data.currentAssistant.model,
       stream: true,
       max_tokens: data.currentAssistant.maxTokens
@@ -151,10 +130,119 @@ const useBigModel = async (sessionId: number) => {
       ].content += chunk.choices[0].delta.content ?? ''
       scrollToBottom()
     }
+    // 关闭等待
+    systemStore.chatWindowLoading = false
+  } else if (data.currentAssistant?.provider === 'Spark') {
+    // 检查配置
+    if (!settingStore.spark.appId || !settingStore.spark.secret || !settingStore.spark.key) {
+      Message.error(t('chatWindow.sparkConfgMiss'))
+      return
+    }
+
+    // 处理并清空问题输入
+    const question = data.question.trim()
+    data.question = ''
+
+    // 开启等待
+    systemStore.chatWindowLoading = true
+    data.waitAnswer = true
+
+    data.currentAssistant.chatMessageList.push({
+      id: new Date().getTime(),
+      role: 'user',
+      content: question,
+      createTime: new Date().getTime()
+    })
+    scrollToBottom()
   }
 
-  // 关闭等待
-  systemStore.chatWindowLoading = false
+  // 星火大模型对话
+  const sparkClient = new WebSocket(
+    getSparkWsUrl(data.currentAssistant.model, settingStore.spark.secret, settingStore.spark.key)
+  )
+  sparkClient.onopen = () => {
+    if (sessionId != data.sessionId || !data.currentAssistant) {
+      return
+    }
+    console.log('星火服务器【已连接】')
+    sparkClient.send(
+      getSparkWsRequestParam(
+        settingStore.spark.appId,
+        data.currentAssistant.model,
+        data.currentAssistant.chatMessageList
+      )
+    )
+  }
+  sparkClient.onmessage = (message) => {
+    if (sessionId != data.sessionId || !data.currentAssistant) {
+      return
+    }
+    console.log(`星火服务器【消息】: ${message.data}`)
+    if (data.waitAnswer) {
+      data.currentAssistant.chatMessageList.push({
+        id: new Date().getTime(),
+        role: 'assistant' as ChatRole,
+        content: '',
+        createTime: new Date().getTime()
+      })
+      scrollToBottom()
+      data.waitAnswer = false
+    }
+    data.currentAssistant.chatMessageList[
+      data.currentAssistant.chatMessageList.length - 1
+    ].content += JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? ''
+    scrollToBottom()
+  }
+  sparkClient.onclose = () => {
+    if (sessionId != data.sessionId) {
+      return
+    }
+    console.log('星火服务器【连接已关闭】')
+    // 关闭等待
+    data.waitAnswer = false
+    systemStore.chatWindowLoading = false
+  }
+  sparkClient.onerror = (e) => {
+    if (sessionId != data.sessionId) {
+      return
+    }
+    console.log('星火服务器【连接错误】', e)
+    // 关闭等待
+    data.waitAnswer = false
+    systemStore.chatWindowLoading = false
+  }
+}
+
+// 将历史消息处理为大模型需要的结构
+const getBigModelMessages = () => {
+  if (!data.currentAssistant) {
+    return []
+  }
+  const messages = data.currentAssistant.chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - data.currentAssistant.contextSize)
+  messages.unshift({
+    role: 'system',
+    content: data.currentAssistant.instruction
+  })
+  // 估算Token，如果超出了上限制则移除上下文一条消息
+  while (
+    messages.length > 2 &&
+    encodeChat(messages, data.currentAssistant.model).length > data.currentAssistant.inputMaxTokens
+  ) {
+    messages.shift()
+    messages.shift()
+    messages.unshift({
+      role: 'system',
+      content: data.currentAssistant.instruction
+    })
+  }
+  return messages
 }
 
 const scrollToBottom = () => {

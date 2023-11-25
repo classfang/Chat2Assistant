@@ -141,17 +141,27 @@ const assistantItemDelete = (id: number) => {
           </a-form-item>
           <a-form-item field="provider" :label="$t('assistantList.provider')">
             <a-select v-model="newForm.provider">
-              <a-option value="OpenAI">{{ $t('bigModelProvider.openAI') }}</a-option>
+              <a-option value="OpenAI" @click="() => (newForm.model = 'gpt-3.5-turbo')">{{
+                $t('bigModelProvider.openAI')
+              }}</a-option>
+              <a-option value="Spark" @click="() => (newForm.model = 'v3.1')">{{
+                $t('bigModelProvider.spark')
+              }}</a-option>
             </a-select>
           </a-form-item>
           <a-form-item field="model" :label="$t('assistantList.model')">
-            <a-select v-model="newForm.model">
+            <a-select v-if="newForm.provider === 'OpenAI'" v-model="newForm.model">
               <a-option value="gpt-4-vision-preview">gpt-4-vision-preview</a-option>
               <a-option value="gpt-4-1106-preview">gpt-4-1106-preview</a-option>
               <a-option value="gpt-4">gpt-4</a-option>
               <a-option value="gpt-4-32k">gpt-4-32k</a-option>
               <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
               <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
+            </a-select>
+            <a-select v-else-if="newForm.provider === 'Spark'" v-model="newForm.model">
+              <a-option value="v1.1">spark-v1.5</a-option>
+              <a-option value="v2.1">spark-v2.0</a-option>
+              <a-option value="v3.1">spark-v3.0</a-option>
             </a-select>
           </a-form-item>
           <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">

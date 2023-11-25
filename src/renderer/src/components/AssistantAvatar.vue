@@ -15,6 +15,9 @@ defineProps({
   <a-avatar v-if="provider === 'OpenAI'" shape="square" :size="size">
     <img alt="avatar" src="@renderer/assets/images/openai.png" />
   </a-avatar>
+  <a-avatar v-else-if="provider === 'Spark'" shape="square" :size="size">
+    <img alt="avatar" src="@renderer/assets/images/spark.png" />
+  </a-avatar>
 </template>
 
 <style lang="less" scoped></style>

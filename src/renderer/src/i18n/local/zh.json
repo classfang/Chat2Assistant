@@ -55,6 +55,8 @@
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",
     "openAIConfgMiss": "OpenAI未配置",
     "openAIError": "OpenAI调用错误，请检查你的配置",
+    "sparkConfgMiss": "星火大模型未配置",
+    "sparkError": "星火大模型调用错误，请检查你的配置",
     "stop": "停止",
     "send": "发送"
   }

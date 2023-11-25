@@ -55,6 +55,8 @@
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
     "openAIConfgMiss": "OpenAI is not configured",
     "openAIError": "OpenAI call error, please check your configuration",
+    "sparkConfgMiss": "iFLYTEK Spark is not configured",
+    "sparkError": "iFLYTEK Spark call error, please check your configuration",
     "stop": "Stop",
     "send": "Send"
   }
