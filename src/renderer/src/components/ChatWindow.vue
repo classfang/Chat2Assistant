@@ -12,6 +12,7 @@ import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-uti
 import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
+import { renderMarkdown } from '@renderer/utils/markdown-util'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
@@ -277,7 +278,7 @@ const getBigModelMessages = () => {
   // 估算Token，如果超出了上限制则移除上下文一条消息
   while (
     messages.length > 2 &&
-    encodeChat(messages, data.currentAssistant.model).length > data.currentAssistant.inputMaxTokens
+    encodeChat(messages, 'gpt-4-0314').length > data.currentAssistant.inputMaxTokens
   ) {
     messages.shift()
     messages.shift()
@@ -286,6 +287,7 @@ const getBigModelMessages = () => {
       content: data.currentAssistant.instruction
     })
   }
+  console.log(messages)
   return messages
 }
 
@@ -334,18 +336,22 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <div v-if="msg.type === 'text'" class="chat-message-content select-text">
-            <span>{{ msg.content }}</span>
-            <span
-              v-if="
-                index === currentAssistant.chatMessageList.length - 1 &&
-                msg.role === 'assistant' &&
-                systemStore.chatWindowLoading
+          <template v-if="msg.type === 'text'">
+            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
+              {{ msg.content }}
+            </div>
+            <div
+              v-else-if="msg.role === 'assistant'"
+              class="chat-message-content select-text"
+              v-html="
+                renderMarkdown(
+                  msg.content,
+                  index === currentAssistant.chatMessageList.length - 1 &&
+                    systemStore.chatWindowLoading
+                )
               "
-              class="chat-message-loading"
-              >丨</span
-            >
-          </div>
+            ></div>
+          </template>
           <div v-else-if="msg.type === 'img'" class="chat-message-img">
             <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
               <template #preview-actions>
@@ -444,7 +450,6 @@ onMounted(() => {
       gap: 15px;
 
       .chat-message-content {
-        white-space: pre-wrap;
         line-break: anywhere;
         background-color: var(--color-fill-1);
         padding: 10px;
@@ -452,7 +457,12 @@ onMounted(() => {
         min-height: 1rem;
         line-height: 1.3rem;
 
-        .chat-message-loading {
+        :deep(p) {
+          margin-block: 0;
+          margin: 0;
+        }
+
+        :deep(.chat-message-loading) {
           font-weight: 500;
           color: rgb(var(--primary-6));
           animation: alternate-hide-show 900ms ease-in-out infinite;
