@@ -1,6 +1,6 @@
 <h1 align="center">Chat2Assistant</h1>
 <h4 align="center">
-An assistant-centered ChatGPT electron client with a minimalist interface will support more models in the future✨
+一款以助手为中心的 ChatGPT Electron客户端，具有极简的界面，将在未来支持更多模型✨✨
 </h4>
 
 <h4 align="center">
@@ -9,25 +9,25 @@ An assistant-centered ChatGPT electron client with a minimalist interface will s
 
 </h4>
 
-![demo](/demo/demo.png)
+![demo](/demo/demo-zh.png)
 
-> now supported：OpenAI，iFLYTEK Spark
+> 现已支持：OpenAI，讯飞星火大模型
 
-## Project Setup
+## 项目启动
 
-### Install
+### 安装
 
 ```bash
 $ yarn
 ```
 
-### Development
+### 开发
 
 ```bash
 $ yarn dev
 ```
 
-### Build
+### 构建
 
 ```bash
 # For windows

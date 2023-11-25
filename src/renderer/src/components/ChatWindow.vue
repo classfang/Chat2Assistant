@@ -395,6 +395,7 @@ onMounted(() => {
         padding: 10px;
         border-radius: var(--border-radius-small);
         min-height: 1rem;
+        line-height: 1.3rem;
 
         .chat-message-loading {
           font-weight: 500;
