@@ -52,7 +52,11 @@
     "model": "Model",
     "maxTokens": "Generated Max Tokens",
     "inputMaxTokens": "Input Max Tokens",
-    "contextSize": "Context Size"
+    "contextSize": "Context Size",
+    "type": "Assistant Type",
+    "chat": "Chat",
+    "drawing": "Drawing",
+    "imageSize": "Image Size"
   },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",

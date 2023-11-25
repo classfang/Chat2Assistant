@@ -13,10 +13,13 @@ declare module 'gpt-tokenizer' {
 }
 
 type BigModelProvider = 'OpenAI' | 'Spark'
+type AssistantType = 'chat' | 'drawing'
+type ChatMsgType = 'text' | 'img'
 type ChatRole = 'user' | 'assistant' | 'system'
 
 interface Assistant {
   id: number
+  type: AssistantType
   name: string
   instruction: string
   provider: BigModelProvider
@@ -24,6 +27,7 @@ interface Assistant {
   inputMaxTokens: number
   maxTokens: number
   contextSize: number
+  imageSize: string
   createTime: number
   lastUpdateTime: number
   lastUseTime: number
@@ -32,6 +36,7 @@ interface Assistant {
 
 interface ChatMessage {
   id: number
+  type: ChatMsgType
   role: ChatRole
   content: string
   createTime: number

@@ -23,15 +23,7 @@ const props = defineProps({
 
 const data = reactive({
   editModalVisible: false,
-  editForm: {
-    name: '',
-    instruction: '',
-    provider: '',
-    model: '',
-    maxTokens: 0,
-    inputMaxTokens: 0,
-    contextSize: 0
-  }
+  editForm: {} as Assistant
 })
 const { editModalVisible, editForm } = toRefs(data)
 
@@ -144,59 +136,96 @@ const deleteConfirm = () => {
               :max-length="20"
             />
           </a-form-item>
-          <a-form-item field="instruction" :label="$t('assistantList.instruction')">
-            <a-textarea
-              v-model="editForm.instruction"
-              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.instruction')"
-              allow-clear
-            />
-          </a-form-item>
-          <a-form-item field="provider" :label="$t('assistantList.provider')">
-            <a-select v-model="editForm.provider">
-              <a-option value="OpenAI" @click="() => (editForm.model = 'gpt-3.5-turbo')">{{
-                $t('bigModelProvider.openAI')
-              }}</a-option>
-              <a-option value="Spark" @click="() => (editForm.model = 'v3.1')">{{
-                $t('bigModelProvider.spark')
-              }}</a-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item field="model" :label="$t('assistantList.model')">
-            <a-select v-if="editForm.provider === 'OpenAI'" v-model="editForm.model">
-              <a-option value="gpt-4-vision-preview">gpt-4-vision-preview</a-option>
-              <a-option value="gpt-4-1106-preview">gpt-4-1106-preview</a-option>
-              <a-option value="gpt-4">gpt-4</a-option>
-              <a-option value="gpt-4-32k">gpt-4-32k</a-option>
-              <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
-              <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
-            </a-select>
-            <a-select v-else-if="editForm.provider === 'Spark'" v-model="editForm.model">
-              <a-option value="v1.1">spark-v1.5</a-option>
-              <a-option value="v2.1">spark-v2.0</a-option>
-              <a-option value="v3.1">spark-v3.0</a-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
-            <a-input-number
-              v-model="editForm.maxTokens"
-              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"
-              :min="1"
-            />
-          </a-form-item>
-          <a-form-item field="inputMaxTokens" :label="$t('assistantList.inputMaxTokens')">
-            <a-input-number
-              v-model="editForm.inputMaxTokens"
-              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.inputMaxTokens')"
-              :min="1"
-            />
-          </a-form-item>
-          <a-form-item field="contextSize" :label="$t('assistantList.contextSize')">
-            <a-input-number
-              v-model="editForm.contextSize"
-              :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.contextSize')"
-              :min="0"
-            />
-          </a-form-item>
+          <!-- 对话助手参数 -->
+          <template v-if="assistant.type === 'chat'">
+            <a-form-item field="instruction" :label="$t('assistantList.instruction')">
+              <a-textarea
+                v-model="editForm.instruction"
+                :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.instruction')"
+                allow-clear
+              />
+            </a-form-item>
+            <a-form-item field="provider" :label="$t('assistantList.provider')">
+              <a-select v-model="editForm.provider">
+                <a-option value="OpenAI" @click="() => (editForm.model = 'gpt-3.5-turbo')">{{
+                  $t('bigModelProvider.openAI')
+                }}</a-option>
+                <a-option value="Spark" @click="() => (editForm.model = 'v3.1')">{{
+                  $t('bigModelProvider.spark')
+                }}</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item field="model" :label="$t('assistantList.model')">
+              <a-select v-if="editForm.provider === 'OpenAI'" v-model="editForm.model">
+                <a-option value="gpt-4-vision-preview">gpt-4-vision-preview</a-option>
+                <a-option value="gpt-4-1106-preview">gpt-4-1106-preview</a-option>
+                <a-option value="gpt-4">gpt-4</a-option>
+                <a-option value="gpt-4-32k">gpt-4-32k</a-option>
+                <a-option value="gpt-3.5-turbo">gpt-3.5-turbo</a-option>
+                <a-option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</a-option>
+              </a-select>
+              <a-select v-else-if="editForm.provider === 'Spark'" v-model="editForm.model">
+                <a-option value="v1.1">spark-v1.5</a-option>
+                <a-option value="v2.1">spark-v2.0</a-option>
+                <a-option value="v3.1">spark-v3.0</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
+              <a-input-number
+                v-model="editForm.maxTokens"
+                :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"
+                :min="1"
+              />
+            </a-form-item>
+            <a-form-item field="inputMaxTokens" :label="$t('assistantList.inputMaxTokens')">
+              <a-input-number
+                v-model="editForm.inputMaxTokens"
+                :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.inputMaxTokens')"
+                :min="1"
+              />
+            </a-form-item>
+            <a-form-item field="contextSize" :label="$t('assistantList.contextSize')">
+              <a-input-number
+                v-model="editForm.contextSize"
+                :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.contextSize')"
+                :min="0"
+              />
+            </a-form-item>
+          </template>
+          <!-- 绘画助手参数 -->
+          <template v-if="assistant.type === 'drawing'">
+            <!-- 提供商 -->
+            <a-form-item field="provider" :label="$t('assistantList.provider')">
+              <a-select v-model="editForm.provider">
+                <a-option value="OpenAI">{{ $t('bigModelProvider.openAI') }}</a-option>
+              </a-select>
+            </a-form-item>
+            <!-- 模型 -->
+            <a-form-item field="model" :label="$t('assistantList.model')">
+              <a-select v-if="editForm.provider === 'OpenAI'" v-model="editForm.model">
+                <a-option value="dall-e-2" @click="() => (editForm.imageSize = '1024x1024')"
+                  >dall-e-2</a-option
+                >
+                <a-option value="dall-e-3" @click="() => (editForm.imageSize = '1024x1024')"
+                  >dall-e-3</a-option
+                >
+              </a-select>
+            </a-form-item>
+            <!-- 图片大小 -->
+            <a-form-item field="model" :label="$t('assistantList.imageSize')">
+              <a-select v-if="editForm.provider === 'OpenAI'" v-model="editForm.imageSize">
+                <a-option v-if="editForm.model === 'dall-e-2'" value="256x256">256x256</a-option>
+                <a-option v-if="editForm.model === 'dall-e-2'" value="512x512">512x512</a-option>
+                <a-option value="1024x1024">1024x1024</a-option>
+                <a-option v-if="editForm.model === 'dall-e-3'" value="1792x1024"
+                  >1792x1024</a-option
+                >
+                <a-option v-if="editForm.model === 'dall-e-3'" value="1024x1792"
+                  >1024x1792</a-option
+                >
+              </a-select>
+            </a-form-item>
+          </template>
         </a-form>
       </div>
     </a-modal>

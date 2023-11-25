@@ -9,6 +9,7 @@ import { Message } from '@arco-design/web-vue'
 import OpenAI from 'openai'
 import { encodeChat } from 'gpt-tokenizer'
 import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
+import { downloadFile } from '@renderer/utils/download-util'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
@@ -91,48 +92,79 @@ const useBigModel = async (sessionId: number) => {
 
     data.currentAssistant.chatMessageList.push({
       id: new Date().getTime(),
+      type: 'text',
       role: 'user',
       content: question,
       createTime: new Date().getTime()
     })
     scrollToBottom()
 
-    // OpenAI对话
     const openai = new OpenAI({
       apiKey: settingStore.openAI.key,
       baseURL: settingStore.openAI.baseUrl,
       dangerouslyAllowBrowser: true
     })
-    const stream = await openai.chat.completions.create({
-      messages: getBigModelMessages(),
-      model: data.currentAssistant.model,
-      stream: true,
-      max_tokens: data.currentAssistant.maxTokens
-    })
-    if (sessionId != data.sessionId) {
-      return
-    }
-    data.currentAssistant.chatMessageList.push({
-      id: new Date().getTime(),
-      role: 'assistant' as ChatRole,
-      content: '',
-      createTime: new Date().getTime()
-    })
-    scrollToBottom()
-    data.waitAnswer = false
-    for await (const chunk of stream) {
+    if (data.currentAssistant.type === 'chat') {
+      // OpenAI对话
+      const stream = await openai.chat.completions.create({
+        messages: getBigModelMessages(),
+        model: data.currentAssistant.model,
+        stream: true,
+        max_tokens: data.currentAssistant.maxTokens
+      })
       if (sessionId != data.sessionId) {
         return
       }
-      console.log(`OpenAi【消息】: ${JSON.stringify(chunk.choices[0])}`)
-      data.currentAssistant.chatMessageList[
-        data.currentAssistant.chatMessageList.length - 1
-      ].content += chunk.choices[0].delta.content ?? ''
+      data.currentAssistant.chatMessageList.push({
+        id: new Date().getTime(),
+        type: 'text',
+        role: 'assistant' as ChatRole,
+        content: '',
+        createTime: new Date().getTime()
+      })
       scrollToBottom()
+      data.waitAnswer = false
+      for await (const chunk of stream) {
+        if (sessionId != data.sessionId) {
+          return
+        }
+        console.log(`OpenAi【消息】: ${JSON.stringify(chunk.choices[0])}`)
+        data.currentAssistant.chatMessageList[
+          data.currentAssistant.chatMessageList.length - 1
+        ].content += chunk.choices[0].delta.content ?? ''
+        scrollToBottom()
+      }
+    } else if (data.currentAssistant.type === 'drawing') {
+      const imagesResponse = await openai.images.generate({
+        prompt: question,
+        model: data.currentAssistant.model,
+        size: data.currentAssistant.imageSize as
+          | '256x256'
+          | '512x512'
+          | '1024x1024'
+          | '1792x1024'
+          | '1024x1792'
+          | null,
+        response_format: 'url'
+      })
+      if (sessionId != data.sessionId) {
+        return
+      }
+      console.log(`OpenAi【消息】: ${JSON.stringify(imagesResponse)}`)
+      data.currentAssistant.chatMessageList.push({
+        id: new Date().getTime(),
+        type: 'img',
+        role: 'assistant' as ChatRole,
+        content: imagesResponse.data[0].url ?? '',
+        createTime: new Date().getTime()
+      })
+      scrollToBottom()
+      data.waitAnswer = false
     }
+
     // 关闭等待
     systemStore.chatWindowLoading = false
-  } else if (data.currentAssistant?.provider === 'Spark') {
+  } else if (data.currentAssistant.provider === 'Spark') {
     // 检查配置
     if (!settingStore.spark.appId || !settingStore.spark.secret || !settingStore.spark.key) {
       Message.error(t('chatWindow.sparkConfgMiss'))
@@ -149,67 +181,69 @@ const useBigModel = async (sessionId: number) => {
 
     data.currentAssistant.chatMessageList.push({
       id: new Date().getTime(),
+      type: 'text',
       role: 'user',
       content: question,
       createTime: new Date().getTime()
     })
     scrollToBottom()
-  }
 
-  // 星火大模型对话
-  const sparkClient = new WebSocket(
-    getSparkWsUrl(data.currentAssistant.model, settingStore.spark.secret, settingStore.spark.key)
-  )
-  sparkClient.onopen = () => {
-    if (sessionId != data.sessionId || !data.currentAssistant) {
-      return
-    }
-    console.log('星火服务器【已连接】')
-    sparkClient.send(
-      getSparkWsRequestParam(
-        settingStore.spark.appId,
-        data.currentAssistant.model,
-        data.currentAssistant.chatMessageList
-      )
+    // 星火大模型对话
+    const sparkClient = new WebSocket(
+      getSparkWsUrl(data.currentAssistant.model, settingStore.spark.secret, settingStore.spark.key)
     )
-  }
-  sparkClient.onmessage = (message) => {
-    if (sessionId != data.sessionId || !data.currentAssistant) {
-      return
+    sparkClient.onopen = () => {
+      if (sessionId != data.sessionId || !data.currentAssistant) {
+        return
+      }
+      console.log('星火服务器【已连接】')
+      sparkClient.send(
+        getSparkWsRequestParam(
+          settingStore.spark.appId,
+          data.currentAssistant.model,
+          data.currentAssistant.chatMessageList
+        )
+      )
     }
-    console.log(`星火服务器【消息】: ${message.data}`)
-    if (data.waitAnswer) {
-      data.currentAssistant.chatMessageList.push({
-        id: new Date().getTime(),
-        role: 'assistant' as ChatRole,
-        content: '',
-        createTime: new Date().getTime()
-      })
+    sparkClient.onmessage = (message) => {
+      if (sessionId != data.sessionId || !data.currentAssistant) {
+        return
+      }
+      console.log(`星火服务器【消息】: ${message.data}`)
+      if (data.waitAnswer) {
+        data.currentAssistant.chatMessageList.push({
+          id: new Date().getTime(),
+          type: 'text',
+          role: 'assistant' as ChatRole,
+          content: '',
+          createTime: new Date().getTime()
+        })
+        scrollToBottom()
+        data.waitAnswer = false
+      }
+      data.currentAssistant.chatMessageList[
+        data.currentAssistant.chatMessageList.length - 1
+      ].content += JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? ''
       scrollToBottom()
+    }
+    sparkClient.onclose = () => {
+      if (sessionId != data.sessionId) {
+        return
+      }
+      console.log('星火服务器【连接已关闭】')
+      // 关闭等待
       data.waitAnswer = false
+      systemStore.chatWindowLoading = false
     }
-    data.currentAssistant.chatMessageList[
-      data.currentAssistant.chatMessageList.length - 1
-    ].content += JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? ''
-    scrollToBottom()
-  }
-  sparkClient.onclose = () => {
-    if (sessionId != data.sessionId) {
-      return
+    sparkClient.onerror = (e) => {
+      if (sessionId != data.sessionId) {
+        return
+      }
+      console.log('星火服务器【连接错误】', e)
+      // 关闭等待
+      data.waitAnswer = false
+      systemStore.chatWindowLoading = false
     }
-    console.log('星火服务器【连接已关闭】')
-    // 关闭等待
-    data.waitAnswer = false
-    systemStore.chatWindowLoading = false
-  }
-  sparkClient.onerror = (e) => {
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log('星火服务器【连接错误】', e)
-    // 关闭等待
-    data.waitAnswer = false
-    systemStore.chatWindowLoading = false
   }
 }
 
@@ -290,8 +324,8 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <div class="chat-message-content select-text">
-            {{ msg.content }}
+          <div v-if="msg.type === 'text'" class="chat-message-content select-text">
+            <span>{{ msg.content }}</span>
             <span
               v-if="
                 index === currentAssistant.chatMessageList.length - 1 &&
@@ -301,6 +335,17 @@ onMounted(() => {
               class="chat-message-loading"
               >丨</span
             >
+          </div>
+          <div v-else-if="msg.type === 'img'" class="chat-message-img">
+            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
+              <template #preview-actions>
+                <a-image-preview-action
+                  name="下载"
+                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
+                  ><icon-download
+                /></a-image-preview-action>
+              </template>
+            </a-image>
           </div>
         </div>
         <div v-if="waitAnswer" class="chat-message">
@@ -414,6 +459,12 @@ onMounted(() => {
             opacity: 0;
           }
         }
+      }
+
+      .chat-message-img {
+        background-color: var(--color-fill-1);
+        padding: 10px;
+        border-radius: var(--border-radius-small);
       }
     }
   }
