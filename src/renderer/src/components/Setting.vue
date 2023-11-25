@@ -50,11 +50,13 @@ onMounted(() => {
                   <a-radio :value="2">{{ $t('setting.app.theme.dark') }}</a-radio>
                 </a-radio-group>
               </a-space>
-              <a-space direction="vertical" :size="10">
+              <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.app.local') }}</div>
                 <a-select v-model="settingStore.app.locale" size="small">
                   <a-option value="zh">中文</a-option>
                   <a-option value="en">English</a-option>
+                  <a-option value="fr">Français</a-option>
+                  <a-option value="ja">日本語</a-option>
                 </a-select>
               </a-space>
               <a-space direction="vertical" :size="10">
