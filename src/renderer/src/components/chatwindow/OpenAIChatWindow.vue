@@ -155,12 +155,14 @@ const getBigModelMessages = () => {
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
 
-  const messages = data.currentAssistant.chatMessageList.map((m) => {
-    return {
-      role: m.role,
-      content: m.content
-    }
-  })
+  const messages = data.currentAssistant.chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - data.currentAssistant.contextSize)
 
   // 增加指令
   if (hasInstruction) {

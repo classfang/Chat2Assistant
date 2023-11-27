@@ -147,7 +147,7 @@ const getBigModelMessages = () => {
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
   // 将消息历史处理为user和assistant轮流对话
-  const messages = [] as { role: string; content: string }[]
+  let messages = [] as { role: string; content: string }[]
   let currentRole = 'user' as 'user' | 'assistant'
   for (let i = data.currentAssistant.chatMessageList.length - 1; i >= 0; i--) {
     const chatMessage = data.currentAssistant.chatMessageList[i]
@@ -159,8 +159,9 @@ const getBigModelMessages = () => {
       currentRole = currentRole === 'user' ? 'assistant' : 'user'
     }
   }
+  messages = messages.slice(-1 - data.currentAssistant.contextSize)
   // 必须user开头user结尾
-  if (data.currentAssistant.chatMessageList[0].role === 'assistant') {
+  if (messages[0].role === 'assistant') {
     messages.shift()
   }
   // 增加指令
