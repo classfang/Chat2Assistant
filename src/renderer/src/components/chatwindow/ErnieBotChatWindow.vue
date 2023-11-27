@@ -53,6 +53,7 @@ const sendQuestion = async (event?: KeyboardEvent) => {
 }
 
 const useBigModel = async (sessionId: string) => {
+  // 官方文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6lp69is2a
   // 检查大模型配置
   if (!settingStore.ernieBot.apiKey || !settingStore.ernieBot.secretKey) {
     Message.error(t('chatWindow.ernieBotConfgMiss'))

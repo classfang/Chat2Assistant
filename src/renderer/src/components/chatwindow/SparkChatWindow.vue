@@ -51,6 +51,7 @@ const sendQuestion = async (event?: KeyboardEvent) => {
 }
 
 const useBigModel = async (sessionId: string) => {
+  // 官方文档：https://www.xfyun.cn/doc/spark/Web.html#_1-%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E
   // 检查大模型配置
   if (!settingStore.spark.appId || !settingStore.spark.secret || !settingStore.spark.key) {
     Message.error(t('chatWindow.sparkConfgMiss'))
@@ -75,7 +76,6 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom()
 
   // 大模型调用
-
   // 星火大模型对话
   const sparkClient = new WebSocket(
     getSparkWsUrl(data.currentAssistant.model, settingStore.spark.secret, settingStore.spark.key)
