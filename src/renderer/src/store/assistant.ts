@@ -6,5 +6,11 @@ export const useAssistantStore = defineStore({
     assistantList: [] as Assistant[],
     currentAssistantId: null as null | string
   }),
+  getters: {
+    getCurrentAssistant(): Assistant {
+      console.log(this.assistantList.find((a) => a.id === this.currentAssistantId)?.id)
+      return this.assistantList.find((a) => a.id === this.currentAssistantId) ?? ({} as Assistant)
+    }
+  },
   persist: true
 })

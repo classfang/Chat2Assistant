@@ -12,28 +12,23 @@ import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { getErnieBotChatUrl } from '@renderer/utils/ernie-bot-util'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { useAssistantStore } from '@renderer/store/assistant'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
+const assistantStore = useAssistantStore()
 const { t } = useI18n()
 const abortCtr = new AbortController()
 
 const chatMessageListRef = ref()
 
-const props = defineProps({
-  currentAssistant: {
-    type: Object as () => Assistant,
-    default: () => {}
-  }
-})
-
 const data = reactive({
-  currentAssistant: props.currentAssistant,
+  currentAssistant: assistantStore.getCurrentAssistant,
   question: '',
   waitAnswer: false,
   sessionId: randomUUID()
 })
-const { question, waitAnswer } = toRefs(data)
+const { currentAssistant, question, waitAnswer } = toRefs(data)
 
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
@@ -203,104 +198,94 @@ onMounted(() => {
 
 <template>
   <div class="chat-window">
-    <template v-if="currentAssistant">
-      <div class="chat-window-header">
-        <div class="assistant-name">{{ currentAssistant?.name }}</div>
-        <div class="assistant-desc">
-          <a-space :size="10">
-            <a-tag>{{ currentAssistant?.provider }}</a-tag>
-            <a-tag>{{ currentAssistant?.model }}</a-tag>
-          </a-space>
-        </div>
+    <div class="chat-window-header">
+      <div class="assistant-name">{{ currentAssistant?.name }}</div>
+      <div class="assistant-desc">
+        <a-space :size="10">
+          <a-tag>{{ currentAssistant?.provider }}</a-tag>
+          <a-tag>{{ currentAssistant?.model }}</a-tag>
+        </a-space>
       </div>
-      <div ref="chatMessageListRef" class="chat-message-list">
-        <div
-          v-for="(msg, index) in currentAssistant.chatMessageList"
-          :key="msg.id"
-          class="chat-message"
-        >
-          <div class="chat-message-avatar">
-            <a-avatar v-if="msg.role === 'user'" shape="square" :size="30">
-              <icon-user />
-            </a-avatar>
-            <AssistantAvatar
-              v-else-if="msg.role === 'assistant'"
-              :provider="currentAssistant.provider"
-              :size="30"
-            />
-          </div>
-          <template v-if="msg.type === 'text'">
-            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-              {{ msg.content }}
-            </div>
-            <div
-              v-else-if="msg.role === 'assistant'"
-              class="chat-message-content select-text"
-              v-html="
-                renderMarkdown(
-                  msg.content,
-                  index === currentAssistant.chatMessageList.length - 1 &&
-                    systemStore.chatWindowLoading
-                )
-              "
-            ></div>
-          </template>
-          <div v-else-if="msg.type === 'img'" class="chat-message-img">
-            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
-              <template #preview-actions>
-                <a-image-preview-action
-                  name="下载"
-                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
-                  ><icon-download
-                /></a-image-preview-action>
-              </template>
-            </a-image>
-          </div>
+    </div>
+    <div ref="chatMessageListRef" class="chat-message-list">
+      <div
+        v-for="(msg, index) in currentAssistant.chatMessageList"
+        :key="msg.id"
+        class="chat-message"
+      >
+        <div class="chat-message-avatar">
+          <a-avatar v-if="msg.role === 'user'" shape="square" :size="30">
+            <icon-user />
+          </a-avatar>
+          <AssistantAvatar
+            v-else-if="msg.role === 'assistant'"
+            :provider="currentAssistant.provider"
+            :size="30"
+          />
         </div>
-        <div v-if="waitAnswer" class="chat-message">
-          <div class="chat-message-avatar">
-            <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
+        <template v-if="msg.type === 'text'">
+          <div v-if="msg.role === 'user'" class="chat-message-content select-text">
+            {{ msg.content }}
           </div>
-          <div class="chat-message-content">
-            <a-spin :size="15" />
-          </div>
-        </div>
-      </div>
-      <div class="chat-input">
-        <a-textarea
-          v-model="question"
-          class="chat-input-textarea"
-          :placeholder="$t('chatWindow.chatInputPlaceholder')"
-          :auto-size="{
-            minRows: 4,
-            maxRows: 4
-          }"
-          allow-clear
-          @keydown.enter.prevent="sendQuestion"
-        />
-        <div class="chat-input-bottom">
-          <a-button v-if="!systemStore.chatWindowLoading" size="small" @click="sendQuestion()">
-            <a-space :size="5">
-              <icon-send :size="15" />
-              <span>{{ $t('chatWindow.send') }}</span>
-            </a-space>
-          </a-button>
-          <a-button v-if="systemStore.chatWindowLoading" size="small" @click="stopAnswer()">
-            <a-space :size="5">
-              <icon-record-stop :size="15" />
-              <span>{{ $t('chatWindow.stop') }}</span>
-            </a-space>
-          </a-button>
-        </div>
-      </div>
-    </template>
-    <div v-else class="chat-window-empty">
-      <a-empty>
-        <template #image>
-          <icon-message />
+          <div
+            v-else-if="msg.role === 'assistant'"
+            class="chat-message-content select-text"
+            v-html="
+              renderMarkdown(
+                msg.content,
+                index === currentAssistant.chatMessageList.length - 1 &&
+                  systemStore.chatWindowLoading
+              )
+            "
+          ></div>
         </template>
-        {{ $t('common.slogan') }}
-      </a-empty>
+        <div v-else-if="msg.type === 'img'" class="chat-message-img">
+          <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
+            <template #preview-actions>
+              <a-image-preview-action
+                name="下载"
+                @click="downloadFile(msg.content, `img-${msg.id}.png`)"
+                ><icon-download
+              /></a-image-preview-action>
+            </template>
+          </a-image>
+        </div>
+      </div>
+      <div v-if="waitAnswer" class="chat-message">
+        <div class="chat-message-avatar">
+          <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
+        </div>
+        <div class="chat-message-content">
+          <a-spin :size="15" />
+        </div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <a-textarea
+        v-model="question"
+        class="chat-input-textarea"
+        :placeholder="$t('chatWindow.chatInputPlaceholder')"
+        :auto-size="{
+          minRows: 4,
+          maxRows: 4
+        }"
+        allow-clear
+        @keydown.enter.prevent="sendQuestion"
+      />
+      <div class="chat-input-bottom">
+        <a-button v-if="!systemStore.chatWindowLoading" size="small" @click="sendQuestion()">
+          <a-space :size="5">
+            <icon-send :size="15" />
+            <span>{{ $t('chatWindow.send') }}</span>
+          </a-space>
+        </a-button>
+        <a-button v-if="systemStore.chatWindowLoading" size="small" @click="stopAnswer()">
+          <a-space :size="5">
+            <icon-record-stop :size="15" />
+            <span>{{ $t('chatWindow.stop') }}</span>
+          </a-space>
+        </a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -397,14 +382,6 @@ onMounted(() => {
       display: flex;
       justify-content: flex-end;
     }
-  }
-
-  .chat-window-empty {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }
 </style>

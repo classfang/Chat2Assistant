@@ -3,7 +3,7 @@ import { reactive, toRefs } from 'vue'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
-import { copyObj } from '@renderer/utils/object-util'
+import { copyFields, copyObj } from '@renderer/utils/object-util'
 import AssistantItem from '@renderer/components/AssistantItem.vue'
 import Setting from '@renderer/components/Setting.vue'
 import { useSystemStore } from '@renderer/store/system'
@@ -84,7 +84,7 @@ const assistantItemUpdate = (newAssistant: Assistant) => {
   if (index < 0) {
     return
   }
-  assistantStore.assistantList[index] = newAssistant
+  copyFields(newAssistant, assistantStore.assistantList[index])
   refreshAssistantListSort()
 }
 
