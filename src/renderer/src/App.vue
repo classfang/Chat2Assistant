@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
 import AssistantList from '@renderer/components/AssistantList.vue'
-import OpenAIChatWindow from '@renderer/components/OpenAIChatWindow.vue'
-import SparkChatWindow from '@renderer/components/SparkChatWindow.vue'
-import ErnieBotChatWindow from '@renderer/components/ErnieBotChatWindow.vue'
+import OpenAIChatWindow from '@renderer/components/chatwindow/OpenAIChatWindow.vue'
+import SparkChatWindow from '@renderer/components/chatwindow/SparkChatWindow.vue'
+import ErnieBotChatWindow from '@renderer/components/chatwindow/ErnieBotChatWindow.vue'
 import { useSettingStore } from '@renderer/store/setting'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { onMounted, reactive, toRefs, watch } from 'vue'
