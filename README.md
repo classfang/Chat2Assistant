@@ -11,7 +11,7 @@ An assistant-centered ChatGPT electron client with a minimalist interface will s
 
 ![demo](/demo/demo.png)
 
-> now supported：OpenAI，iFLYTEK Spark
+> now supported：OpenAI, iFLYTEK Spark, ERNIE Bot
 
 ## Project Setup
 
