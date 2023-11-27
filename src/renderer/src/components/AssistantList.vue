@@ -169,6 +169,9 @@ const assistantItemDelete = (id: string) => {
                 <a-option value="Spark" @click="() => (newForm.model = 'v3.1')">{{
                   $t('bigModelProvider.spark')
                 }}</a-option>
+                <a-option value="ERNIEBot" @click="() => (newForm.model = 'ERNIE-Bot-turbo')">{{
+                  $t('bigModelProvider.ernieBot')
+                }}</a-option>
               </a-select>
             </a-form-item>
             <!-- 模型 -->
@@ -185,6 +188,12 @@ const assistantItemDelete = (id: string) => {
                 <a-option value="v1.1">spark-v1.5</a-option>
                 <a-option value="v2.1">spark-v2.0</a-option>
                 <a-option value="v3.1">spark-v3.0</a-option>
+              </a-select>
+              <a-select v-else-if="newForm.provider === 'ERNIEBot'" v-model="newForm.model">
+                <a-option value="ERNIE-Bot 4.0">ERNIE-Bot 4.0</a-option>
+                <a-option value="ERNIE-Bot-8K">ERNIE-Bot-8K</a-option>
+                <a-option value="ERNIE-Bot">ERNIE-Bot</a-option>
+                <a-option value="ERNIE-Bot-turbo">ERNIE-Bot-turbo</a-option>
               </a-select>
             </a-form-item>
             <!-- 生成token限制 -->

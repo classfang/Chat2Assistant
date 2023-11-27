@@ -154,6 +154,9 @@ const deleteConfirm = () => {
                 <a-option value="Spark" @click="() => (editForm.model = 'v3.1')">{{
                   $t('bigModelProvider.spark')
                 }}</a-option>
+                <a-option value="ERNIEBot" @click="() => (editForm.model = 'ERNIE-Bot-turbo')">{{
+                  $t('bigModelProvider.ernieBot')
+                }}</a-option>
               </a-select>
             </a-form-item>
             <a-form-item field="model" :label="$t('assistantList.model')">
@@ -169,6 +172,12 @@ const deleteConfirm = () => {
                 <a-option value="v1.1">spark-v1.5</a-option>
                 <a-option value="v2.1">spark-v2.0</a-option>
                 <a-option value="v3.1">spark-v3.0</a-option>
+              </a-select>
+              <a-select v-else-if="editForm.provider === 'ERNIEBot'" v-model="editForm.model">
+                <a-option value="ERNIE-Bot 4.0">ERNIE-Bot 4.0</a-option>
+                <a-option value="ERNIE-Bot-8K">ERNIE-Bot-8K</a-option>
+                <a-option value="ERNIE-Bot">ERNIE-Bot</a-option>
+                <a-option value="ERNIE-Bot-turbo">ERNIE-Bot-turbo</a-option>
               </a-select>
             </a-form-item>
             <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">

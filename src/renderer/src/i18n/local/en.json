@@ -41,11 +41,17 @@
       "appId": "APPID",
       "secret": "APISecret",
       "key": "APIKey"
+    },
+    "ernieBot": {
+      "name": "ERNIE Bot",
+      "apiKey": "API Key",
+      "secretKey": "Secret Key"
     }
   },
   "bigModelProvider": {
     "openAI": "OpenAI",
-    "spark": "iFLYTEK Spark"
+    "spark": "iFLYTEK Spark",
+    "ernieBot": "ERNIE Bot"
   },
   "assistantList": {
     "new": "New Assistant",
@@ -67,6 +73,8 @@
     "openAIError": "OpenAI call error, please check your configuration",
     "sparkConfgMiss": "iFLYTEK Spark is not configured",
     "sparkError": "iFLYTEK Spark call error, please check your configuration",
+    "ernieBotConfgMiss": "ERNIE Bot is not configured",
+    "ernieBotError": "ERNIE Bot call error, please check your configuration",
     "stop": "Stop",
     "send": "Send"
   }

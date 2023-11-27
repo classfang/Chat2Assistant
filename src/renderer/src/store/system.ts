@@ -5,5 +5,5 @@ export const useSystemStore = defineStore({
   state: () => ({
     chatWindowLoading: false
   }),
-  persist: true
+  persist: false
 })

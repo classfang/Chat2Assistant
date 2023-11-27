@@ -17,6 +17,10 @@ export const useSettingStore = defineStore({
       appId: '',
       secret: '',
       key: ''
+    },
+    ernieBot: {
+      apiKey: '',
+      secretKey: ''
     }
   }),
   persist: true

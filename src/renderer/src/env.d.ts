@@ -12,7 +12,7 @@ declare module 'gpt-tokenizer' {
   export { encodeChat }
 }
 
-type BigModelProvider = 'OpenAI' | 'Spark'
+type BigModelProvider = 'OpenAI' | 'Spark' | 'ERNIEBot'
 type AssistantType = 'chat' | 'drawing'
 type ChatMsgType = 'text' | 'img'
 type ChatRole = 'user' | 'assistant' | 'system'

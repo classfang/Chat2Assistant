@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
 import AssistantList from '@renderer/components/AssistantList.vue'
-import ChatWindow from '@renderer/components/ChatWindow.vue'
+import OpenAIChatWindow from '@renderer/components/OpenAIChatWindow.vue'
+import SparkChatWindow from '@renderer/components/SparkChatWindow.vue'
+import ErnieBotChatWindow from '@renderer/components/ErnieBotChatWindow.vue'
 import { useSettingStore } from '@renderer/store/setting'
-import { onMounted, watch } from 'vue'
+import { useAssistantStore } from '@renderer/store/assistant'
+import { onMounted, reactive, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const settingStore = useSettingStore()
+const assistantStore = useAssistantStore()
 const { locale } = useI18n()
+
+const data = reactive({
+  currentAssistant: undefined as undefined | Assistant
+})
+const { currentAssistant } = toRefs(data)
 
 // 主题设置监听
 let stopDarkThemeListener
@@ -36,11 +45,34 @@ watch(
   }
 )
 
+// 深度监听当前助手修改
+watch(
+  () => [assistantStore.currentAssistantId, assistantStore.assistantList],
+  () => {
+    getCurrentAssistant()
+  },
+  {
+    deep: true
+  }
+)
+
+const getCurrentAssistant = () => {
+  if (assistantStore.currentAssistantId) {
+    data.currentAssistant = assistantStore.assistantList.find(
+      (a) => a.id === assistantStore.currentAssistantId
+    )
+  } else {
+    data.currentAssistant = undefined
+  }
+}
+
 onMounted(() => {
   // 更新主题
   updateTheme()
   // 设置语言
   locale.value = settingStore.app.locale
+  // 获取当前助手
+  getCurrentAssistant()
 })
 </script>
 
@@ -50,7 +82,21 @@ onMounted(() => {
       <AssistantList class="assistant-list" />
     </div>
     <div class="app-body-right">
-      <ChatWindow class="chat-window" />
+      <OpenAIChatWindow
+        v-if="currentAssistant?.provider === 'OpenAI'"
+        :current-assistant="currentAssistant"
+        class="chat-window"
+      />
+      <SparkChatWindow
+        v-else-if="currentAssistant?.provider === 'Spark'"
+        :current-assistant="currentAssistant"
+        class="chat-window"
+      />
+      <ErnieBotChatWindow
+        v-else-if="currentAssistant?.provider === 'ERNIEBot'"
+        :current-assistant="currentAssistant"
+        class="chat-window"
+      />
     </div>
   </div>
 </template>

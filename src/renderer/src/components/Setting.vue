@@ -100,7 +100,7 @@ onMounted(() => {
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.officialWebsite') }}</div>
                 <a-link @click="openInBrowser('https://xinghuo.xfyun.cn')"
-                  >https://xinghuo.xfyun.cn/</a-link
+                  >https://xinghuo.xfyun.cn</a-link
                 >
               </a-space>
               <a-space direction="vertical" :size="10" fill>
@@ -114,6 +114,24 @@ onMounted(() => {
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.spark.key') }}</div>
                 <a-input-password v-model="settingStore.spark.key" size="small" />
+              </a-space>
+            </a-space>
+          </a-tab-pane>
+          <a-tab-pane key="4" :title="$t('setting.ernieBot.name')">
+            <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.officialWebsite') }}</div>
+                <a-link @click="openInBrowser('https://yiyan.baidu.com')"
+                  >https://yiyan.baidu.com</a-link
+                >
+              </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.ernieBot.apiKey') }}</div>
+                <a-input v-model="settingStore.ernieBot.apiKey" size="small" />
+              </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.ernieBot.secretKey') }}</div>
+                <a-input-password v-model="settingStore.ernieBot.secretKey" size="small" />
               </a-space>
             </a-space>
           </a-tab-pane>

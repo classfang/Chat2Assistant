@@ -41,11 +41,17 @@
       "appId": "APPID",
       "secret": "APISecret",
       "key": "APIKey"
+    },
+    "ernieBot": {
+      "name": "文心一言",
+      "apiKey": "API Key",
+      "secretKey": "Secret Key"
     }
   },
   "bigModelProvider": {
     "openAI": "OpenAI",
-    "spark": "讯飞星火"
+    "spark": "讯飞星火",
+    "ernieBot": "文心一言"
   },
   "assistantList": {
     "new": "新增助手",
@@ -67,6 +73,8 @@
     "openAIError": "OpenAI调用错误，请检查你的配置",
     "sparkConfgMiss": "星火大模型未配置",
     "sparkError": "星火大模型调用错误，请检查你的配置",
+    "ernieBotConfgMiss": "文心一言大模型未配置",
+    "ernieBotError": "文心一言大模型调用错误，请检查你的配置",
     "stop": "停止",
     "send": "发送"
   }
