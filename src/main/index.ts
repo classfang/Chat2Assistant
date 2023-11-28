@@ -19,9 +19,12 @@ const creatTempPath = () => {
   }
 }
 
+// 主窗口
+let mainWindow
+
 function createWindow(): void {
   // 创建主窗口
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: mainWindowConfig.minWidth,
     height: mainWindowConfig.minHeight,
     minWidth: mainWindowConfig.minWidth,
@@ -150,4 +153,9 @@ ipcMain.handle('readLocalImageBase64', (_event, path: string) => {
   // 将图片数据转换为Base64
   const base64Data = Buffer.from(data).toString('base64')
   return base64Data
+})
+
+// 设置代理地址
+ipcMain.handle('setProxy', (_event, proxyUrl: string) => {
+  mainWindow?.webContents.session.setProxy({ proxyRules: proxyUrl })
 })

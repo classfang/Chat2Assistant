@@ -17,10 +17,15 @@ const openCacheDir = () => {
   window.electron.ipcRenderer.invoke('openCacheDir')
 }
 
+const appProxyChange = () => {
+  window.electron.ipcRenderer.invoke('setProxy', settingStore.app.proxy)
+}
+
 onMounted(() => {
   window.electron.ipcRenderer.invoke('getAppVersion').then((v) => {
     data.appVersion = `v${v}`
   })
+  appProxyChange()
 })
 </script>
 
@@ -58,6 +63,15 @@ onMounted(() => {
                   <a-option value="en">English</a-option>
                 </a-select>
               </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.app.proxy') }}</div>
+                <a-input
+                  v-model="settingStore.app.proxy"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.app.proxy')"
+                  @change="appProxyChange()"
+                />
+              </a-space>
               <a-space direction="vertical" :size="10">
                 <div>{{ $t('setting.app.cache') }}</div>
                 <a-button size="mini" @click="openCacheDir()">{{
@@ -87,11 +101,19 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.openAI.baseUrl') }}</div>
-                <a-input v-model="settingStore.openAI.baseUrl" size="small" />
+                <a-input
+                  v-model="settingStore.openAI.baseUrl"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.openAI.baseUrl')"
+                />
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.openAI.key') }}</div>
-                <a-input-password v-model="settingStore.openAI.key" size="small" />
+                <a-input-password
+                  v-model="settingStore.openAI.key"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.openAI.key')"
+                />
               </a-space>
             </a-space>
           </a-tab-pane>
@@ -105,15 +127,27 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.spark.appId') }}</div>
-                <a-input v-model="settingStore.spark.appId" size="small" />
+                <a-input
+                  v-model="settingStore.spark.appId"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.spark.appId')"
+                />
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.spark.secret') }}</div>
-                <a-input-password v-model="settingStore.spark.secret" size="small" />
+                <a-input-password
+                  v-model="settingStore.spark.secret"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.spark.secret')"
+                />
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.spark.key') }}</div>
-                <a-input-password v-model="settingStore.spark.key" size="small" />
+                <a-input-password
+                  v-model="settingStore.spark.key"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.spark.key')"
+                />
               </a-space>
             </a-space>
           </a-tab-pane>
@@ -127,11 +161,19 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.ernieBot.apiKey') }}</div>
-                <a-input v-model="settingStore.ernieBot.apiKey" size="small" />
+                <a-input
+                  v-model="settingStore.ernieBot.apiKey"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.ernieBot.apiKey')"
+                />
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.ernieBot.secretKey') }}</div>
-                <a-input-password v-model="settingStore.ernieBot.secretKey" size="small" />
+                <a-input-password
+                  v-model="settingStore.ernieBot.secretKey"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.ernieBot.secretKey')"
+                />
               </a-space>
             </a-space>
           </a-tab-pane>

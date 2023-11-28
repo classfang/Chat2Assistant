@@ -11,7 +11,8 @@
     "deleteConfirmContent": "删除后将无法恢复。",
     "clear": "清空",
     "clearConfirm": "确认清空聊天记录吗？",
-    "clearConfirmContent": "聊天记录清空后将无法恢复。"
+    "clearConfirmContent": "聊天记录清空后将无法恢复。",
+    "loadErrorRetry": "加载失败，点击重试"
   },
   "setting": {
     "name": "设置",
@@ -29,7 +30,8 @@
       "currentVersion": "当前版本",
       "downloadVersion": "下载新版",
       "cache": "缓存",
-      "cachePath": "缓存目录"
+      "cachePath": "缓存目录",
+      "proxy": "代理地址"
     },
     "openAI": {
       "name": "OpenAI",

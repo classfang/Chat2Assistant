@@ -69,6 +69,7 @@ onMounted(() => {
 
 <template>
   <div class="app">
+    <!-- 侧边栏 -->
     <div class="app-sidebar">
       <UserAvatar :editable="true" :size="36" />
       <icon-message
@@ -87,33 +88,33 @@ onMounted(() => {
         </template>
       </Setting>
     </div>
-    <div class="app-body">
-      <template v-if="currentPage === 'chat'">
-        <div class="app-body-left">
-          <AssistantList class="assistant-list" />
-        </div>
-        <div class="app-body-right">
-          <OpenAIChatWindow
-            v-if="assistantStore.getCurrentAssistant.provider === 'OpenAI'"
-            :key="'OpenAI' + assistantStore.getCurrentAssistant.id"
-            class="chat-window"
-          />
-          <SparkChatWindow
-            v-else-if="assistantStore.getCurrentAssistant.provider === 'Spark'"
-            :key="'Spark' + assistantStore.getCurrentAssistant.id"
-            class="chat-window"
-          />
-          <ErnieBotChatWindow
-            v-else-if="assistantStore.getCurrentAssistant.provider === 'ERNIEBot'"
-            :key="'ERNIEBot' + assistantStore.getCurrentAssistant.id"
-            class="chat-window"
-          />
-          <EmptyChatWindow v-else />
-        </div>
-      </template>
-      <template v-if="currentPage === 'web-app'">
-        <WebApp />
-      </template>
+
+    <!-- 多页面 -->
+    <div v-show="currentPage === 'chat'" class="app-body">
+      <div class="app-body-left">
+        <AssistantList class="assistant-list" />
+      </div>
+      <div class="app-body-right">
+        <OpenAIChatWindow
+          v-if="assistantStore.getCurrentAssistant.provider === 'OpenAI'"
+          :key="'OpenAI' + assistantStore.getCurrentAssistant.id"
+          class="chat-window"
+        />
+        <SparkChatWindow
+          v-else-if="assistantStore.getCurrentAssistant.provider === 'Spark'"
+          :key="'Spark' + assistantStore.getCurrentAssistant.id"
+          class="chat-window"
+        />
+        <ErnieBotChatWindow
+          v-else-if="assistantStore.getCurrentAssistant.provider === 'ERNIEBot'"
+          :key="'ERNIEBot' + assistantStore.getCurrentAssistant.id"
+          class="chat-window"
+        />
+        <EmptyChatWindow v-else />
+      </div>
+    </div>
+    <div v-show="currentPage === 'web-app'" class="app-body">
+      <WebApp />
     </div>
   </div>
 </template>

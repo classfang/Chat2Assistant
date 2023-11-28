@@ -11,7 +11,8 @@
     "deleteConfirmContent": "After being deleted, it cannot be restored.",
     "clear": "Clear",
     "clearConfirm": "Are you sure to clear your chat history?",
-    "clearConfirmContent": "Chat history will not be restored after clearing."
+    "clearConfirmContent": "Chat history will not be restored after clearing.",
+    "loadErrorRetry": "Failed to load, click retry"
   },
   "setting": {
     "name": "Settings",
@@ -29,7 +30,8 @@
       "currentVersion": "Current Version",
       "downloadVersion": "Download new version",
       "cache": "Cache",
-      "cachePath": "Cache directory"
+      "cachePath": "Cache directory",
+      "proxy": "Proxy address"
     },
     "openAI": {
       "name": "OpenAI",
