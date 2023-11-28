@@ -26,9 +26,9 @@ onMounted(() => {
 
 <template>
   <div class="setting">
-    <a-button class="setting-btn" @click="modalVisible = !systemStore.chatWindowLoading">
-      <icon-settings />
-    </a-button>
+    <div @click="modalVisible = !systemStore.chatWindowLoading">
+      <slot name="default"></slot>
+    </div>
 
     <!-- 设置Modal -->
     <a-modal
@@ -141,12 +141,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="less" scoped>
-.setting {
-  .setting-btn {
-    padding: 5px;
-    height: 32px;
-    width: 32px;
-  }
-}
-</style>
+<style lang="less" scoped></style>

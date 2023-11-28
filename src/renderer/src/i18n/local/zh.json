@@ -48,6 +48,11 @@
       "secretKey": "Secret Key"
     }
   },
+  "userSetting": {
+    "name": "用户信息",
+    "selectAvatar": "选择",
+    "nickname": "昵称"
+  },
   "bigModelProvider": {
     "openAI": "OpenAI",
     "spark": "讯飞星火",

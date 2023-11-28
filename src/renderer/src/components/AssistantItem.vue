@@ -250,7 +250,6 @@ const deleteConfirm = () => {
   padding: 15px;
   background-color: var(--color-fill-1);
   border-radius: var(--border-radius-small);
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 15px;

@@ -5,7 +5,6 @@ import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
 import { copyFields, copyObj } from '@renderer/utils/object-util'
 import AssistantItem from '@renderer/components/AssistantItem.vue'
-import Setting from '@renderer/components/Setting.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
@@ -108,7 +107,6 @@ onMounted(() => {
           <span>{{ $t('assistantList.new') }}</span>
         </template>
       </a-button>
-      <Setting class="setting-btn" />
     </div>
     <div ref="assistantListRef" class="assistant-list-container">
       <AssistantItem
@@ -280,10 +278,6 @@ onMounted(() => {
     .assistant-new-btn {
       flex-grow: 1;
       padding: 10px;
-    }
-
-    .setting-btn {
-      flex-shrink: 0;
     }
   }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSystemStore } from '@renderer/store/system'
 import { onMounted, reactive, ref, toRefs } from 'vue'
+import UserAvatar from '@renderer/components/UserAvatar.vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
@@ -214,9 +215,7 @@ onMounted(() => {
         class="chat-message"
       >
         <div class="chat-message-avatar">
-          <a-avatar v-if="msg.role === 'user'" shape="square" :size="30">
-            <icon-user />
-          </a-avatar>
+          <UserAvatar v-if="msg.role === 'user'" :size="30" />
           <AssistantAvatar
             v-else-if="msg.role === 'assistant'"
             :provider="currentAssistant.provider"

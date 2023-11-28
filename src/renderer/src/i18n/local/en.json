@@ -48,6 +48,11 @@
       "secretKey": "Secret Key"
     }
   },
+  "userSetting": {
+    "name": "User Info",
+    "selectAvatar": "Select",
+    "nickname": "Nickname"
+  },
   "bigModelProvider": {
     "openAI": "OpenAI",
     "spark": "iFLYTEK Spark",

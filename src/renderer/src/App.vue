@@ -1,18 +1,27 @@
 <script setup lang="ts">
 import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
+import UserAvatar from '@renderer/components/UserAvatar.vue'
+import Setting from '@renderer/components/Setting.vue'
 import AssistantList from '@renderer/components/AssistantList.vue'
 import OpenAIChatWindow from '@renderer/components/chatwindow/OpenAIChatWindow.vue'
 import SparkChatWindow from '@renderer/components/chatwindow/SparkChatWindow.vue'
 import ErnieBotChatWindow from '@renderer/components/chatwindow/ErnieBotChatWindow.vue'
 import EmptyChatWindow from '@renderer/components/chatwindow/EmptyChatWindow.vue'
+import { useSystemStore } from '@renderer/store/system'
 import { useSettingStore } from '@renderer/store/setting'
 import { useAssistantStore } from '@renderer/store/assistant'
-import { onMounted, watch } from 'vue'
+import { onMounted, reactive, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+const systemStore = useSystemStore()
 const settingStore = useSettingStore()
 const assistantStore = useAssistantStore()
 const { locale } = useI18n()
+
+const data = reactive({
+  currentPage: 'chat'
+})
+const { currentPage } = toRefs(data)
 
 // 主题设置监听
 let stopDarkThemeListener
@@ -41,6 +50,14 @@ watch(
   }
 )
 
+// 页面切换
+const changePage = (page: string) => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
+  data.currentPage = page
+}
+
 onMounted(() => {
   // 更新主题
   updateTheme()
@@ -51,26 +68,49 @@ onMounted(() => {
 
 <template>
   <div class="app">
-    <div class="app-body-left">
-      <AssistantList class="assistant-list" />
+    <div class="app-sidebar">
+      <UserAvatar :editable="true" :size="36" />
+      <icon-message
+        class="app-siderbar-item"
+        :class="{ 'app-siderbar-item-active': currentPage === 'chat' }"
+        @click="changePage('chat')"
+      />
+      <icon-common
+        class="app-siderbar-item"
+        :class="{ 'app-siderbar-item-active': currentPage === 'collect' }"
+        @click="changePage('collect')"
+      />
+      <Setting style="margin-top: auto">
+        <template #default>
+          <icon-settings class="app-siderbar-item" />
+        </template>
+      </Setting>
     </div>
-    <div class="app-body-right">
-      <OpenAIChatWindow
-        v-if="assistantStore.getCurrentAssistant.provider === 'OpenAI'"
-        :key="'OpenAI' + assistantStore.getCurrentAssistant.id"
-        class="chat-window"
-      />
-      <SparkChatWindow
-        v-else-if="assistantStore.getCurrentAssistant.provider === 'Spark'"
-        :key="'Spark' + assistantStore.getCurrentAssistant.id"
-        class="chat-window"
-      />
-      <ErnieBotChatWindow
-        v-else-if="assistantStore.getCurrentAssistant.provider === 'ERNIEBot'"
-        :key="'ERNIEBot' + assistantStore.getCurrentAssistant.id"
-        class="chat-window"
-      />
-      <EmptyChatWindow v-else />
+    <div class="app-body">
+      <template v-if="currentPage === 'chat'">
+        <div class="app-body-left">
+          <AssistantList class="assistant-list" />
+        </div>
+        <div class="app-body-right">
+          <OpenAIChatWindow
+            v-if="assistantStore.getCurrentAssistant.provider === 'OpenAI'"
+            :key="'OpenAI' + assistantStore.getCurrentAssistant.id"
+            class="chat-window"
+          />
+          <SparkChatWindow
+            v-else-if="assistantStore.getCurrentAssistant.provider === 'Spark'"
+            :key="'Spark' + assistantStore.getCurrentAssistant.id"
+            class="chat-window"
+          />
+          <ErnieBotChatWindow
+            v-else-if="assistantStore.getCurrentAssistant.provider === 'ERNIEBot'"
+            :key="'ERNIEBot' + assistantStore.getCurrentAssistant.id"
+            class="chat-window"
+          />
+          <EmptyChatWindow v-else />
+        </div>
+      </template>
+      <template v-if="currentPage === 'collect'">todo</template>
     </div>
   </div>
 </template>
@@ -84,29 +124,57 @@ onMounted(() => {
   background-color: var(--color-bg-1);
   color: var(--color-text-1);
 
-  .app-body-left {
+  .app-sidebar {
     flex-shrink: 0;
-    width: 250px;
-    height: 100%;
-    overflow: hidden;
+    width: 60px;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--color-border-1);
+    align-items: center;
+    gap: 25px;
+    box-sizing: border-box;
+    padding: 15px 0;
+    background-color: var(--color-fill-1);
 
-    .assistant-list {
-      flex-grow: 1;
+    .app-siderbar-item {
+      font-size: 30px;
+      stroke-width: 2;
+      color: var(--color-text-2);
+    }
+
+    .app-siderbar-item-active {
+      stroke-width: 3;
+      color: rgb(var(--primary-6));
     }
   }
 
-  .app-body-right {
+  .app-body {
     flex-grow: 1;
-    height: 100%;
-    overflow: hidden;
     display: flex;
-    flex-direction: column;
+    overflow: hidden;
+    .app-body-left {
+      flex-shrink: 0;
+      width: 250px;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-border-1);
 
-    .chat-window {
+      .assistant-list {
+        flex-grow: 1;
+      }
+    }
+
+    .app-body-right {
       flex-grow: 1;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      .chat-window {
+        flex-grow: 1;
+      }
     }
   }
 }
