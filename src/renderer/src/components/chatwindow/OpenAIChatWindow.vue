@@ -4,7 +4,7 @@ import { onMounted, reactive, ref, toRefs } from 'vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
-import { Message } from '@arco-design/web-vue'
+import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
 import OpenAI from 'openai'
 import { encodeChat } from 'gpt-tokenizer'
 import { downloadFile } from '@renderer/utils/download-util'
@@ -12,6 +12,7 @@ import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -23,10 +24,11 @@ const chatMessageListRef = ref()
 const data = reactive({
   currentAssistant: assistantStore.getCurrentAssistant,
   question: '',
+  selectImageList: [] as FileItem[],
   waitAnswer: false,
   sessionId: randomUUID()
 })
-const { currentAssistant, question, waitAnswer } = toRefs(data)
+const { currentAssistant, question, selectImageList, waitAnswer } = toRefs(data)
 
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
@@ -52,21 +54,37 @@ const useBigModel = async (sessionId: string) => {
     return
   }
 
+  // 开启等待
+  systemStore.chatWindowLoading = true
+  data.waitAnswer = true
+
   // 处理并清空问题输入
   const question = data.question.trim()
   data.question = ''
 
-  // 开启等待
-  systemStore.chatWindowLoading = true
-  data.waitAnswer = true
+  // 处理并清空图片数据
+  let questionImage = ''
+  if (data.selectImageList[0]) {
+    const imagePath = data.selectImageList[0].file?.path
+    if (data.currentAssistant.model === 'gpt-4-vision-preview' && imagePath) {
+      questionImage = await window.electron.ipcRenderer.invoke(
+        'saveFileByPath',
+        imagePath,
+        `${randomUUID()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
+      )
+    }
+    data.selectImageList = []
+  }
 
   data.currentAssistant.chatMessageList.push({
     id: randomUUID(),
     type: 'text',
     role: 'user',
     content: question,
+    image: questionImage,
     createTime: nowTimestamp()
   })
+
   scrollToBottom()
 
   // 大模型调用
@@ -78,7 +96,7 @@ const useBigModel = async (sessionId: string) => {
   if (data.currentAssistant.type === 'chat') {
     // OpenAI对话
     const stream = await openai.chat.completions.create({
-      messages: getBigModelMessages(),
+      messages: (await getBigModelMessages()) as Array<ChatCompletionMessageParam>,
       model: data.currentAssistant.model,
       stream: true,
       max_tokens: data.currentAssistant.maxTokens
@@ -146,7 +164,29 @@ const useBigModel = async (sessionId: string) => {
 }
 
 // 将历史消息处理为大模型需要的结构
-const getBigModelMessages = () => {
+const getBigModelMessages = async () => {
+  // 是否是图片问题
+  const lastChatMessage =
+    data.currentAssistant.chatMessageList[data.currentAssistant.chatMessageList.length - 1]
+  if (lastChatMessage.image) {
+    const imageBase64Data = await window.electron.ipcRenderer.invoke(
+      'readLocalImageBase64',
+      lastChatMessage.image
+    )
+    return [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: lastChatMessage.content },
+          {
+            type: 'image_url',
+            image_url: `data:image/jpg;base64,${imageBase64Data}`
+          }
+        ]
+      }
+    ]
+  }
+
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
 
@@ -193,6 +233,15 @@ const stopAnswer = () => {
   data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
   data.waitAnswer = false
+}
+
+const selectImageRequest = (option: RequestOption) => {
+  const { onSuccess } = option
+  onSuccess()
+
+  return {
+    abort: () => {}
+  }
 }
 
 onMounted(() => {
@@ -277,6 +326,21 @@ onMounted(() => {
         @keydown.enter.prevent="sendQuestion"
       />
       <div class="chat-input-bottom">
+        <div
+          v-if="currentAssistant.model === 'gpt-4-vision-preview'"
+          class="chat-input-select-image"
+        >
+          <a-upload
+            :file-list="selectImageList"
+            :limit="1"
+            :custom-request="selectImageRequest"
+            accept="image/*"
+          >
+            <template #upload-button>
+              <a-button size="small">{{ $t('chatWindow.selectImage') }}</a-button>
+            </template>
+          </a-upload>
+        </div>
         <a-button v-if="!systemStore.chatWindowLoading" size="small" @click="sendQuestion()">
           <a-space :size="5">
             <icon-send :size="15" />
@@ -384,7 +448,25 @@ onMounted(() => {
       box-sizing: border-box;
       padding: 5px 15px 15px 15px;
       display: flex;
+      align-items: center;
       justify-content: flex-end;
+
+      .chat-input-select-image {
+        margin-right: auto;
+        max-width: 200px;
+
+        :deep(.arco-upload-wrapper) {
+          display: flex;
+          .arco-upload-list-item-content {
+            background-color: transparent;
+            padding: 0;
+            transition: none;
+          }
+          .arco-upload-progress {
+            display: none;
+          }
+        }
+      }
     }
   }
 }

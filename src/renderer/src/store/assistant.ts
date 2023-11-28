@@ -8,7 +8,6 @@ export const useAssistantStore = defineStore({
   }),
   getters: {
     getCurrentAssistant(): Assistant {
-      console.log(this.assistantList.find((a) => a.id === this.currentAssistantId)?.id)
       return this.assistantList.find((a) => a.id === this.currentAssistantId) ?? ({} as Assistant)
     }
   },

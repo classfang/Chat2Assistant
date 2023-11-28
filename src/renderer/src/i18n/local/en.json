@@ -76,6 +76,7 @@
     "ernieBotConfgMiss": "ERNIE Bot is not configured",
     "ernieBotError": "ERNIE Bot call error, please check your configuration",
     "stop": "Stop",
-    "send": "Send"
+    "send": "Send",
+    "selectImage": "Select image"
   }
 }

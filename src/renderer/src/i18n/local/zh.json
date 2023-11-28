@@ -76,6 +76,7 @@
     "ernieBotConfgMiss": "文心一言大模型未配置",
     "ernieBotError": "文心一言大模型调用错误，请检查你的配置",
     "stop": "停止",
-    "send": "发送"
+    "send": "发送",
+    "selectImage": "选择图片"
   }
 }

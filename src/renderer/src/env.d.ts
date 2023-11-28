@@ -39,5 +39,6 @@ interface ChatMessage {
   type: ChatMsgType
   role: ChatRole
   content: string
+  image?: string
   createTime: number
 }

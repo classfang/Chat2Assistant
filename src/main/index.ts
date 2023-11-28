@@ -8,6 +8,16 @@ import Store from 'electron-store'
 
 // 临时缓存目录
 const tempPath = join(app.getPath('userData'), 'temp')
+const creatTempPath = () => {
+  // 创建保存目录
+  try {
+    fs.mkdirSync(tempPath)
+  } catch (e: any) {
+    if (e.code != 'EEXIST') {
+      console.log('创建目录失败：', e)
+    }
+  }
+}
 
 function createWindow(): void {
   // 创建主窗口
@@ -58,6 +68,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  creatTempPath()
+
   createWindow()
 
   app.on('activate', function () {
@@ -101,13 +113,7 @@ ipcMain.handle('getAppVersion', () => {
 
 // 保存网络文件
 ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) => {
-  // 创建保存目录
-  try {
-    fs.mkdirSync(tempPath)
-  } catch (e) {
-    console.log('创建目录失败：', e)
-  }
-
+  creatTempPath()
   // 请求文件
   const fetchResp = await fetch(url)
   const blob = await fetchResp.blob()
@@ -122,7 +128,25 @@ ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) =>
   return filePath
 })
 
+// 保存本地文件
+ipcMain.handle('saveFileByPath', async (_event, path: string, fileName: string) => {
+  creatTempPath()
+  const filePath = join(tempPath, fileName)
+  fs.copyFileSync(path, filePath)
+
+  return filePath
+})
+
 // 打开缓存目录
 ipcMain.handle('openCacheDir', () => {
   shell.openPath(tempPath)
+})
+
+// 读取本地图片为base64字符串
+ipcMain.handle('readLocalImageBase64', (_event, path: string) => {
+  // 读取图片文件
+  const data = fs.readFileSync(path)
+  // 将图片数据转换为Base64
+  const base64Data = Buffer.from(data).toString('base64')
+  return base64Data
 })
