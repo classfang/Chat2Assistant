@@ -236,7 +236,8 @@ const stopAnswer = () => {
 }
 
 const selectImageRequest = (option: RequestOption) => {
-  const { onSuccess } = option
+  const { fileItem, onSuccess } = option
+  data.selectImageList = [fileItem]
   onSuccess()
 
   return {
@@ -278,7 +279,23 @@ onMounted(() => {
         </div>
         <template v-if="msg.type === 'text'">
           <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-            {{ msg.content }}
+            <div>{{ msg.content }}</div>
+            <a-image
+              v-if="msg.image"
+              width="300"
+              height="300"
+              :src="`file://${msg.image}`"
+              show-loader
+              fit="cover"
+            >
+              <template #preview-actions>
+                <a-image-preview-action
+                  name="下载"
+                  @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
+                  ><icon-download
+                /></a-image-preview-action>
+              </template>
+            </a-image>
           </div>
           <div
             v-else-if="msg.role === 'assistant'"
@@ -402,6 +419,9 @@ onMounted(() => {
         border-radius: var(--border-radius-small);
         min-height: 1rem;
         line-height: 1.3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
 
         :deep(p) {
           margin-block: 0;
