@@ -31,8 +31,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      webSecurity: false // 允许跨域
+      sandbox: false, // 允许渲染进程通信（window.electron）
+      webSecurity: false // 允许跨域请求、file协议加载本地文件等
     }
   })
 
