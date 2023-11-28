@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, toRefs } from 'vue'
+import { onMounted, reactive, ref, toRefs } from 'vue'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
@@ -9,10 +9,13 @@ import Setting from '@renderer/components/Setting.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
+import Sortable from 'sortablejs'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
 const { t } = useI18n()
+
+const assistantListRef = ref()
 
 const newFormDefault = {
   name: '',
@@ -32,32 +35,21 @@ const data = reactive({
 })
 const { newModalVisible, newForm } = toRefs(data)
 
-const refreshAssistantListSort = () => {
-  assistantStore.assistantList.sort(
-    (a1, a2) =>
-      Math.max(a2.createTime, a2.lastUpdateTime, a2.lastUseTime) -
-      Math.max(a1.createTime, a1.lastUpdateTime, a1.lastUseTime)
-  )
-}
-
 const handleNewModalBeforeOk = async () => {
   await new Promise<void>((resolve, reject) => {
     if (!data.newForm.name) {
       Message.error(`${t('assistantList.name')} ${t('common.required')}`)
       reject()
     }
-    assistantStore.assistantList.push(
+    assistantStore.assistantList.unshift(
       copyObj({
         ...data.newForm,
         id: randomUUID(),
         createTime: nowTimestamp(),
         lastUpdateTime: nowTimestamp(),
-        lastUseTime: nowTimestamp(),
         chatMessageList: []
       })
     )
-    refreshAssistantListSort()
-
     resolve()
   })
   return true
@@ -85,13 +77,23 @@ const assistantItemUpdate = (newAssistant: Assistant) => {
     return
   }
   copyFields(newAssistant, assistantStore.assistantList[index])
-  refreshAssistantListSort()
 }
 
 const assistantItemDelete = (id: string) => {
   assistantStore.assistantList = assistantStore.assistantList.filter((a) => a.id != id)
   assistantStore.currentAssistantId = null
 }
+
+onMounted(() => {
+  new Sortable(assistantListRef.value, {
+    animation: 150,
+    onEnd: (event) => {
+      const { oldIndex, newIndex } = event
+      const movedItem = assistantStore.assistantList.splice(oldIndex, 1)[0]
+      assistantStore.assistantList.splice(newIndex, 0, movedItem)
+    }
+  })
+})
 </script>
 
 <template>
@@ -107,7 +109,7 @@ const assistantItemDelete = (id: string) => {
       </a-button>
       <Setting class="setting-btn" />
     </div>
-    <div class="assistant-list-container">
+    <div ref="assistantListRef" class="assistant-list-container">
       <AssistantItem
         v-for="a in assistantStore.assistantList"
         :key="a.id"

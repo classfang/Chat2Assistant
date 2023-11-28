@@ -5,6 +5,7 @@ import { reactive, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useSystemStore } from '@renderer/store/system'
+import { nowTimestamp } from '@renderer/utils/date-util'
 
 const systemStore = useSystemStore()
 
@@ -43,7 +44,7 @@ const handleEditModalBeforeOk = async () => {
       Message.error(`${t('assistantList.name')} ${t('common.required')}`)
       reject()
     }
-
+    data.editForm.lastUpdateTime = nowTimestamp()
     emits('update', data.editForm)
 
     resolve()

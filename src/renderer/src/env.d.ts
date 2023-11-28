@@ -30,7 +30,6 @@ interface Assistant {
   imageSize: string
   createTime: number
   lastUpdateTime: number
-  lastUseTime: number
   chatMessageList: ChatMessage[]
 }
 
