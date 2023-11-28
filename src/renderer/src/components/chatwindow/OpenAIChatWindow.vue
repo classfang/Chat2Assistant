@@ -33,7 +33,12 @@ const { currentAssistant, question, selectImageList, waitAnswer } = toRefs(data)
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
   if (systemStore.chatWindowLoading || !data.question.trim() || event?.isComposing) {
+    event?.preventDefault()
     return
+  } else if (event?.shiftKey) {
+    return
+  } else {
+    event?.preventDefault()
   }
 
   // 大模型调用
@@ -340,7 +345,7 @@ onMounted(() => {
           maxRows: 4
         }"
         allow-clear
-        @keydown.enter.prevent="sendQuestion"
+        @keydown.enter="sendQuestion"
       />
       <div class="chat-input-bottom">
         <div
