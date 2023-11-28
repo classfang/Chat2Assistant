@@ -12,6 +12,7 @@ import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
+import { scrollToBottom } from '@renderer/utils/element-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -73,7 +74,7 @@ const useBigModel = async (sessionId: string) => {
     content: question,
     createTime: nowTimestamp()
   })
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
   // 星火大模型对话
@@ -106,13 +107,13 @@ const useBigModel = async (sessionId: string) => {
         content: '',
         createTime: nowTimestamp()
       })
-      scrollToBottom()
+      scrollToBottom(chatMessageListRef.value)
       data.waitAnswer = false
     }
     data.currentAssistant.chatMessageList[
       data.currentAssistant.chatMessageList.length - 1
     ].content += JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? ''
-    scrollToBottom()
+    scrollToBottom(chatMessageListRef.value)
   }
   sparkClient.onclose = () => {
     if (sessionId != data.sessionId) {
@@ -167,12 +168,6 @@ const getBigModelMessages = () => {
   return messages
 }
 
-const scrollToBottom = () => {
-  setTimeout(() => {
-    chatMessageListRef.value.scrollTop = chatMessageListRef.value.scrollHeight
-  }, 0)
-}
-
 const stopAnswer = () => {
   data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
@@ -180,7 +175,7 @@ const stopAnswer = () => {
 }
 
 onMounted(() => {
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 })
 </script>
 

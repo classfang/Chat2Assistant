@@ -13,6 +13,7 @@ import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { getErnieBotChatUrl } from '@renderer/utils/ernie-bot-util'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
+import { scrollToBottom } from '@renderer/utils/element-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -75,7 +76,7 @@ const useBigModel = async (sessionId: string) => {
     content: question,
     createTime: nowTimestamp()
   })
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
   // 文心一言模型对话
@@ -111,13 +112,13 @@ const useBigModel = async (sessionId: string) => {
             content: '',
             createTime: nowTimestamp()
           })
-          scrollToBottom()
+          scrollToBottom(chatMessageListRef.value)
           data.waitAnswer = false
         }
         data.currentAssistant.chatMessageList[
           data.currentAssistant.chatMessageList.length - 1
         ].content += JSON.parse(e.data).result ?? ''
-        scrollToBottom()
+        scrollToBottom(chatMessageListRef.value)
       },
       onclose: () => {
         console.log('文心一言大模型关闭连接')
@@ -183,12 +184,6 @@ const getBigModelMessages = () => {
   return messages
 }
 
-const scrollToBottom = () => {
-  setTimeout(() => {
-    chatMessageListRef.value.scrollTop = chatMessageListRef.value.scrollHeight
-  }, 0)
-}
-
 const stopAnswer = () => {
   data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
@@ -197,7 +192,7 @@ const stopAnswer = () => {
 }
 
 onMounted(() => {
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 })
 </script>
 

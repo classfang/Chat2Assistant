@@ -13,6 +13,7 @@ import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import { scrollToBottom } from '@renderer/utils/element-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -90,7 +91,7 @@ const useBigModel = async (sessionId: string) => {
     createTime: nowTimestamp()
   })
 
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
   const openai = new OpenAI({
@@ -116,7 +117,7 @@ const useBigModel = async (sessionId: string) => {
       content: '',
       createTime: nowTimestamp()
     })
-    scrollToBottom()
+    scrollToBottom(chatMessageListRef.value)
     data.waitAnswer = false
     for await (const chunk of stream) {
       if (sessionId != data.sessionId) {
@@ -126,7 +127,7 @@ const useBigModel = async (sessionId: string) => {
       data.currentAssistant.chatMessageList[
         data.currentAssistant.chatMessageList.length - 1
       ].content += chunk.choices[0].delta.content ?? ''
-      scrollToBottom()
+      scrollToBottom(chatMessageListRef.value)
     }
   } else if (data.currentAssistant.type === 'drawing') {
     const imagesResponse = await openai.images.generate({
@@ -160,7 +161,7 @@ const useBigModel = async (sessionId: string) => {
       content: `file://${imageUrl}`,
       createTime: nowTimestamp()
     })
-    scrollToBottom()
+    scrollToBottom(chatMessageListRef.value)
     data.waitAnswer = false
   }
 
@@ -228,12 +229,6 @@ const getBigModelMessages = async () => {
   return messages
 }
 
-const scrollToBottom = () => {
-  setTimeout(() => {
-    chatMessageListRef.value.scrollTop = chatMessageListRef.value.scrollHeight
-  }, 0)
-}
-
 const stopAnswer = () => {
   data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
@@ -251,7 +246,7 @@ const selectImageRequest = (option: RequestOption) => {
 }
 
 onMounted(() => {
-  scrollToBottom()
+  scrollToBottom(chatMessageListRef.value)
 })
 </script>
 
