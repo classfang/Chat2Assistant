@@ -32,7 +32,8 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false, // 允许渲染进程通信（window.electron）
-      webSecurity: false // 允许跨域请求、file协议加载本地文件等
+      webSecurity: false, // 允许跨域请求、file协议加载本地文件等
+      webviewTag: true // 启动webview
     }
   })
 

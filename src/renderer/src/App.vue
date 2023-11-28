@@ -3,6 +3,7 @@ import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
 import UserAvatar from '@renderer/components/UserAvatar.vue'
 import Setting from '@renderer/components/Setting.vue'
 import AssistantList from '@renderer/components/AssistantList.vue'
+import WebApp from '@renderer/components/WebApp.vue'
 import OpenAIChatWindow from '@renderer/components/chatwindow/OpenAIChatWindow.vue'
 import SparkChatWindow from '@renderer/components/chatwindow/SparkChatWindow.vue'
 import ErnieBotChatWindow from '@renderer/components/chatwindow/ErnieBotChatWindow.vue'
@@ -77,8 +78,8 @@ onMounted(() => {
       />
       <icon-common
         class="app-siderbar-item"
-        :class="{ 'app-siderbar-item-active': currentPage === 'collect' }"
-        @click="changePage('collect')"
+        :class="{ 'app-siderbar-item-active': currentPage === 'web-app' }"
+        @click="changePage('web-app')"
       />
       <Setting style="margin-top: auto">
         <template #default>
@@ -110,7 +111,9 @@ onMounted(() => {
           <EmptyChatWindow v-else />
         </div>
       </template>
-      <template v-if="currentPage === 'collect'">todo</template>
+      <template v-if="currentPage === 'web-app'">
+        <WebApp />
+      </template>
     </div>
   </div>
 </template>
