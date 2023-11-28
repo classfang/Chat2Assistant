@@ -85,6 +85,7 @@ const assistantItemDelete = (id: string) => {
 }
 
 onMounted(() => {
+  // 拖拽排序
   new Sortable(assistantListRef.value, {
     animation: 150,
     onEnd: (event) => {
