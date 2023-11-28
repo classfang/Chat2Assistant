@@ -84,6 +84,12 @@
     "ernieBotError": "文心一言大模型调用错误，请检查你的配置",
     "stop": "停止",
     "send": "发送",
-    "selectImage": "选择图片"
+    "selectImage": "选择图片",
+    "copy": "复制",
+    "multipleChoice": "多选",
+    "selectSuccess": "已添加至收藏夹"
+  },
+  "collectionSet": {
+    "search": "搜索收藏"
   }
 }

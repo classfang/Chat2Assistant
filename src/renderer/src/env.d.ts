@@ -41,3 +41,9 @@ interface ChatMessage {
   image?: string
   createTime: number
 }
+
+interface ChatMessageSet {
+  id: string
+  chatMessageList: ChatMessage[]
+  createTime: number
+}

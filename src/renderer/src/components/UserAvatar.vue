@@ -4,6 +4,7 @@ import { useSystemStore } from '@renderer/store/system'
 import { reactive, toRefs } from 'vue'
 import { FileItem, RequestOption } from '@arco-design/web-vue'
 import { randomUUID } from '@renderer/utils/id-util'
+import { saveFileByPath } from '@renderer/utils/main-thread-util'
 
 const userStore = useUserStore()
 const systemStore = useSystemStore()
@@ -30,16 +31,13 @@ const selectImageRequest = (option: RequestOption) => {
   const imagePath = fileItem.file?.path
   if (imagePath) {
     data.avatarFile = fileItem
-    window.electron.ipcRenderer
-      .invoke(
-        'saveFileByPath',
-        imagePath,
-        `${randomUUID()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
-      )
-      .then((res) => {
-        userStore.avatar = `file://${res}`
-        onSuccess()
-      })
+    saveFileByPath(
+      imagePath,
+      `${randomUUID()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
+    ).then((res) => {
+      userStore.avatar = `file://${res}`
+      onSuccess()
+    })
   }
 
   return {

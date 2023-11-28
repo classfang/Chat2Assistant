@@ -3,6 +3,7 @@ import { useSettingStore } from '@renderer/store/setting'
 import { onMounted, reactive, toRefs } from 'vue'
 import { useSystemStore } from '@renderer/store/system'
 import { openInBrowser } from '@renderer/utils/window-util'
+import { openCacheDir, setProxy, getAppVersion } from '@renderer/utils/main-thread-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -13,19 +14,11 @@ const data = reactive({
 })
 const { modalVisible, appVersion } = toRefs(data)
 
-const openCacheDir = () => {
-  window.electron.ipcRenderer.invoke('openCacheDir')
-}
-
-const appProxyChange = () => {
-  window.electron.ipcRenderer.invoke('setProxy', settingStore.app.proxy)
-}
-
 onMounted(() => {
-  window.electron.ipcRenderer.invoke('getAppVersion').then((v) => {
+  getAppVersion().then((v) => {
     data.appVersion = `v${v}`
   })
-  appProxyChange()
+  setProxy(settingStore.app.proxy)
 })
 </script>
 
@@ -69,7 +62,7 @@ onMounted(() => {
                   v-model="settingStore.app.proxy"
                   size="small"
                   :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.app.proxy')"
-                  @change="appProxyChange()"
+                  @change="setProxy(settingStore.app.proxy)"
                 />
               </a-space>
               <a-space direction="vertical" :size="10">

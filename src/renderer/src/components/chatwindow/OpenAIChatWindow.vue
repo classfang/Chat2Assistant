@@ -3,6 +3,7 @@ import { useSystemStore } from '@renderer/store/system'
 import { onMounted, reactive, ref, toRefs } from 'vue'
 import UserAvatar from '@renderer/components/UserAvatar.vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
+import MultipleChoiceConsole from '@renderer/components/chatwindow/MultipleChoiceConsole.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
@@ -14,7 +15,13 @@ import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import { clipboardWriteText } from '@renderer/utils/main-thread-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
+import {
+  readLocalImageBase64,
+  saveFileByPath,
+  saveFileByUrl
+} from '@renderer/utils/main-thread-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -24,13 +31,22 @@ const { t } = useI18n()
 const chatMessageListRef = ref()
 
 const data = reactive({
+  sessionId: randomUUID(),
   currentAssistant: assistantStore.getCurrentAssistant,
   question: '',
   selectImageList: [] as FileItem[],
   waitAnswer: false,
-  sessionId: randomUUID()
+  multipleChoiceFlag: false,
+  multipleChoiceList: [] as string[]
 })
-const { currentAssistant, question, selectImageList, waitAnswer } = toRefs(data)
+const {
+  currentAssistant,
+  question,
+  selectImageList,
+  waitAnswer,
+  multipleChoiceFlag,
+  multipleChoiceList
+} = toRefs(data)
 
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
@@ -74,8 +90,7 @@ const useBigModel = async (sessionId: string) => {
   if (data.selectImageList[0]) {
     const imagePath = data.selectImageList[0].file?.path
     if (data.currentAssistant.model === 'gpt-4-vision-preview' && imagePath) {
-      questionImage = await window.electron.ipcRenderer.invoke(
-        'saveFileByPath',
+      questionImage = await saveFileByPath(
         imagePath,
         `${randomUUID()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
       )
@@ -149,11 +164,7 @@ const useBigModel = async (sessionId: string) => {
     console.log(`OpenAi【消息】: ${JSON.stringify(imagesResponse)}`)
     let imageUrl = imagesResponse.data[0].url ?? ''
     if (imageUrl) {
-      imageUrl = await window.electron.ipcRenderer.invoke(
-        'saveFileByUrl',
-        imagesResponse.data[0].url,
-        `${randomUUID()}.png`
-      )
+      imageUrl = await saveFileByUrl(imageUrl, `${randomUUID()}.png`)
     }
     data.currentAssistant.chatMessageList.push({
       id: randomUUID(),
@@ -176,10 +187,7 @@ const getBigModelMessages = async () => {
   const lastChatMessage =
     data.currentAssistant.chatMessageList[data.currentAssistant.chatMessageList.length - 1]
   if (lastChatMessage.image) {
-    const imageBase64Data = await window.electron.ipcRenderer.invoke(
-      'readLocalImageBase64',
-      lastChatMessage.image
-    )
+    const imageBase64Data = await readLocalImageBase64(lastChatMessage.image)
     return [
       {
         role: 'user',
@@ -246,6 +254,26 @@ const selectImageRequest = (option: RequestOption) => {
   }
 }
 
+const multipleChoiceChange = (id: string) => {
+  if (data.multipleChoiceList.includes(id)) {
+    data.multipleChoiceList = data.multipleChoiceList.filter((i) => i != id)
+  } else {
+    data.multipleChoiceList.push(id)
+  }
+}
+
+const multipleChoiceOpen = () => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
+  data.multipleChoiceFlag = true
+}
+
+const multipleChoiceClose = () => {
+  data.multipleChoiceList = []
+  data.multipleChoiceFlag = false
+}
+
 onMounted(() => {
   scrollToBottom(chatMessageListRef.value)
 })
@@ -263,63 +291,73 @@ onMounted(() => {
       </div>
     </div>
     <div ref="chatMessageListRef" class="chat-message-list">
-      <div
+      <a-dropdown
         v-for="(msg, index) in currentAssistant.chatMessageList"
         :key="msg.id"
-        class="chat-message"
+        :align-point="true"
+        trigger="contextMenu"
       >
-        <div class="chat-message-avatar">
-          <UserAvatar v-if="msg.role === 'user'" :size="30" />
-          <AssistantAvatar
-            v-else-if="msg.role === 'assistant'"
-            :provider="currentAssistant.provider"
-            :size="30"
-          />
-        </div>
-        <template v-if="msg.type === 'text'">
-          <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-            <div>{{ msg.content }}</div>
-            <a-image
-              v-if="msg.image"
-              width="300"
-              height="300"
-              :src="`file://${msg.image}`"
-              show-loader
-              fit="cover"
-            >
+        <div class="chat-message">
+          <a-checkbox v-if="multipleChoiceFlag" @change="multipleChoiceChange(msg.id)" />
+          <div class="chat-message-avatar">
+            <UserAvatar v-if="msg.role === 'user'" :size="30" />
+            <AssistantAvatar
+              v-else-if="msg.role === 'assistant'"
+              :provider="currentAssistant.provider"
+              :size="30"
+            />
+          </div>
+          <template v-if="msg.type === 'text'">
+            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
+              <div>{{ msg.content }}</div>
+              <a-image
+                v-if="msg.image"
+                width="300"
+                height="300"
+                :src="`file://${msg.image}`"
+                show-loader
+                fit="cover"
+              >
+                <template #preview-actions>
+                  <a-image-preview-action
+                    name="下载"
+                    @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
+                    ><icon-download
+                  /></a-image-preview-action>
+                </template>
+              </a-image>
+            </div>
+            <div
+              v-else-if="msg.role === 'assistant'"
+              class="chat-message-content select-text"
+              v-html="
+                renderMarkdown(
+                  msg.content,
+                  index === currentAssistant.chatMessageList.length - 1 &&
+                    systemStore.chatWindowLoading
+                )
+              "
+            ></div>
+          </template>
+          <div v-else-if="msg.type === 'img'" class="chat-message-img">
+            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
               <template #preview-actions>
                 <a-image-preview-action
                   name="下载"
-                  @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
+                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
                   ><icon-download
                 /></a-image-preview-action>
               </template>
             </a-image>
           </div>
-          <div
-            v-else-if="msg.role === 'assistant'"
-            class="chat-message-content select-text"
-            v-html="
-              renderMarkdown(
-                msg.content,
-                index === currentAssistant.chatMessageList.length - 1 &&
-                  systemStore.chatWindowLoading
-              )
-            "
-          ></div>
-        </template>
-        <div v-else-if="msg.type === 'img'" class="chat-message-img">
-          <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
-            <template #preview-actions>
-              <a-image-preview-action
-                name="下载"
-                @click="downloadFile(msg.content, `img-${msg.id}.png`)"
-                ><icon-download
-              /></a-image-preview-action>
-            </template>
-          </a-image>
         </div>
-      </div>
+        <template #content>
+          <a-doption @click="clipboardWriteText(msg.content)">{{
+            $t('chatWindow.copy')
+          }}</a-doption>
+          <a-doption @click="multipleChoiceOpen()">{{ $t('chatWindow.multipleChoice') }}</a-doption>
+        </template>
+      </a-dropdown>
       <div v-if="waitAnswer" class="chat-message">
         <div class="chat-message-avatar">
           <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
@@ -369,6 +407,12 @@ onMounted(() => {
             <span>{{ $t('chatWindow.stop') }}</span>
           </a-space>
         </a-button>
+        <MultipleChoiceConsole
+          v-if="multipleChoiceFlag"
+          :current-assistant="currentAssistant"
+          :multiple-choice-list="multipleChoiceList"
+          @close="multipleChoiceClose()"
+        />
       </div>
     </div>
   </div>
@@ -457,6 +501,7 @@ onMounted(() => {
   .chat-input {
     flex-shrink: 0;
     border-top: 1px solid var(--color-border-1);
+    position: relative;
 
     .chat-input-textarea {
       border: none;

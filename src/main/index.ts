@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, clipboard } from 'electron'
 import { join } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -158,4 +158,9 @@ ipcMain.handle('readLocalImageBase64', (_event, path: string) => {
 // 设置代理地址
 ipcMain.handle('setProxy', (_event, proxyUrl: string) => {
   mainWindow?.webContents.session.setProxy({ proxyRules: proxyUrl })
+})
+
+// 复制文本到剪贴板
+ipcMain.handle('clipboardWriteText', (_event, text: string) => {
+  clipboard.writeText(text)
 })

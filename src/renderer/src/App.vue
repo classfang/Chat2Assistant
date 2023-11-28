@@ -146,7 +146,7 @@ onMounted(() => {
     gap: 25px;
     box-sizing: border-box;
     padding: 15px 0;
-    background-color: var(--color-fill-1);
+    background-color: var(--color-fill-2);
 
     .app-siderbar-item {
       font-size: 30px;

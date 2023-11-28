@@ -3,7 +3,7 @@
     "slogan": "The era of artificial intelligence has dawned.",
     "ok": "Confirm",
     "cancel": "Cancel",
-    "pleaseEnter": "Please Enter",
+    "pleaseEnter": "Please enter",
     "required": "is required",
     "edit": "Edit",
     "delete": "Delete",
@@ -84,6 +84,12 @@
     "ernieBotError": "ERNIE Bot call error, please check your configuration",
     "stop": "Stop",
     "send": "Send",
-    "selectImage": "Select image"
+    "selectImage": "Select image",
+    "copy": "Copy",
+    "multipleChoice": "Multiple choice",
+    "selectSuccess": "Added to favorites"
+  },
+  "collectionSet": {
+    "search": "Search favorites"
   }
 }
