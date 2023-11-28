@@ -4,6 +4,7 @@ import UserAvatar from '@renderer/components/UserAvatar.vue'
 import Setting from '@renderer/components/Setting.vue'
 import AssistantList from '@renderer/components/AssistantList.vue'
 import WebApp from '@renderer/components/WebApp.vue'
+import CollectionSet from '@renderer/components/CollectionSet.vue'
 import OpenAIChatWindow from '@renderer/components/chatwindow/OpenAIChatWindow.vue'
 import SparkChatWindow from '@renderer/components/chatwindow/SparkChatWindow.vue'
 import ErnieBotChatWindow from '@renderer/components/chatwindow/ErnieBotChatWindow.vue'
@@ -79,6 +80,11 @@ onMounted(() => {
       />
       <icon-common
         class="app-siderbar-item"
+        :class="{ 'app-siderbar-item-active': currentPage === 'collect' }"
+        @click="changePage('collect')"
+      />
+      <icon-public
+        class="app-siderbar-item"
         :class="{ 'app-siderbar-item-active': currentPage === 'web-app' }"
         @click="changePage('web-app')"
       />
@@ -112,6 +118,9 @@ onMounted(() => {
         />
         <EmptyChatWindow v-else />
       </div>
+    </div>
+    <div v-show="currentPage === 'collect'" class="app-body">
+      <CollectionSet />
     </div>
     <div v-show="currentPage === 'web-app'" class="app-body">
       <WebApp />
