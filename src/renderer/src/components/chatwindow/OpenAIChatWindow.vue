@@ -465,6 +465,7 @@ onMounted(() => {
       gap: 15px;
 
       .chat-message-content {
+        white-space: pre-wrap;
         line-break: anywhere;
         background-color: var(--color-fill-1);
         padding: 10px;
