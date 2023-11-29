@@ -49,8 +49,11 @@ const multipleChoiceCollect = () => {
   if (props.multipleChoiceList.length === 0) {
     return
   }
-  const chatMessageSet = {
+  const chatMessageSet: ChatMessageSet = {
     id: randomUUID(),
+    name: assistantStore.getCurrentAssistant.name,
+    provider: assistantStore.getCurrentAssistant.provider,
+    model: assistantStore.getCurrentAssistant.model,
     chatMessageList: [] as ChatMessage[],
     createTime: nowTimestamp()
   }

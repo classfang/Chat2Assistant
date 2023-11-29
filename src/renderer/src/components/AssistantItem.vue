@@ -8,7 +8,6 @@ import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
 
 const systemStore = useSystemStore()
-
 const { t } = useI18n()
 
 const props = defineProps({

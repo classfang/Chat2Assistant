@@ -44,6 +44,9 @@ interface ChatMessage {
 
 interface ChatMessageSet {
   id: string
+  name: string
+  provider: BigModelProvider
+  model: string
   chatMessageList: ChatMessage[]
   createTime: number
 }
