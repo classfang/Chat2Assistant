@@ -38,6 +38,12 @@ const webviewEndLoad = (event): void => {
   }
   data.isWebviewLoading = false
 }
+
+// 重新加载
+const reload = () => {
+  data.startTimestamp = nowTimestamp()
+  webviewRef.value.reload()
+}
 </script>
 
 <template>
@@ -54,9 +60,7 @@ const webviewEndLoad = (event): void => {
       <a-spin dot />
     </div>
     <div v-else-if="isWebviewLoadingError" class="webview-loading-error">
-      <a-button size="small" @click="webviewRef.reload()">{{
-        $t('common.loadErrorRetry')
-      }}</a-button>
+      <a-button size="small" @click="reload()">{{ $t('common.loadErrorRetry') }}</a-button>
     </div>
   </div>
 </template>
