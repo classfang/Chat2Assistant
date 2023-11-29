@@ -385,6 +385,9 @@ onMounted(() => {
         border-radius: var(--border-radius-small);
         min-height: 1rem;
         line-height: 1.3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
 
         :deep(p) {
           margin-block: 0;
