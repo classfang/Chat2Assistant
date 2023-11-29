@@ -60,3 +60,19 @@ img {
 ::-webkit-scrollbar-thumb:active {
   background-color: var(--color-fill-4);
 }
+
+// vue过渡动画
+.slide2top-enter-active,
+.slide2top-leave-active {
+  transition: transform 300ms;
+}
+
+.slide2top-enter-from,
+.slide2top-leave-to {
+  transform: translateY(100%);
+}
+
+.slide2top-enter-to,
+.slide2top-leave-from {
+  transform: translateY(0);
+}

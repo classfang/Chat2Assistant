@@ -262,11 +262,12 @@ const multipleChoiceChange = (id: string) => {
   }
 }
 
-const multipleChoiceOpen = () => {
+const multipleChoiceOpen = (id: string) => {
   if (systemStore.chatWindowLoading) {
     return
   }
   data.multipleChoiceFlag = true
+  multipleChoiceChange(id)
 }
 
 const multipleChoiceClose = () => {
@@ -298,7 +299,11 @@ onMounted(() => {
         trigger="contextMenu"
       >
         <div class="chat-message">
-          <a-checkbox v-if="multipleChoiceFlag" @change="multipleChoiceChange(msg.id)" />
+          <a-checkbox
+            v-if="multipleChoiceFlag"
+            :default-checked="multipleChoiceList.includes(msg.id)"
+            @change="multipleChoiceChange(msg.id)"
+          />
           <div class="chat-message-avatar">
             <UserAvatar v-if="msg.role === 'user'" :size="30" />
             <AssistantAvatar
@@ -355,7 +360,9 @@ onMounted(() => {
           <a-doption @click="clipboardWriteText(msg.content)">{{
             $t('chatWindow.copy')
           }}</a-doption>
-          <a-doption @click="multipleChoiceOpen()">{{ $t('chatWindow.multipleChoice') }}</a-doption>
+          <a-doption @click="multipleChoiceOpen(msg.id)">{{
+            $t('chatWindow.multipleChoice')
+          }}</a-doption>
         </template>
       </a-dropdown>
       <div v-if="waitAnswer" class="chat-message">
@@ -407,12 +414,14 @@ onMounted(() => {
             <span>{{ $t('chatWindow.stop') }}</span>
           </a-space>
         </a-button>
-        <MultipleChoiceConsole
-          v-if="multipleChoiceFlag"
-          :current-assistant="currentAssistant"
-          :multiple-choice-list="multipleChoiceList"
-          @close="multipleChoiceClose()"
-        />
+        <transition name="slide2top">
+          <MultipleChoiceConsole
+            v-if="multipleChoiceFlag"
+            :current-assistant="currentAssistant"
+            :multiple-choice-list="multipleChoiceList"
+            @close="multipleChoiceClose()"
+          />
+        </transition>
       </div>
     </div>
   </div>

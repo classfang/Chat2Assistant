@@ -8,6 +8,8 @@ import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import UserAvatar from '@renderer/components/UserAvatar.vue'
 import { downloadFile } from '@renderer/utils/download-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
+import { nowTimestamp } from '@renderer/utils/date-util'
+import { exportTextFile } from '@renderer/utils/download-util'
 
 const collectionSetStore = useCollectionSetStore()
 const { t } = useI18n()
@@ -41,6 +43,15 @@ const deleteConfirm = (id: string) => {
       }
     }
   })
+}
+
+const exportChatMessageList = (id: string) => {
+  const collectionSet = collectionSetStore.chatMessageSetList.find((c) => c.id === id)
+  if (!collectionSet) {
+    return
+  }
+  const content = collectionSet.chatMessageList.map((r) => r.role + ': \n' + r.content).join('\n\n')
+  exportTextFile(`records-${nowTimestamp()}.md`, content)
 }
 </script>
 
@@ -85,6 +96,14 @@ const deleteConfirm = (id: string) => {
                     @click="deleteConfirm(c.id)"
                     >{{ $t('common.delete') }}</a-button
                   >
+                  <a-button
+                    type="text"
+                    style="width: 100%"
+                    status="danger"
+                    size="small"
+                    @click="exportChatMessageList(c.id)"
+                    >{{ $t('common.export') }}</a-button
+                  >
                 </a-space>
               </template>
             </a-popover>
@@ -93,63 +112,73 @@ const deleteConfirm = (id: string) => {
       </div>
     </div>
     <div class="collection-set-right">
-      <div class="chat-window-header">
-        <div class="assistant-name">{{ currentCollection?.name }}</div>
-        <div class="assistant-desc">
-          <a-space :size="10">
-            <a-tag>{{ currentCollection?.provider }}</a-tag>
-            <a-tag>{{ currentCollection?.model }}</a-tag>
-          </a-space>
-        </div>
-      </div>
-      <div class="chat-message-list">
-        <div v-for="msg in currentCollection?.chatMessageList" :key="msg.id" class="chat-message">
-          <div class="chat-message-avatar">
-            <UserAvatar v-if="msg.role === 'user'" :size="30" />
-            <AssistantAvatar
-              v-else-if="msg.role === 'assistant'"
-              :provider="currentCollection?.provider"
-              :size="30"
-            />
+      <template v-if="currentCollection">
+        <div class="collection-window-header">
+          <div class="assistant-name">{{ currentCollection.name }}</div>
+          <div class="assistant-desc">
+            <a-space :size="10">
+              <a-tag>{{ currentCollection.provider }}</a-tag>
+              <a-tag>{{ currentCollection.model }}</a-tag>
+            </a-space>
           </div>
-          <template v-if="msg.type === 'text'">
-            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-              <div>{{ msg.content }}</div>
-              <a-image
-                v-if="msg.image"
-                width="300"
-                height="300"
-                :src="`file://${msg.image}`"
-                show-loader
-                fit="cover"
-              >
+        </div>
+        <div class="chat-message-list">
+          <div v-for="msg in currentCollection.chatMessageList" :key="msg.id" class="chat-message">
+            <div class="chat-message-avatar">
+              <UserAvatar v-if="msg.role === 'user'" :size="30" />
+              <AssistantAvatar
+                v-else-if="msg.role === 'assistant'"
+                :provider="currentCollection?.provider"
+                :size="30"
+              />
+            </div>
+            <template v-if="msg.type === 'text'">
+              <div v-if="msg.role === 'user'" class="chat-message-content select-text">
+                <div>{{ msg.content }}</div>
+                <a-image
+                  v-if="msg.image"
+                  width="300"
+                  height="300"
+                  :src="`file://${msg.image}`"
+                  show-loader
+                  fit="cover"
+                >
+                  <template #preview-actions>
+                    <a-image-preview-action
+                      name="下载"
+                      @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
+                      ><icon-download
+                    /></a-image-preview-action>
+                  </template>
+                </a-image>
+              </div>
+              <div
+                v-else-if="msg.role === 'assistant'"
+                class="chat-message-content select-text"
+                v-html="renderMarkdown(msg.content, false)"
+              ></div>
+            </template>
+            <div v-else-if="msg.type === 'img'" class="chat-message-img">
+              <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
                 <template #preview-actions>
                   <a-image-preview-action
                     name="下载"
-                    @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
+                    @click="downloadFile(msg.content, `img-${msg.id}.png`)"
                     ><icon-download
                   /></a-image-preview-action>
                 </template>
               </a-image>
             </div>
-            <div
-              v-else-if="msg.role === 'assistant'"
-              class="chat-message-content select-text"
-              v-html="renderMarkdown(msg.content, false)"
-            ></div>
-          </template>
-          <div v-else-if="msg.type === 'img'" class="chat-message-img">
-            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
-              <template #preview-actions>
-                <a-image-preview-action
-                  name="下载"
-                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
-                  ><icon-download
-                /></a-image-preview-action>
-              </template>
-            </a-image>
           </div>
         </div>
+      </template>
+      <div v-else class="collection-window-empty">
+        <a-empty>
+          <template #image>
+            <icon-common />
+          </template>
+          {{ $t('collectionSet.empty') }}
+        </a-empty>
       </div>
     </div>
   </div>
@@ -249,7 +278,7 @@ const deleteConfirm = (id: string) => {
     display: flex;
     flex-direction: column;
 
-    .chat-window-header {
+    .collection-window-header {
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -301,6 +330,14 @@ const deleteConfirm = (id: string) => {
           border-radius: var(--border-radius-small);
         }
       }
+    }
+
+    .collection-window-empty {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }

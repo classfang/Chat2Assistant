@@ -7,6 +7,7 @@
     "required": "不能为空",
     "edit": "编辑",
     "delete": "删除",
+    "export": "导出",
     "deleteConfirm": "确认删除吗？",
     "deleteConfirmContent": "删除后将无法恢复。",
     "clear": "清空",
@@ -90,6 +91,7 @@
     "selectSuccess": "已添加至收藏夹"
   },
   "collectionSet": {
-    "search": "搜索收藏"
+    "search": "搜索收藏",
+    "empty": "收藏与AI对话的灵感"
   }
 }

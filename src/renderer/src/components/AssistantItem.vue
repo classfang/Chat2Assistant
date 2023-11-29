@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
+import { exportTextFile } from '@renderer/utils/download-util'
 
 const systemStore = useSystemStore()
 const { t } = useI18n()
@@ -80,6 +81,16 @@ const deleteConfirm = () => {
     }
   })
 }
+
+const exportChatMessageList = () => {
+  if (systemStore.chatWindowLoading) {
+    return
+  }
+  const content = props.assistant.chatMessageList
+    .map((r) => r.role + ': \n' + r.content)
+    .join('\n\n')
+  exportTextFile(`records-${nowTimestamp()}.md`, content)
+}
 </script>
 
 <template>
@@ -96,6 +107,13 @@ const deleteConfirm = () => {
             size="small"
             @click="edit"
             >{{ $t('common.edit') }}</a-button
+          >
+          <a-button
+            type="text"
+            style="width: 100%; color: var(--color-text-1)"
+            size="small"
+            @click="exportChatMessageList"
+            >{{ $t('common.export') }}</a-button
           >
           <a-button
             type="text"

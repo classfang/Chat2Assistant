@@ -7,6 +7,7 @@
     "required": "is required",
     "edit": "Edit",
     "delete": "Delete",
+    "export": "Export",
     "deleteConfirm": "Do you want to delete it?",
     "deleteConfirmContent": "After being deleted, it cannot be restored.",
     "clear": "Clear",
@@ -90,6 +91,7 @@
     "selectSuccess": "Added to favorites"
   },
   "collectionSet": {
-    "search": "Search favorites"
+    "search": "Search favorites",
+    "empty": "Collect inspiration for chatting with AI"
   }
 }

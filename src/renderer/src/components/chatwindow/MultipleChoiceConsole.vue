@@ -4,6 +4,7 @@ import { useAssistantStore } from '@renderer/store/assistant'
 import { useCollectionSetStore } from '@renderer/store/collection-set'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
+import { exportTextFile } from '@renderer/utils/download-util'
 import { reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -23,6 +24,18 @@ const data = reactive({
 })
 
 const emits = defineEmits(['collect', 'delete', 'close'])
+
+const getSelectChatMessageList = () => {
+  const chatMessageList = [] as ChatMessage[]
+  props.multipleChoiceList.forEach((id) => {
+    const chatMessage = data.currentAssistant.chatMessageList.find((msg) => msg.id === id)
+    if (chatMessage) {
+      chatMessageList.push(chatMessage)
+    }
+  })
+  chatMessageList.sort((m1, m2) => m1.createTime - m2.createTime)
+  return chatMessageList
+}
 
 const multipleChoiceDelete = () => {
   if (props.multipleChoiceList.length === 0) {
@@ -54,19 +67,23 @@ const multipleChoiceCollect = () => {
     name: assistantStore.getCurrentAssistant.name,
     provider: assistantStore.getCurrentAssistant.provider,
     model: assistantStore.getCurrentAssistant.model,
-    chatMessageList: [] as ChatMessage[],
+    chatMessageList: getSelectChatMessageList(),
     createTime: nowTimestamp()
   }
-  props.multipleChoiceList.forEach((id) => {
-    const chatMessage = data.currentAssistant.chatMessageList.find((msg) => msg.id === id)
-    if (chatMessage) {
-      chatMessageSet.chatMessageList.push(chatMessage)
-    }
-  })
-  chatMessageSet.chatMessageList.sort((m1, m2) => m1.createTime - m2.createTime)
   collectionSetStore.chatMessageSetList.unshift(chatMessageSet)
   emits('close')
   Message.success(t('chatWindow.selectSuccess'))
+}
+
+const multipleChoiceDownload = () => {
+  if (props.multipleChoiceList.length === 0) {
+    return
+  }
+  const content = getSelectChatMessageList()
+    .map((r) => r.role + ': \n' + r.content)
+    .join('\n\n')
+  exportTextFile(`records-${nowTimestamp()}.md`, content)
+  emits('close')
 }
 </script>
 
@@ -74,6 +91,9 @@ const multipleChoiceCollect = () => {
   <div class="multiple-choice-console">
     <a-button shape="circle" class="multiple-choice-console-btn" @click="multipleChoiceCollect()">
       <icon-common class="multiple-choice-console-icon" />
+    </a-button>
+    <a-button shape="circle" class="multiple-choice-console-btn" @click="multipleChoiceDownload()">
+      <icon-download class="multiple-choice-console-icon" />
     </a-button>
     <a-button shape="circle" class="multiple-choice-console-btn" @click="multipleChoiceDelete()">
       <icon-delete class="multiple-choice-console-icon" />
