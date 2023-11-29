@@ -27,8 +27,6 @@ const { currentUrl, isWebviewLoading, isWebviewLoadingError } = toRefs(data)
 const webviewStartLoad = (): void => {
   console.log('webviewStartLoad', props.url)
   data.isWebviewLoading = true
-  data.isWebviewLoadingError = false
-  data.startTimestamp = nowTimestamp()
 }
 
 // webview加载完毕
@@ -43,8 +41,14 @@ const webviewEndLoad = (event): void => {
 
 // 重新加载
 const reload = () => {
+  data.isWebviewLoadingError = false
+  data.startTimestamp = nowTimestamp()
   webviewRef.value.reload()
 }
+
+defineExpose({
+  reload
+})
 </script>
 
 <template>

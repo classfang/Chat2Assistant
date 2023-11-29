@@ -1,22 +1,85 @@
 <script setup lang="ts">
 import MyWebView from '@renderer/components/MyWebView.vue'
+import { reactive, ref, toRefs } from 'vue'
+
+const openaiWebviewRef = ref()
+const sparkWebviewRef = ref()
+const ernieBotWebviewRef = ref()
+
+const data = reactive({
+  activeKey: '1'
+})
+const { activeKey } = toRefs(data)
 </script>
 
 <template>
   <div class="web-app">
-    <a-tabs default-active-key="1">
-      <a-tab-pane key="1" :title="$t('bigModelProvider.openAI')">
-        <MyWebView url="https://chat.openai.com" :allowpopups="true" class="web-app-webview" />
-      </a-tab-pane>
-      <a-tab-pane key="2" :title="$t('bigModelProvider.spark')">
+    <a-tabs v-model:active-key="activeKey" lazy-load>
+      <a-tab-pane key="1">
+        <template #title>
+          <div class="tab-title">
+            <div>{{ $t('bigModelProvider.openAI') }}</div>
+            <a-button
+              v-if="activeKey === '1'"
+              type="text"
+              size="mini"
+              shape="circle"
+              @click="openaiWebviewRef.reload()"
+            >
+              <icon-refresh />
+            </a-button>
+          </div>
+        </template>
         <MyWebView
+          ref="openaiWebviewRef"
+          url="https://chat.openai.com"
+          :allowpopups="true"
+          class="web-app-webview"
+        />
+      </a-tab-pane>
+      <a-tab-pane key="2">
+        <template #title>
+          <div class="tab-title">
+            <div>{{ $t('bigModelProvider.spark') }}</div>
+            <a-button
+              v-if="activeKey === '2'"
+              type="text"
+              size="mini"
+              shape="circle"
+              @click="sparkWebviewRef.reload()"
+            >
+              <icon-refresh />
+            </a-button>
+          </div>
+        </template>
+        <MyWebView
+          ref="sparkWebviewRef"
           url="https://xinghuo.xfyun.cn/desk"
           :allowpopups="true"
           class="web-app-webview"
         />
       </a-tab-pane>
-      <a-tab-pane key="3" :title="$t('bigModelProvider.ernieBot')">
-        <MyWebView url="https://yiyan.baidu.com" :allowpopups="true" class="web-app-webview" />
+      <a-tab-pane key="3">
+        <template #title>
+          <div class="tab-title">
+            <div>{{ $t('bigModelProvider.ernieBot') }}</div>
+            <a-button
+              v-if="activeKey === '3'"
+              type="text"
+              size="mini"
+              shape="circle"
+              @click="ernieBotWebviewRef.reload()"
+            >
+              <icon-refresh />
+            </a-button>
+          </div>
+        </template>
+        <MyWebView
+          ref="ernieBotWebviewRef"
+          url="https://yiyan.baidu.com"
+          :allowpopups="true"
+          class="web-app-webview"
+        />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -25,6 +88,12 @@ import MyWebView from '@renderer/components/MyWebView.vue'
 <style lang="less" scoped>
 .web-app {
   width: 100%;
+
+  :deep(.tab-title) {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
   .web-app-webview {
     width: 100%;
