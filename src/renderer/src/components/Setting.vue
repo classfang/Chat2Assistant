@@ -10,13 +10,29 @@ const settingStore = useSettingStore()
 
 const data = reactive({
   modalVisible: false,
-  appVersion: '--'
+  appVersion: '--',
+  newVersionFlag: false
 })
-const { modalVisible, appVersion } = toRefs(data)
+const { modalVisible, appVersion, newVersionFlag } = toRefs(data)
+
+const checkNewVersion = () => {
+  fetch('https://api.github.com/repos/classfang/Chat2Assistant/releases/latest')
+    .then((res) => res.json())
+    .then((json) => {
+      if (json.tag_name) {
+        data.newVersionFlag = data.appVersion != json.tag_name
+      }
+    })
+}
 
 onMounted(() => {
   getAppVersion().then((v) => {
     data.appVersion = `v${v}`
+    checkNewVersion()
+  })
+  // 每次获得焦点检查最新版本
+  window.electron.ipcRenderer.on('main-window-focus', () => {
+    checkNewVersion()
   })
   setProxy(settingStore.app.proxy)
 })
@@ -25,7 +41,9 @@ onMounted(() => {
 <template>
   <div class="setting">
     <div @click="modalVisible = !systemStore.chatWindowLoading">
-      <slot name="default"></slot>
+      <a-badge :count="newVersionFlag ? 1 : 0" dot :dot-style="{ width: '10px', height: '10px' }">
+        <slot name="default"></slot>
+      </a-badge>
     </div>
 
     <!-- 设置Modal -->
@@ -76,11 +94,19 @@ onMounted(() => {
                 <div>
                   <a-space :size="20">
                     <div>{{ $t('setting.app.currentVersion') }} {{ appVersion }}</div>
-                    <a-button
-                      size="mini"
-                      @click="openInBrowser('https://github.com/classfang/Chat2Assistant/releases')"
-                      >{{ $t('setting.app.downloadVersion') }}</a-button
+                    <a-badge
+                      :count="newVersionFlag ? 1 : 0"
+                      dot
+                      :dot-style="{ width: '10px', height: '10px' }"
                     >
+                      <a-button
+                        size="mini"
+                        @click="
+                          openInBrowser('https://github.com/classfang/Chat2Assistant/releases')
+                        "
+                        >{{ $t('setting.app.downloadVersion') }}</a-button
+                      >
+                    </a-badge>
                   </a-space>
                 </div>
               </a-space>

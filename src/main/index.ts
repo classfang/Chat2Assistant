@@ -59,6 +59,16 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
+  // 监听窗口获得焦点的事件
+  mainWindow.on('focus', () => {
+    mainWindow.webContents.send('main-window-focus')
+  })
+
+  // 监听窗口失去焦点的事件
+  mainWindow.on('blur', () => {
+    mainWindow.webContents.send('main-window-blur')
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
