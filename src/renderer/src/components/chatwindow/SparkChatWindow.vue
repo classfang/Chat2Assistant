@@ -9,7 +9,6 @@ import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
 import { encodeChat } from 'gpt-tokenizer'
 import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
-import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -238,13 +237,10 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <template v-if="msg.type === 'text'">
-            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-              {{ msg.content }}
-            </div>
+          <div class="chat-message-content select-text">
+            <div v-if="msg.role === 'user'">{{ msg.content }}</div>
             <div
               v-else-if="msg.role === 'assistant'"
-              class="chat-message-content select-text"
               v-html="
                 renderMarkdown(
                   msg.content,
@@ -253,17 +249,6 @@ onMounted(() => {
                 )
               "
             ></div>
-          </template>
-          <div v-else-if="msg.type === 'img'" class="chat-message-img">
-            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
-              <template #preview-actions>
-                <a-image-preview-action
-                  name="下载"
-                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
-                  ><icon-download
-                /></a-image-preview-action>
-              </template>
-            </a-image>
           </div>
         </div>
         <template #content>

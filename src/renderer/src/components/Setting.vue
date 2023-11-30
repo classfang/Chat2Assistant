@@ -4,16 +4,24 @@ import { onMounted, reactive, toRefs } from 'vue'
 import { useSystemStore } from '@renderer/store/system'
 import { openInBrowser } from '@renderer/utils/window-util'
 import { openCacheDir, setProxy, getAppVersion } from '@renderer/utils/main-thread-util'
+import { useAssistantStore } from '@renderer/store/assistant'
+import { useCollectionSetStore } from '@renderer/store/collection-set'
+import { Message } from '@arco-design/web-vue'
+import { useI18n } from 'vue-i18n'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
+const assistantStore = useAssistantStore()
+const collectionSetStore = useCollectionSetStore()
+const { t } = useI18n()
 
 const data = reactive({
   modalVisible: false,
   appVersion: '--',
-  newVersionFlag: false
+  newVersionFlag: false,
+  clearCacheFalg: false
 })
-const { modalVisible, appVersion, newVersionFlag } = toRefs(data)
+const { modalVisible, appVersion, newVersionFlag, clearCacheFalg } = toRefs(data)
 
 const checkNewVersion = () => {
   fetch('https://api.github.com/repos/classfang/Chat2Assistant/releases/latest')
@@ -23,6 +31,34 @@ const checkNewVersion = () => {
         data.newVersionFlag = data.appVersion != json.tag_name
       }
     })
+}
+
+// 清理缓存（图片）
+const clearCache = async () => {
+  if (data.clearCacheFalg) {
+    return
+  }
+  data.clearCacheFalg = true
+
+  // 所有对话记录和收藏中的图片
+  const images: string[] = []
+  assistantStore.assistantList.forEach((asst) =>
+    asst.chatMessageList.forEach((msg) => {
+      if (msg.image) {
+        images.push(msg.image)
+      }
+    })
+  )
+  collectionSetStore.chatMessageSetList.forEach((set) =>
+    set.chatMessageList.forEach((msg) => {
+      if (msg.image) {
+        images.push(msg.image)
+      }
+    })
+  )
+  await window.electron.ipcRenderer.invoke('clearCache', images)
+  data.clearCacheFalg = false
+  Message.success(t('setting.app.cacheClearSuccess'))
 }
 
 onMounted(() => {
@@ -85,9 +121,16 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10">
                 <div>{{ $t('setting.app.cache') }}</div>
-                <a-button size="mini" @click="openCacheDir()">{{
-                  $t('setting.app.cachePath')
-                }}</a-button>
+                <div>
+                  <a-space :size="20">
+                    <a-button size="mini" @click="openCacheDir()">{{
+                      $t('setting.app.cachePath')
+                    }}</a-button>
+                    <a-button size="mini" :loading="clearCacheFalg" @click="clearCache()">{{
+                      $t('setting.app.cacheClear')
+                    }}</a-button>
+                  </a-space>
+                </div>
               </a-space>
               <a-space direction="vertical" :size="10">
                 <div>{{ $t('setting.app.version') }}</div>

@@ -170,7 +170,8 @@ const useBigModel = async (sessionId: string) => {
       id: randomUUID(),
       type: 'img',
       role: 'assistant' as ChatRole,
-      content: `file://${imageUrl}`,
+      content: '',
+      image: imageUrl,
       createTime: nowTimestamp()
     })
     scrollToBottom(chatMessageListRef.value)
@@ -312,29 +313,10 @@ onMounted(() => {
               :size="30"
             />
           </div>
-          <template v-if="msg.type === 'text'">
-            <div v-if="msg.role === 'user'" class="chat-message-content select-text">
-              <div>{{ msg.content }}</div>
-              <a-image
-                v-if="msg.image"
-                width="300"
-                height="300"
-                :src="`file://${msg.image}`"
-                show-loader
-                fit="cover"
-              >
-                <template #preview-actions>
-                  <a-image-preview-action
-                    name="下载"
-                    @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
-                    ><icon-download
-                  /></a-image-preview-action>
-                </template>
-              </a-image>
-            </div>
+          <div class="chat-message-content select-text">
+            <div v-if="msg.role === 'user'">{{ msg.content }}</div>
             <div
               v-else-if="msg.role === 'assistant'"
-              class="chat-message-content select-text"
               v-html="
                 renderMarkdown(
                   msg.content,
@@ -343,13 +325,18 @@ onMounted(() => {
                 )
               "
             ></div>
-          </template>
-          <div v-else-if="msg.type === 'img'" class="chat-message-img">
-            <a-image width="300" height="300" :src="msg.content" show-loader fit="cover">
+            <a-image
+              v-if="msg.image"
+              width="300"
+              height="300"
+              :src="`file://${msg.image}`"
+              show-loader
+              fit="cover"
+            >
               <template #preview-actions>
                 <a-image-preview-action
                   name="下载"
-                  @click="downloadFile(msg.content, `img-${msg.id}.png`)"
+                  @click="downloadFile(`file://${msg.image}`, `img-${msg.id}.png`)"
                   ><icon-download
                 /></a-image-preview-action>
               </template>

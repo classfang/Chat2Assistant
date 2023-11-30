@@ -32,6 +32,8 @@
       "downloadVersion": "Download new version",
       "cache": "Cache",
       "cachePath": "Cache directory",
+      "cacheClear": "Clear cache",
+      "cacheClearSuccess": "Cache clearing complete",
       "proxy": "Proxy address"
     },
     "openAI": {

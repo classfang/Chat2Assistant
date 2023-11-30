@@ -32,6 +32,8 @@
       "downloadVersion": "下载新版",
       "cache": "缓存",
       "cachePath": "缓存目录",
+      "cacheClear": "清理缓存",
+      "cacheClearSuccess": "缓存清理完成",
       "proxy": "代理地址"
     },
     "openAI": {

@@ -184,3 +184,20 @@ ipcMain.handle('setProxy', (_event, proxyUrl: string) => {
 ipcMain.handle('clipboardWriteText', (_event, text: string) => {
   clipboard.writeText(text)
 })
+
+// 清理缓存
+ipcMain.handle('clearCache', (_event, images: string[]) => {
+  if (images.length === 0) {
+    return
+  }
+  const files: string[] = fs.readdirSync(tempPath)
+  if (!files || files.length === 0) {
+    return
+  }
+  files.forEach((file) => {
+    const filePath = join(tempPath, file)
+    if (!images.includes(filePath)) {
+      fs.unlinkSync(filePath)
+    }
+  })
+})
