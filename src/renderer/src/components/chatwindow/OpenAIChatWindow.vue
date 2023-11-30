@@ -282,7 +282,7 @@ onMounted(() => {
 
 <template>
   <div class="chat-window">
-    <div class="chat-window-header">
+    <div class="chat-window-header drag-area">
       <div class="assistant-name">{{ currentAssistant?.name }}</div>
       <div class="assistant-desc">
         <a-space :size="10">

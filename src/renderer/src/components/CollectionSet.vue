@@ -58,11 +58,11 @@ const exportChatMessageList = (id: string) => {
 <template>
   <div class="collection-set">
     <div class="collection-set-left">
-      <div class="collection-set-list-search">
+      <div class="collection-set-list-search drag-area">
         <a-input-search
           v-model="keyword"
           :placeholder="$t('collectionSet.search')"
-          class="search-input"
+          class="search-input no-drag-area"
         />
       </div>
       <div class="collection-set-list">
@@ -113,7 +113,7 @@ const exportChatMessageList = (id: string) => {
     </div>
     <div class="collection-set-right">
       <template v-if="currentCollection">
-        <div class="collection-window-header">
+        <div class="collection-window-header drag-area">
           <div class="assistant-name">{{ currentCollection.name }}</div>
           <div class="assistant-desc">
             <a-space :size="10">
@@ -172,7 +172,7 @@ const exportChatMessageList = (id: string) => {
           </div>
         </div>
       </template>
-      <div v-else class="collection-window-empty">
+      <div v-else class="collection-window-empty drag-area">
         <a-empty>
           <template #image>
             <icon-common />
@@ -200,11 +200,11 @@ const exportChatMessageList = (id: string) => {
     gap: 15px;
     border-right: 1px solid var(--color-border-1);
     box-sizing: border-box;
-    padding: 15px 0;
+    padding-bottom: 15px;
 
     .collection-set-list-search {
       box-sizing: border-box;
-      padding: 0 15px;
+      padding: 15px 15px 0 15px;
 
       .search-input {
         border: none;

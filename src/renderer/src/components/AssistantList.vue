@@ -98,8 +98,8 @@ onMounted(() => {
 
 <template>
   <div class="assistant-list">
-    <div class="assistant-header">
-      <a-button class="assistant-new-btn" @click="newModalVisible = true">
+    <div class="assistant-header drag-area">
+      <a-button class="assistant-new-btn no-drag-area" @click="newModalVisible = true">
         <template #icon>
           <icon-plus />
         </template>
@@ -265,7 +265,7 @@ onMounted(() => {
   gap: 15px;
   overflow: hidden;
   box-sizing: border-box;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
 
   .assistant-header {
     flex-shrink: 0;

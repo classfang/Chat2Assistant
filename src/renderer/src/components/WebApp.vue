@@ -13,11 +13,11 @@ const { activeKey } = toRefs(data)
 </script>
 
 <template>
-  <div class="web-app">
+  <div class="web-app drag-area">
     <a-tabs v-model:active-key="activeKey" lazy-load>
       <a-tab-pane key="1">
         <template #title>
-          <div class="tab-title">
+          <div class="tab-title no-drag-area">
             <div>{{ $t('bigModelProvider.openAI') }}</div>
             <a-button
               v-if="activeKey === '1'"
@@ -34,12 +34,12 @@ const { activeKey } = toRefs(data)
           ref="openaiWebviewRef"
           url="https://chat.openai.com"
           :allowpopups="true"
-          class="web-app-webview"
+          class="web-app-webview no-drag-area"
         />
       </a-tab-pane>
       <a-tab-pane key="2">
         <template #title>
-          <div class="tab-title">
+          <div class="tab-title no-drag-area">
             <div>{{ $t('bigModelProvider.spark') }}</div>
             <a-button
               v-if="activeKey === '2'"
@@ -56,12 +56,12 @@ const { activeKey } = toRefs(data)
           ref="sparkWebviewRef"
           url="https://xinghuo.xfyun.cn/desk"
           :allowpopups="true"
-          class="web-app-webview"
+          class="web-app-webview no-drag-area"
         />
       </a-tab-pane>
       <a-tab-pane key="3">
         <template #title>
-          <div class="tab-title">
+          <div class="tab-title no-drag-area">
             <div>{{ $t('bigModelProvider.ernieBot') }}</div>
             <a-button
               v-if="activeKey === '3'"
@@ -78,7 +78,7 @@ const { activeKey } = toRefs(data)
           ref="ernieBotWebviewRef"
           url="https://yiyan.baidu.com"
           :allowpopups="true"
-          class="web-app-webview"
+          class="web-app-webview no-drag-area"
         />
       </a-tab-pane>
     </a-tabs>

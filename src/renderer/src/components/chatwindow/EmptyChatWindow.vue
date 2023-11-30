@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="chat-window">
+  <div class="chat-window drag-area">
     <div class="chat-window-empty">
       <a-empty>
         <template #image>

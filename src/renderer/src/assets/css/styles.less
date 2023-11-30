@@ -19,6 +19,11 @@ body {
   user-select: none;
 }
 
+img {
+  // 图片不允许拖拽
+  -webkit-user-drag: none;
+}
+
 .select-text {
   user-select: text;
 
@@ -27,9 +32,12 @@ body {
   }
 }
 
-img {
-  // 图片不允许拖拽
-  -webkit-user-drag: none;
+.drag-area {
+  -webkit-app-region: drag;
+}
+
+.no-drag-area {
+  -webkit-app-region: no-drag;
 }
 
 // 全局滚动条样式

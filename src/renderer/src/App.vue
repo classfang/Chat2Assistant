@@ -71,26 +71,26 @@ onMounted(() => {
 <template>
   <div class="app">
     <!-- 侧边栏 -->
-    <div class="app-sidebar">
-      <UserAvatar :editable="true" :size="36" />
+    <div class="app-sidebar drag-area">
+      <UserAvatar class="no-drag-area" :editable="true" :size="36" />
       <icon-message
-        class="app-siderbar-item"
+        class="app-siderbar-item no-drag-area"
         :class="{ 'app-siderbar-item-active': currentPage === 'chat' }"
         @click="changePage('chat')"
       />
       <icon-common
-        class="app-siderbar-item"
+        class="app-siderbar-item no-drag-area"
         :class="{ 'app-siderbar-item-active': currentPage === 'collect' }"
         @click="changePage('collect')"
       />
       <icon-public
-        class="app-siderbar-item"
+        class="app-siderbar-item no-drag-area"
         :class="{ 'app-siderbar-item-active': currentPage === 'web-app' }"
         @click="changePage('web-app')"
       />
       <Setting style="margin-top: auto">
         <template #default>
-          <icon-settings class="app-siderbar-item" />
+          <icon-settings class="app-siderbar-item no-drag-area" />
         </template>
       </Setting>
     </div>
@@ -139,13 +139,13 @@ onMounted(() => {
 
   .app-sidebar {
     flex-shrink: 0;
-    width: 60px;
+    width: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 25px;
     box-sizing: border-box;
-    padding: 15px 0;
+    padding: 65px 0 15px 0;
     background-color: var(--color-fill-2);
 
     .app-siderbar-item {
