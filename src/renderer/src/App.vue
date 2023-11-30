@@ -172,6 +172,7 @@ onMounted(() => {
       display: flex;
       flex-direction: column;
       border-right: 1px solid var(--color-border-1);
+      box-sizing: border-box;
 
       .assistant-list {
         flex-grow: 1;
