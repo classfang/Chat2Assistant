@@ -35,7 +35,7 @@ const selectImageRequest = (option: RequestOption) => {
       imagePath,
       `${randomUUID()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
     ).then((res) => {
-      userStore.avatar = `file://${res}`
+      userStore.avatar = res
       onSuccess()
     })
   }
@@ -53,7 +53,7 @@ const selectImageRequest = (option: RequestOption) => {
       :size="size"
       @click="modalVisible = !systemStore.chatWindowLoading && editable"
     >
-      <img v-if="userStore.avatar" :src="userStore.avatar" />
+      <img v-if="userStore.avatar" :src="'file://' + userStore.avatar" />
       <icon-user v-else />
     </a-avatar>
     <!-- 用户设置Modal -->

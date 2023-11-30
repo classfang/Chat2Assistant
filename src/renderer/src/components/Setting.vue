@@ -8,9 +8,11 @@ import { useAssistantStore } from '@renderer/store/assistant'
 import { useCollectionSetStore } from '@renderer/store/collection-set'
 import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '@renderer/store/user'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
+const userStore = useUserStore()
 const assistantStore = useAssistantStore()
 const collectionSetStore = useCollectionSetStore()
 const { t } = useI18n()
@@ -40,8 +42,11 @@ const clearCache = async () => {
   }
   data.clearCacheFalg = true
 
-  // 所有对话记录和收藏中的图片
+  // 用户头像、所有对话记录图片、收藏中的图片
   const images: string[] = []
+  if (userStore.avatar) {
+    images.push(userStore.avatar)
+  }
   assistantStore.assistantList.forEach((asst) =>
     asst.chatMessageList.forEach((msg) => {
       if (msg.image) {
