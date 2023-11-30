@@ -13,6 +13,18 @@
 
 > 现已支持：OpenAI，讯飞星火大模型，文心一言大模型
 
+## 使用应用
+
+### 在 release 中下载对于的应用包即可
+
+### App 在 macOS 下提示已损坏无法打开解决办法
+
+打开终端，输入以下命令，并执行：
+
+`sudo xattr -d com.apple.quarantine /Applications/xxxx.app`
+
+注意：/Applications/xxxx.app 换成你的App路径。
+
 ## 项目启动
 
 ### 安装
