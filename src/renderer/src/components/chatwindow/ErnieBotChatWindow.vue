@@ -258,6 +258,7 @@ onMounted(() => {
             <div v-if="msg.role === 'user'">{{ msg.content }}</div>
             <div
               v-else-if="msg.role === 'assistant'"
+              class="chat-message-md"
               v-html="
                 renderMarkdown(
                   msg.content,
@@ -326,102 +327,5 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-.chat-window {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-
-  .chat-window-header {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--color-border-1);
-    box-sizing: border-box;
-    padding: 15px;
-
-    .assistant-name {
-      font-size: 16px;
-      font-weight: 500;
-    }
-  }
-
-  .chat-message-list {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    box-sizing: border-box;
-    padding: 15px;
-
-    .chat-message {
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-
-      .chat-message-content {
-        white-space: pre-wrap;
-        line-break: anywhere;
-        background-color: var(--color-fill-1);
-        padding: 10px;
-        border-radius: var(--border-radius-small);
-        min-height: 1rem;
-        line-height: 1.3rem;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-
-        :deep(p) {
-          margin-block: 0;
-          margin: 0;
-        }
-
-        :deep(.chat-message-loading) {
-          font-weight: 500;
-          color: rgb(var(--primary-6));
-          animation: alternate-hide-show 900ms ease-in-out infinite;
-        }
-
-        @keyframes alternate-hide-show {
-          0%,
-          50%,
-          100% {
-            opacity: 1;
-          }
-          60%,
-          90% {
-            opacity: 0;
-          }
-        }
-      }
-
-      .chat-message-img {
-        background-color: var(--color-fill-1);
-        padding: 10px;
-        border-radius: var(--border-radius-small);
-      }
-    }
-  }
-
-  .chat-input {
-    flex-shrink: 0;
-    border-top: 1px solid var(--color-border-1);
-    position: relative;
-
-    .chat-input-textarea {
-      border: none;
-      background-color: var(--color-bg-1);
-    }
-
-    .chat-input-bottom {
-      box-sizing: border-box;
-      padding: 5px 15px 15px 15px;
-      display: flex;
-      justify-content: flex-end;
-    }
-  }
-}
+@import '../../assets/css/chat-window.less';
 </style>

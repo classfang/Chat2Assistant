@@ -113,7 +113,7 @@ const exportChatMessageList = (id: string) => {
     </div>
     <div class="collection-set-right">
       <template v-if="currentCollection">
-        <div class="collection-window-header drag-area">
+        <div class="chat-window-header drag-area">
           <div class="assistant-name">{{ currentCollection.name }}</div>
           <div class="assistant-desc">
             <a-space :size="10">
@@ -136,6 +136,7 @@ const exportChatMessageList = (id: string) => {
               <div v-if="msg.role === 'user'">{{ msg.content }}</div>
               <div
                 v-else-if="msg.role === 'assistant'"
+                class="chat-message-md"
                 v-html="renderMarkdown(msg.content, false)"
               ></div>
               <a-image
@@ -171,6 +172,8 @@ const exportChatMessageList = (id: string) => {
 </template>
 
 <style lang="less" scoped>
+@import '../assets/css/chat-window.less';
+
 .collection-set {
   width: 100%;
   flex-grow: 1;
@@ -263,60 +266,6 @@ const exportChatMessageList = (id: string) => {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-
-    .collection-window-header {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--color-border-1);
-      box-sizing: border-box;
-      padding: 15px;
-
-      .assistant-name {
-        font-size: 16px;
-        font-weight: 500;
-      }
-    }
-
-    .chat-message-list {
-      flex-grow: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      box-sizing: border-box;
-      padding: 15px;
-
-      .chat-message {
-        display: flex;
-        align-items: flex-start;
-        gap: 15px;
-
-        .chat-message-content {
-          line-break: anywhere;
-          background-color: var(--color-fill-1);
-          padding: 10px;
-          border-radius: var(--border-radius-small);
-          min-height: 1rem;
-          line-height: 1.3rem;
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-
-          :deep(p) {
-            margin-block: 0;
-            margin: 0;
-          }
-        }
-
-        .chat-message-img {
-          background-color: var(--color-fill-1);
-          padding: 10px;
-          border-radius: var(--border-radius-small);
-        }
-      }
-    }
 
     .collection-window-empty {
       width: 100%;

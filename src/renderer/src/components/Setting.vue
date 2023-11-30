@@ -19,7 +19,7 @@ const { t } = useI18n()
 
 const data = reactive({
   modalVisible: false,
-  appVersion: '--',
+  appVersion: '0.0.0',
   newVersionFlag: false,
   clearCacheFalg: false
 })
@@ -29,8 +29,14 @@ const checkNewVersion = () => {
   fetch('https://api.github.com/repos/classfang/Chat2Assistant/releases/latest')
     .then((res) => res.json())
     .then((json) => {
-      if (json.tag_name) {
-        data.newVersionFlag = data.appVersion != json.tag_name
+      if (json.name) {
+        const appVersionArray = data.appVersion.split('.')
+        const newVersionArray = json.name.split('.')
+        for (let i = 0; i < newVersionArray.length; i++) {
+          if (newVersionArray[i] > appVersionArray[i]) {
+            data.newVersionFlag = true
+          }
+        }
       }
     })
 }
@@ -68,7 +74,7 @@ const clearCache = async () => {
 
 onMounted(() => {
   getAppVersion().then((v) => {
-    data.appVersion = `v${v}`
+    data.appVersion = v
     checkNewVersion()
   })
   // 每次获得焦点检查最新版本
@@ -141,7 +147,7 @@ onMounted(() => {
                 <div>{{ $t('setting.app.version') }}</div>
                 <div>
                   <a-space :size="20">
-                    <div>{{ $t('setting.app.currentVersion') }} {{ appVersion }}</div>
+                    <div>{{ $t('setting.app.currentVersion') }} v{{ appVersion }}</div>
                     <a-badge
                       :count="newVersionFlag ? 1 : 0"
                       dot
