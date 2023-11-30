@@ -1,6 +1,6 @@
 {
   "name": "chat2assistant",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "An assistant-centered ChatGPT electron client",
   "main": "./out/main/index.js",
   "author": "junki.cn",
