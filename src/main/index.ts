@@ -31,13 +31,22 @@ function createWindow(): void {
     minHeight: mainWindowConfig.minHeight,
     show: false,
     autoHideMenuBar: true,
+    // mac下不显示标题栏
     titleBarStyle: 'hiddenInset',
+    // mac下红绿灯位置
+    trafficLightPosition: {
+      x: 5,
+      y: 5
+    },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false, // 允许渲染进程通信（window.electron）
-      webSecurity: false, // 允许跨域请求、file协议加载本地文件等
-      webviewTag: true // 启动webview
+      // 允许渲染进程通信（window.electron）
+      sandbox: false,
+      // 允许跨域请求、file协议加载本地文件等
+      webSecurity: false,
+      // 启动webview
+      webviewTag: true
     }
   })
 

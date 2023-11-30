@@ -139,7 +139,7 @@ onMounted(() => {
 
   .app-sidebar {
     flex-shrink: 0;
-    width: 70px;
+    width: 65px;
     display: flex;
     flex-direction: column;
     align-items: center;
