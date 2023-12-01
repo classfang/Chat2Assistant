@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, toRefs } from 'vue'
+import { reactive, toRefs } from 'vue'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
@@ -8,13 +8,11 @@ import AssistantItem from '@renderer/components/AssistantItem.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
-import Sortable from 'sortablejs'
+import draggable from 'vuedraggable'
 
 const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
 const { t } = useI18n()
-
-const assistantListRef = ref()
 
 const newFormDefault = {
   name: '',
@@ -82,18 +80,6 @@ const assistantItemDelete = (id: string) => {
   assistantStore.assistantList = assistantStore.assistantList.filter((a) => a.id != id)
   assistantStore.currentAssistantId = null
 }
-
-onMounted(() => {
-  // 拖拽排序
-  new Sortable(assistantListRef.value, {
-    animation: 150,
-    onEnd: (event) => {
-      const { oldIndex, newIndex } = event
-      const movedItem = assistantStore.assistantList.splice(oldIndex, 1)[0]
-      assistantStore.assistantList.splice(newIndex, 0, movedItem)
-    }
-  })
-})
 </script>
 
 <template>
@@ -108,19 +94,24 @@ onMounted(() => {
         </template>
       </a-button>
     </div>
-    <div ref="assistantListRef" class="assistant-list-container">
-      <AssistantItem
-        v-for="a in assistantStore.assistantList"
-        :key="a.id"
-        :assistant="a"
-        :is-active="assistantStore.currentAssistantId === a.id"
-        class="assistant-item"
-        @click="assistantItemActive(a)"
-        @delete="assistantItemDelete(a.id)"
-        @update="assistantItemUpdate"
-        @clear="a.chatMessageList = []"
-      />
-    </div>
+    <draggable
+      v-model="assistantStore.assistantList"
+      group="people"
+      item-key="id"
+      class="assistant-list-container"
+    >
+      <template #item="{ element }">
+        <AssistantItem
+          :assistant="element"
+          :is-active="assistantStore.currentAssistantId === element.id"
+          class="assistant-item"
+          @click="assistantItemActive(element)"
+          @delete="assistantItemDelete(element.id)"
+          @update="assistantItemUpdate"
+          @clear="element.chatMessageList = []"
+        />
+      </template>
+    </draggable>
 
     <!-- 新增助手Modal -->
     <a-modal

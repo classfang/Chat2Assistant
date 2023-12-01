@@ -36,9 +36,9 @@
     "openai": "^4.20.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.0",
-    "sortablejs": "^1.15.0",
     "uuid": "^9.0.1",
-    "vue-i18n": "^9.7.1"
+    "vue-i18n": "^9.7.1",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@arco-design/web-vue": "^2.53.2",
