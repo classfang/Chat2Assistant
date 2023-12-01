@@ -15,6 +15,8 @@ An assistant-centered ChatGPT electron client with a minimalist interface will s
 
 ## Use application
 
+> Application package is not signed and notarized, in case of failure to install, you can clone the code local packaging
+
 ### Download the application package in release
 
 ### The App under macOS indicates that it is damaged and cannot open the solution
