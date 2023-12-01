@@ -13,13 +13,13 @@ An assistant-centered ChatGPT electron client with a minimalist interface will s
 
 > now supported：OpenAI, iFLYTEK Spark, ERNIE Bot
 
-## Use application
+## 1. Use application
 
 > Application package is not signed and notarized, in case of failure to install, you can clone the code local packaging
 
-### Download the application package in release
+### 1.1 Download the application package in release
 
-### The App under macOS indicates that it is damaged and cannot open the solution
+### 1.2 The App under macOS indicates that it is damaged and cannot open the solution
 
 Open the terminal, enter the following command, and execute:
 
@@ -27,21 +27,21 @@ Open the terminal, enter the following command, and execute:
 
 Note: Replace /Applications/xxxx.app with your App path.
 
-## Project Setup
+## 2. Project Setup
 
-### Install
+### 2.1 Install
 
 ```bash
 $ yarn
 ```
 
-### Development
+### 2.2 Development
 
 ```bash
 $ yarn dev
 ```
 
-### Build
+### 2.3 Build
 
 ```bash
 # For windows
