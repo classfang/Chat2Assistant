@@ -13,7 +13,8 @@
     "clear": "Clear",
     "clearConfirm": "Are you sure to clear your chat history?",
     "clearConfirmContent": "Chat history will not be restored after clearing.",
-    "loadErrorRetry": "Failed to load, click retry"
+    "loadErrorRetry": "Failed to load, click retry",
+    "copySuccess": "Copied to clipboard"
   },
   "setting": {
     "name": "Settings",

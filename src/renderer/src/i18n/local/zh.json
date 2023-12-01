@@ -13,7 +13,8 @@
     "clear": "清空",
     "clearConfirm": "确认清空聊天记录吗？",
     "clearConfirmContent": "聊天记录清空后将无法恢复。",
-    "loadErrorRetry": "加载失败，点击重试"
+    "loadErrorRetry": "加载失败，点击重试",
+    "copySuccess": "已复制到剪贴板"
   },
   "setting": {
     "name": "设置",
