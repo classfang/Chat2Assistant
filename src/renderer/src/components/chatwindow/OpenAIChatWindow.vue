@@ -302,6 +302,7 @@ onMounted(() => {
         <div class="chat-message">
           <a-checkbox
             v-if="multipleChoiceFlag"
+            class="chat-message-checkbox"
             :default-checked="multipleChoiceList.includes(msg.id)"
             @change="multipleChoiceChange(msg.id)"
           />
@@ -328,6 +329,7 @@ onMounted(() => {
             ></div>
             <a-image
               v-if="msg.image"
+              class="chat-message-img"
               width="300"
               height="300"
               :src="`file://${msg.image}`"

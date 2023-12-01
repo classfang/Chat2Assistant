@@ -71,7 +71,14 @@
     align-items: flex-start;
     gap: 15px;
 
+    .chat-message-checkbox,
+    .chat-message-avatar {
+      flex-shrink: 0;
+    }
+
     .chat-message-content {
+      flex: 1;
+      min-width: 0;
       white-space: pre-wrap;
       line-break: anywhere;
       background-color: var(--color-fill-1);
@@ -110,12 +117,11 @@
           }
         }
       }
-    }
 
-    .chat-message-img {
-      background-color: var(--color-fill-1);
-      padding: 10px;
-      border-radius: var(--border-radius-small);
+      .chat-message-img {
+        background-color: var(--color-fill-1);
+        border-radius: var(--border-radius-small);
+      }
     }
   }
 }
