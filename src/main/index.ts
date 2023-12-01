@@ -20,7 +20,7 @@ const creatTempPath = () => {
 }
 
 // 主窗口
-let mainWindow
+let mainWindow: BrowserWindow
 
 function createWindow(): void {
   // 创建主窗口
