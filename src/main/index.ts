@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, clipboard } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, clipboard, dialog } from 'electron'
 import { join } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -200,4 +200,16 @@ ipcMain.handle('clearCache', (_event, images: string[]) => {
       fs.unlinkSync(filePath)
     }
   })
+})
+
+// 选择文件并读取内容
+ipcMain.handle('selectFileAndRead', (_event, extensions = ['*']) => {
+  const result = dialog.showOpenDialogSync(mainWindow, {
+    properties: ['openFile'],
+    filters: [{ name: 'Select File', extensions }]
+  })
+  if (result && result[0]) {
+    return fs.readFileSync(result[0])
+  }
+  return null
 })

@@ -28,14 +28,39 @@
         "dark": "Dark"
       },
       "local": "Language",
-      "version": "Version",
-      "currentVersion": "Current Version",
-      "downloadVersion": "Download new version",
-      "cache": "Cache",
-      "cachePath": "Cache directory",
-      "cacheClear": "Clear cache",
-      "cacheClearSuccess": "Cache clearing complete",
+      "version": {
+        "name": "Version",
+        "current": "Current Version",
+        "download": "Download new version"
+      },
+      "cache": {
+        "name": "Cache",
+        "path": "Cache directory",
+        "clear": "Clear cache",
+        "clearSuccess": "Cache clearing complete"
+      },
       "proxy": "Proxy address"
+    },
+    "backup": {
+      "name": "Backup",
+      "importOk": "Select file",
+      "importSuccess": "Import success",
+      "importNone": "No data has been imported",
+      "importError": "Import error",
+      "setting": {
+        "name": "Settings backup",
+        "export": "Export settings",
+        "import": "Import settings",
+        "importConfirm": "Import settings warning",
+        "importConfirmContent": "Select backup file import, the existing application Settings will be overwritten, the operation cannot be restored!"
+      },
+      "data": {
+        "name": "Data backup",
+        "export": "Export application data",
+        "import": "Import application data",
+        "importConfirm": "Import data warning",
+        "importConfirmContent": "Select backup file import, the existing application data will be overwritten, the operation cannot be restored!"
+      }
     },
     "openAI": {
       "name": "OpenAI",

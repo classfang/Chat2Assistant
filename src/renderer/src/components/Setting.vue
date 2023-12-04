@@ -6,9 +6,11 @@ import { openInBrowser } from '@renderer/utils/window-util'
 import { openCacheDir, setProxy, getAppVersion } from '@renderer/utils/main-thread-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { useCollectionSetStore } from '@renderer/store/collection-set'
-import { Message } from '@arco-design/web-vue'
+import { Message, Modal } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@renderer/store/user'
+import { exportTextFile } from '@renderer/utils/download-util'
+import { formatDateTime } from '@renderer/utils/date-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -69,7 +71,121 @@ const clearCache = async () => {
   )
   await window.electron.ipcRenderer.invoke('clearCache', images)
   data.clearCacheFalg = false
-  Message.success(t('setting.app.cacheClearSuccess'))
+  Message.success(t('setting.app.cache.clearSuccess'))
+}
+
+const exportSettingBackup = () => {
+  exportTextFile(
+    `setting-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
+    JSON.stringify(settingStore)
+  )
+}
+
+const exportDataBackup = () => {
+  exportTextFile(
+    `data-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
+    JSON.stringify({
+      assistantStore,
+      collectionSetStore
+    })
+  )
+}
+
+const importSettingBackup = () => {
+  Modal.confirm({
+    title: t('setting.backup.setting.importConfirm'),
+    content: t('setting.backup.setting.importConfirmContent'),
+    okText: t('setting.backup.importOk'),
+    cancelText: t('common.cancel'),
+    onOk: async () => {
+      try {
+        const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
+          '.c2a'
+        ])
+        let importFlag = false
+        if (selectFileResult) {
+          systemStore.globalLoading = true
+          const settingBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
+          if ('app' in settingBackup) {
+            settingStore.app = settingBackup.app
+            importFlag = true
+          }
+          if ('openAI' in settingBackup) {
+            settingStore.openAI = settingBackup.openAI
+            importFlag = true
+          }
+          if ('spark' in settingBackup) {
+            settingStore.spark = settingBackup.spark
+            importFlag = true
+          }
+          if ('ernieBot' in settingBackup) {
+            settingStore.ernieBot = settingBackup.ernieBot
+            importFlag = true
+          }
+          if ('tongyi' in settingBackup) {
+            settingStore.tongyi = settingBackup.tongyi
+            importFlag = true
+          }
+        }
+        if (importFlag) {
+          Message.success(t('setting.backup.importSuccess'))
+        } else {
+          Message.error(t('setting.backup.importNone'))
+        }
+      } catch (e) {
+        Message.error(t('setting.backup.importError'))
+      } finally {
+        systemStore.globalLoading = false
+      }
+    }
+  })
+}
+
+const importDataBackup = () => {
+  Modal.confirm({
+    title: t('setting.backup.data.importConfirm'),
+    content: t('setting.backup.data.importConfirmContent'),
+    okText: t('setting.backup.importOk'),
+    cancelText: t('common.cancel'),
+    onOk: async () => {
+      try {
+        const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
+          '.c2a'
+        ])
+        let importFlag = false
+        if (selectFileResult) {
+          systemStore.globalLoading = true
+          const dataBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
+          if ('assistantStore' in dataBackup) {
+            if ('assistantList' in dataBackup.assistantStore) {
+              assistantStore.assistantList = dataBackup.assistantStore.assistantList
+              importFlag = true
+            }
+            if ('currentAssistantId' in dataBackup.assistantStore) {
+              assistantStore.currentAssistantId = dataBackup.assistantStore.currentAssistantId
+              importFlag = true
+            }
+          }
+          if ('collectionSetStore' in dataBackup) {
+            if ('chatMessageSetList' in dataBackup.collectionSetStore) {
+              collectionSetStore.chatMessageSetList =
+                dataBackup.collectionSetStore.chatMessageSetList
+              importFlag = true
+            }
+          }
+        }
+        if (importFlag) {
+          Message.success(t('setting.backup.importSuccess'))
+        } else {
+          Message.error(t('setting.backup.importNone'))
+        }
+      } catch (e) {
+        Message.error(t('setting.backup.importError'))
+      } finally {
+        systemStore.globalLoading = false
+      }
+    }
+  })
 }
 
 onMounted(() => {
@@ -104,7 +220,7 @@ onMounted(() => {
       <template #title> {{ $t('setting.name') }} </template>
       <div style="height: 60vh; overflow-y: auto">
         <a-tabs position="left">
-          <a-tab-pane key="1" :title="$t('setting.app.name')">
+          <a-tab-pane key="app" :title="$t('setting.app.name')">
             <a-space direction="vertical" :size="20" fill>
               <a-space direction="vertical" :size="10">
                 <div>{{ $t('setting.app.theme.name') }}</div>
@@ -131,23 +247,29 @@ onMounted(() => {
                 />
               </a-space>
               <a-space direction="vertical" :size="10">
-                <div>{{ $t('setting.app.cache') }}</div>
+                <div>{{ $t('setting.app.cache.name') }}</div>
                 <div>
                   <a-space :size="20">
-                    <a-button size="mini" @click="openCacheDir()">{{
-                      $t('setting.app.cachePath')
-                    }}</a-button>
-                    <a-button size="mini" :loading="clearCacheFalg" @click="clearCache()">{{
-                      $t('setting.app.cacheClear')
-                    }}</a-button>
+                    <a-button size="mini" @click="openCacheDir()">
+                      <a-space :size="5">
+                        <icon-folder />
+                        <span>{{ $t('setting.app.cache.path') }}</span>
+                      </a-space>
+                    </a-button>
+                    <a-button size="mini" :loading="clearCacheFalg" @click="clearCache()">
+                      <a-space :size="5">
+                        <icon-delete />
+                        <span>{{ $t('setting.app.cache.clear') }}</span>
+                      </a-space>
+                    </a-button>
                   </a-space>
                 </div>
               </a-space>
               <a-space direction="vertical" :size="10">
-                <div>{{ $t('setting.app.version') }}</div>
+                <div>{{ $t('setting.app.version.name') }}</div>
                 <div>
                   <a-space :size="20">
-                    <div>{{ $t('setting.app.currentVersion') }} v{{ appVersion }}</div>
+                    <div>{{ $t('setting.app.version.current') }} v{{ appVersion }}</div>
                     <a-badge
                       :count="newVersionFlag ? 1 : 0"
                       dot
@@ -158,15 +280,61 @@ onMounted(() => {
                         @click="
                           openInBrowser('https://github.com/classfang/Chat2Assistant/releases')
                         "
-                        >{{ $t('setting.app.downloadVersion') }}</a-button
                       >
+                        <a-space :size="5">
+                          <icon-download />
+                          <span>{{ $t('setting.app.version.download') }}</span>
+                        </a-space>
+                      </a-button>
                     </a-badge>
                   </a-space>
                 </div>
               </a-space>
             </a-space>
           </a-tab-pane>
-          <a-tab-pane key="2" :title="$t('setting.openAI.name')">
+          <a-tab-pane key="backup" :title="$t('setting.backup.name')">
+            <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10">
+                <div>{{ $t('setting.backup.setting.name') }}</div>
+                <div>
+                  <a-space :size="20">
+                    <a-button size="mini" @click="exportSettingBackup()">
+                      <a-space :size="5">
+                        <icon-download />
+                        <span>{{ $t('setting.backup.setting.export') }}</span>
+                      </a-space>
+                    </a-button>
+                    <a-button size="mini" @click="importSettingBackup()">
+                      <a-space :size="5">
+                        <icon-upload />
+                        <span>{{ $t('setting.backup.setting.import') }}</span>
+                      </a-space>
+                    </a-button>
+                  </a-space>
+                </div>
+              </a-space>
+              <a-space direction="vertical" :size="10">
+                <div>{{ $t('setting.backup.data.name') }}</div>
+                <div>
+                  <a-space :size="20">
+                    <a-button size="mini" @click="exportDataBackup()">
+                      <a-space :size="5">
+                        <icon-download />
+                        <span>{{ $t('setting.backup.data.export') }}</span>
+                      </a-space>
+                    </a-button>
+                    <a-button size="mini" @click="importDataBackup()">
+                      <a-space :size="5">
+                        <icon-upload />
+                        <span>{{ $t('setting.backup.data.import') }}</span>
+                      </a-space>
+                    </a-button>
+                  </a-space>
+                </div>
+              </a-space>
+            </a-space>
+          </a-tab-pane>
+          <a-tab-pane key="openAI" :title="$t('setting.openAI.name')">
             <a-space direction="vertical" :size="20" fill>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.officialWebsite') }}</div>
@@ -190,7 +358,7 @@ onMounted(() => {
               </a-space>
             </a-space>
           </a-tab-pane>
-          <a-tab-pane key="3" :title="$t('setting.spark.name')">
+          <a-tab-pane key="spark" :title="$t('setting.spark.name')">
             <a-space direction="vertical" :size="20" fill>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.officialWebsite') }}</div>
@@ -224,7 +392,7 @@ onMounted(() => {
               </a-space>
             </a-space>
           </a-tab-pane>
-          <a-tab-pane key="4" :title="$t('setting.ernieBot.name')">
+          <a-tab-pane key="ernieBot" :title="$t('setting.ernieBot.name')">
             <a-space direction="vertical" :size="20" fill>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.officialWebsite') }}</div>
@@ -250,7 +418,7 @@ onMounted(() => {
               </a-space>
             </a-space>
           </a-tab-pane>
-          <a-tab-pane key="5" :title="$t('setting.tongyi.name')">
+          <a-tab-pane key="tongyi" :title="$t('setting.tongyi.name')">
             <a-space direction="vertical" :size="20" fill>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.officialWebsite') }}</div>
