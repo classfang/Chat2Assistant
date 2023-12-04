@@ -30,6 +30,7 @@ const selectImageRequest = (option: RequestOption) => {
   const { fileItem, onSuccess } = option
   const imagePath = fileItem.file?.path
   if (imagePath) {
+    fileItem.url = fileItem.file?.path
     data.avatarFile = fileItem
     saveFileByPath(
       imagePath,
