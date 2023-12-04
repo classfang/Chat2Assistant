@@ -111,10 +111,10 @@ const importSettingBackup = () => {
     onOk: async () => {
       try {
         const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
-          '.c2a'
+          'c2a'
         ])
-        let importFlag = false
         if (selectFileResult) {
+          let importFlag = false
           systemStore.globalLoading = true
           const settingBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
           if ('app' in settingBackup) {
@@ -137,11 +137,11 @@ const importSettingBackup = () => {
             settingStore.tongyi = settingBackup.tongyi
             importFlag = true
           }
-        }
-        if (importFlag) {
-          Message.success(t('setting.backup.importSuccess'))
-        } else {
-          Message.error(t('setting.backup.importNone'))
+          if (importFlag) {
+            Message.success(t('setting.backup.importSuccess'))
+          } else {
+            Message.error(t('setting.backup.importNone'))
+          }
         }
       } catch (e) {
         Message.error(t('setting.backup.importError'))
@@ -161,10 +161,10 @@ const importDataBackup = () => {
     onOk: async () => {
       try {
         const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
-          '.c2a'
+          'c2a'
         ])
-        let importFlag = false
         if (selectFileResult) {
+          let importFlag = false
           systemStore.globalLoading = true
           const dataBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
           if ('assistantStore' in dataBackup) {
@@ -184,11 +184,11 @@ const importDataBackup = () => {
               importFlag = true
             }
           }
-        }
-        if (importFlag) {
-          Message.success(t('setting.backup.importSuccess'))
-        } else {
-          Message.error(t('setting.backup.importNone'))
+          if (importFlag) {
+            Message.success(t('setting.backup.importSuccess'))
+          } else {
+            Message.error(t('setting.backup.importNone'))
+          }
         }
       } catch (e) {
         Message.error(t('setting.backup.importError'))
