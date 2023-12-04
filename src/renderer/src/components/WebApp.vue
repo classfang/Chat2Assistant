@@ -5,6 +5,7 @@ import { reactive, ref, toRefs } from 'vue'
 const openaiWebviewRef = ref()
 const sparkWebviewRef = ref()
 const ernieBotWebviewRef = ref()
+const tongyiWebviewRef = ref()
 
 const data = reactive({
   activeKey: '1'
@@ -77,6 +78,28 @@ const { activeKey } = toRefs(data)
         <MyWebView
           ref="ernieBotWebviewRef"
           url="https://yiyan.baidu.com"
+          :allowpopups="true"
+          class="web-app-webview no-drag-area"
+        />
+      </a-tab-pane>
+      <a-tab-pane key="4">
+        <template #title>
+          <div class="tab-title no-drag-area">
+            <div>{{ $t('bigModelProvider.tongyi') }}</div>
+            <a-button
+              v-if="activeKey === '4'"
+              type="text"
+              size="mini"
+              shape="circle"
+              @click="tongyiWebviewRef.reload()"
+            >
+              <icon-refresh />
+            </a-button>
+          </div>
+        </template>
+        <MyWebView
+          ref="tongyiWebviewRef"
+          url="https://tongyi.aliyun.com/qianwen"
           :allowpopups="true"
           class="web-app-webview no-drag-area"
         />
