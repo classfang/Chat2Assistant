@@ -37,6 +37,12 @@ const handleNewModalBeforeOk = async () => {
     if (!data.newForm.name) {
       Message.error(`${t('assistantList.name')} ${t('common.required')}`)
       reject()
+      return
+    }
+    if (!data.newForm.model) {
+      Message.error(`${t('assistantList.model')} ${t('common.required')}`)
+      reject()
+      return
     }
     assistantStore.assistantList.unshift(
       copyObj({
@@ -155,14 +161,17 @@ const assistantItemDelete = (id: string) => {
             <!-- 提供商 -->
             <a-form-item field="provider" :label="$t('assistantList.provider')">
               <a-select v-model="newForm.provider">
-                <a-option value="OpenAI" @click="() => (newForm.model = 'gpt-3.5-turbo')">{{
+                <a-option value="OpenAI" @click="() => (newForm.model = '')">{{
                   $t('bigModelProvider.openAI')
                 }}</a-option>
-                <a-option value="Spark" @click="() => (newForm.model = 'v3.1')">{{
+                <a-option value="Spark" @click="() => (newForm.model = '')">{{
                   $t('bigModelProvider.spark')
                 }}</a-option>
-                <a-option value="ERNIEBot" @click="() => (newForm.model = 'ERNIE-Bot-turbo')">{{
+                <a-option value="ERNIEBot" @click="() => (newForm.model = '')">{{
                   $t('bigModelProvider.ernieBot')
+                }}</a-option>
+                <a-option value="Tongyi" @click="() => (newForm.model = '')">{{
+                  $t('bigModelProvider.tongyi')
                 }}</a-option>
               </a-select>
             </a-form-item>
@@ -186,6 +195,11 @@ const assistantItemDelete = (id: string) => {
                 <a-option value="ERNIE-Bot-8K">ERNIE-Bot-8K</a-option>
                 <a-option value="ERNIE-Bot">ERNIE-Bot</a-option>
                 <a-option value="ERNIE-Bot-turbo">ERNIE-Bot-turbo</a-option>
+              </a-select>
+              <a-select v-else-if="newForm.provider === 'Tongyi'" v-model="newForm.model">
+                <a-option value="qwen-turbo">qwen-turbo</a-option>
+                <a-option value="qwen-plus">qwen-plus</a-option>
+                <a-option value="qwen-max">qwen-max</a-option>
               </a-select>
             </a-form-item>
             <!-- 生成token限制 -->

@@ -21,6 +21,9 @@ export const useSettingStore = defineStore({
     ernieBot: {
       apiKey: '',
       secretKey: ''
+    },
+    tongyi: {
+      apiKey: ''
     }
   }),
   persist: true

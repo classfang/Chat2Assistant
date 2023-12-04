@@ -52,6 +52,10 @@
       "name": "文心一言",
       "apiKey": "API Key",
       "secretKey": "Secret Key"
+    },
+    "tongyi": {
+      "name": "通义千问",
+      "apiKey": "API Key"
     }
   },
   "userSetting": {
@@ -62,7 +66,8 @@
   "bigModelProvider": {
     "openAI": "OpenAI",
     "spark": "讯飞星火",
-    "ernieBot": "文心一言"
+    "ernieBot": "文心一言",
+    "tongyi": "通义千问"
   },
   "assistantList": {
     "new": "新增助手",
@@ -86,6 +91,8 @@
     "sparkError": "星火大模型调用错误，请检查你的配置",
     "ernieBotConfgMiss": "文心一言大模型未配置",
     "ernieBotError": "文心一言大模型调用错误，请检查你的配置",
+    "tongyiConfgMiss": "通义千问大模型未配置",
+    "tongyiError": "通义千问大模型调用错误，请检查你的配置",
     "stop": "停止",
     "send": "发送",
     "selectImage": "选择图片",

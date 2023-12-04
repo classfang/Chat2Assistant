@@ -52,6 +52,10 @@
       "name": "ERNIE Bot",
       "apiKey": "API Key",
       "secretKey": "Secret Key"
+    },
+    "tongyi": {
+      "name": "Tongyi Qianwen",
+      "apiKey": "API Key"
     }
   },
   "userSetting": {
@@ -62,7 +66,8 @@
   "bigModelProvider": {
     "openAI": "OpenAI",
     "spark": "iFLYTEK Spark",
-    "ernieBot": "ERNIE Bot"
+    "ernieBot": "ERNIE Bot",
+    "tongyi": "Tongyi Qianwen"
   },
   "assistantList": {
     "new": "New Assistant",
@@ -86,6 +91,8 @@
     "sparkError": "iFLYTEK Spark call error, please check your configuration",
     "ernieBotConfgMiss": "ERNIE Bot is not configured",
     "ernieBotError": "ERNIE Bot call error, please check your configuration",
+    "tongyiConfgMiss": "Tongyi Qianwen is not configured",
+    "tongyiError": "Tongyi Qianwen call error, please check your configuration",
     "stop": "Stop",
     "send": "Send",
     "selectImage": "Select image",

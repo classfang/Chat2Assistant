@@ -11,7 +11,6 @@ import { encodeChat } from 'gpt-tokenizer'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
-import { getErnieBotChatUrl } from '@renderer/utils/ernie-bot-util'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
@@ -52,17 +51,17 @@ const sendQuestion = async (event?: KeyboardEvent) => {
     await useBigModel(data.sessionId)
   } catch (e) {
     console.log('big model error: ', e)
-    Message.error(e ? e + '' : t('chatWindow.ernieBot'))
+    Message.error(e ? e + '' : t('chatWindow.tongyi'))
     systemStore.chatWindowLoading = false
     data.waitAnswer = false
   }
 }
 
 const useBigModel = async (sessionId: string) => {
-  // 官方文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6lp69is2a
+  // 官方文档：https://help.aliyun.com/zh/dashscope/developer-reference/api-details?spm=a2c4g.11186623.0.0.168b7abeKDCDeP#25745d61fbx49
   // 检查大模型配置
-  if (!settingStore.ernieBot.apiKey || !settingStore.ernieBot.secretKey) {
-    Message.error(t('chatWindow.ernieBotConfgMiss'))
+  if (!settingStore.tongyi.apiKey) {
+    Message.error(t('chatWindow.tongyiConfgMiss'))
     return
   }
 
@@ -84,31 +83,31 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
-  // 文心一言模型对话
-  const tokenResp = await fetch(
-    `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${settingStore.ernieBot.apiKey}&client_secret=${settingStore.ernieBot.secretKey}`
-  )
-  const tokenRespJson = await tokenResp.json()
-  const accessToken = tokenRespJson.access_token
-
   if (sessionId != data.sessionId) {
     return
   }
 
   fetchEventSource(
-    `${getErnieBotChatUrl(data.currentAssistant.model)}?access_token=${accessToken}`,
+    'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
     {
       signal: abortCtr.signal,
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${settingStore.tongyi.apiKey}`,
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream'
+      },
       body: JSON.stringify({
-        messages: getBigModelMessages(),
-        stream: true
+        model: data.currentAssistant.model,
+        input: {
+          messages: getBigModelMessages()
+        }
       }),
       onmessage: (e) => {
         if (sessionId != data.sessionId) {
           return
         }
-        console.log('文心一言大模型回复：', e)
+        console.log('通义千问大模型回复：', e)
         if (data.waitAnswer) {
           data.currentAssistant.chatMessageList.push({
             id: randomUUID(),
@@ -122,17 +121,17 @@ const useBigModel = async (sessionId: string) => {
         }
         data.currentAssistant.chatMessageList[
           data.currentAssistant.chatMessageList.length - 1
-        ].content += JSON.parse(e.data).result ?? ''
+        ].content = JSON.parse(e.data).output.text ?? ''
         scrollToBottom(chatMessageListRef.value)
       },
       onclose: () => {
-        console.log('文心一言大模型关闭连接')
+        console.log('通义千问大模型关闭连接')
         // 关闭等待
         data.waitAnswer = false
         systemStore.chatWindowLoading = false
       },
       onerror: (err: any) => {
-        console.log('文心一言大模型错误：', err)
+        console.log('通义千问大模型错误：', err)
         // 关闭等待
         data.waitAnswer = false
         systemStore.chatWindowLoading = false
@@ -149,39 +148,36 @@ const useBigModel = async (sessionId: string) => {
 const getBigModelMessages = () => {
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
-  // 将消息历史处理为user和assistant轮流对话
-  let messages = [] as { role: string; content: string }[]
-  let currentRole = 'user' as 'user' | 'assistant'
-  for (let i = data.currentAssistant.chatMessageList.length - 1; i >= 0; i--) {
-    const chatMessage = data.currentAssistant.chatMessageList[i]
-    if (currentRole === chatMessage.role) {
-      messages.unshift({
-        role: chatMessage.role,
-        content: chatMessage.content
-      })
-      currentRole = currentRole === 'user' ? 'assistant' : 'user'
-    }
-  }
-  messages = messages.slice(-1 - data.currentAssistant.contextSize)
-  // 必须user开头user结尾
-  if (messages[0].role === 'assistant') {
-    messages.shift()
-  }
+
+  const messages = data.currentAssistant.chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - data.currentAssistant.contextSize)
+
   // 增加指令
   if (hasInstruction) {
-    data.currentAssistant.chatMessageList[
-      data.currentAssistant.chatMessageList.length - 1
-    ].content = `${data.currentAssistant.instruction}\n${
-      data.currentAssistant.chatMessageList[data.currentAssistant.chatMessageList.length - 1]
-        .content
-    }`
+    messages.unshift({
+      role: 'system',
+      content: data.currentAssistant.instruction
+    })
   }
   // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
   while (
-    messages.length > 1 &&
+    messages.length > (hasInstruction ? 2 : 1) &&
     encodeChat(messages, 'gpt-4-0314').length > data.currentAssistant.inputMaxTokens
   ) {
     messages.shift()
+    if (hasInstruction) {
+      messages.shift()
+      messages.unshift({
+        role: 'system',
+        content: data.currentAssistant.instruction
+      })
+    }
   }
   return messages
 }

@@ -8,6 +8,7 @@ import CollectionSet from '@renderer/components/CollectionSet.vue'
 import OpenAIChatWindow from '@renderer/components/chatwindow/OpenAIChatWindow.vue'
 import SparkChatWindow from '@renderer/components/chatwindow/SparkChatWindow.vue'
 import ErnieBotChatWindow from '@renderer/components/chatwindow/ErnieBotChatWindow.vue'
+import TongyiChatWindow from '@renderer/components/chatwindow/TongyiChatWindow.vue'
 import EmptyChatWindow from '@renderer/components/chatwindow/EmptyChatWindow.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { useSettingStore } from '@renderer/store/setting'
@@ -114,6 +115,11 @@ onMounted(() => {
         <ErnieBotChatWindow
           v-else-if="assistantStore.getCurrentAssistant.provider === 'ERNIEBot'"
           :key="'ERNIEBot' + assistantStore.getCurrentAssistant.id"
+          class="chat-window"
+        />
+        <TongyiChatWindow
+          v-else-if="assistantStore.getCurrentAssistant.provider === 'Tongyi'"
+          :key="'Tongyi' + assistantStore.getCurrentAssistant.id"
           class="chat-window"
         />
         <EmptyChatWindow v-else />

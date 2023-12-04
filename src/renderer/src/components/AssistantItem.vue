@@ -43,6 +43,12 @@ const handleEditModalBeforeOk = async () => {
     if (!data.editForm.name) {
       Message.error(`${t('assistantList.name')} ${t('common.required')}`)
       reject()
+      return
+    }
+    if (!data.editForm.model) {
+      Message.error(`${t('assistantList.model')} ${t('common.required')}`)
+      reject()
+      return
     }
     data.editForm.lastUpdateTime = nowTimestamp()
     emits('update', data.editForm)
@@ -135,7 +141,7 @@ const exportChatMessageList = () => {
       </template>
     </a-popover>
 
-    <!-- 新增助手Modal -->
+    <!-- 编辑助手Modal -->
     <a-modal
       v-model:visible="editModalVisible"
       :ok-text="$t('common.ok')"
@@ -166,14 +172,17 @@ const exportChatMessageList = () => {
             </a-form-item>
             <a-form-item field="provider" :label="$t('assistantList.provider')">
               <a-select v-model="editForm.provider">
-                <a-option value="OpenAI" @click="() => (editForm.model = 'gpt-3.5-turbo')">{{
+                <a-option value="OpenAI" @click="() => (editForm.model = '')">{{
                   $t('bigModelProvider.openAI')
                 }}</a-option>
-                <a-option value="Spark" @click="() => (editForm.model = 'v3.1')">{{
+                <a-option value="Spark" @click="() => (editForm.model = '')">{{
                   $t('bigModelProvider.spark')
                 }}</a-option>
-                <a-option value="ERNIEBot" @click="() => (editForm.model = 'ERNIE-Bot-turbo')">{{
+                <a-option value="ERNIEBot" @click="() => (editForm.model = '')">{{
                   $t('bigModelProvider.ernieBot')
+                }}</a-option>
+                <a-option value="Tongyi" @click="() => (editForm.model = '')">{{
+                  $t('bigModelProvider.tongyi')
                 }}</a-option>
               </a-select>
             </a-form-item>
@@ -196,6 +205,11 @@ const exportChatMessageList = () => {
                 <a-option value="ERNIE-Bot-8K">ERNIE-Bot-8K</a-option>
                 <a-option value="ERNIE-Bot">ERNIE-Bot</a-option>
                 <a-option value="ERNIE-Bot-turbo">ERNIE-Bot-turbo</a-option>
+              </a-select>
+              <a-select v-else-if="editForm.provider === 'Tongyi'" v-model="editForm.model">
+                <a-option value="qwen-turbo">qwen-turbo</a-option>
+                <a-option value="qwen-plus">qwen-plus</a-option>
+                <a-option value="qwen-max">qwen-max</a-option>
               </a-select>
             </a-form-item>
             <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">

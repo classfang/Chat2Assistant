@@ -250,6 +250,24 @@ onMounted(() => {
               </a-space>
             </a-space>
           </a-tab-pane>
+          <a-tab-pane key="5" :title="$t('setting.tongyi.name')">
+            <a-space direction="vertical" :size="20" fill>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.officialWebsite') }}</div>
+                <a-link @click="openInBrowser('https://tongyi.aliyun.com')"
+                  >https://tongyi.aliyun.com</a-link
+                >
+              </a-space>
+              <a-space direction="vertical" :size="10" fill>
+                <div>{{ $t('setting.tongyi.apiKey') }}</div>
+                <a-input
+                  v-model="settingStore.tongyi.apiKey"
+                  size="small"
+                  :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.tongyi.apiKey')"
+                />
+              </a-space>
+            </a-space>
+          </a-tab-pane>
         </a-tabs>
       </div>
     </a-modal>
