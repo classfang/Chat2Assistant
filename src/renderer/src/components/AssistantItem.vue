@@ -285,10 +285,6 @@ const exportChatMessageList = () => {
   align-items: center;
   gap: 15px;
 
-  &:hover {
-    background-color: var(--color-fill-2);
-  }
-
   .assistant-item-avatar {
     flex-shrink: 0;
   }
@@ -304,6 +300,6 @@ const exportChatMessageList = () => {
 }
 
 .assistant-item-active {
-  background-color: var(--color-fill-3) !important;
+  background-color: var(--color-fill-3);
 }
 </style>
