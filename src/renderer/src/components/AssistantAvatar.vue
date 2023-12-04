@@ -31,4 +31,8 @@ defineProps({
   </a-avatar>
 </template>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.assistant-avatar {
+  background-color: var(--color-bg-white);
+}
+</style>
