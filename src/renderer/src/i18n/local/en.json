@@ -64,10 +64,10 @@
     "nickname": "Nickname"
   },
   "bigModelProvider": {
-    "openAI": "OpenAI",
-    "spark": "iFLYTEK Spark",
-    "ernieBot": "ERNIE Bot",
-    "tongyi": "Tongyi Qianwen"
+    "OpenAI": "OpenAI",
+    "Spark": "iFLYTEK Spark",
+    "ERNIEBot": "ERNIE Bot",
+    "Tongyi": "Tongyi Qianwen"
   },
   "assistantList": {
     "new": "New Assistant",

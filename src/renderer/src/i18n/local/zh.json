@@ -64,10 +64,10 @@
     "nickname": "昵称"
   },
   "bigModelProvider": {
-    "openAI": "OpenAI",
-    "spark": "讯飞星火",
-    "ernieBot": "文心一言",
-    "tongyi": "通义千问"
+    "OpenAI": "OpenAI",
+    "Spark": "讯飞星火",
+    "ERNIEBot": "文心一言",
+    "Tongyi": "通义千问"
   },
   "assistantList": {
     "new": "新增助手",

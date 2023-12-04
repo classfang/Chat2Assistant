@@ -5,6 +5,7 @@ import { formatDateTime } from '@renderer/utils/date-util'
 import { Modal } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
+import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.vue'
 import UserAvatar from '@renderer/components/UserAvatar.vue'
 import { downloadFile } from '@renderer/utils/download-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -113,15 +114,7 @@ const exportChatMessageList = (id: string) => {
     </div>
     <div class="collection-set-right">
       <template v-if="currentCollection">
-        <div class="chat-window-header drag-area">
-          <div class="assistant-name">{{ currentCollection.name }}</div>
-          <div class="assistant-desc">
-            <a-space :size="10">
-              <a-tag>{{ currentCollection.provider }}</a-tag>
-              <a-tag>{{ currentCollection.model }}</a-tag>
-            </a-space>
-          </div>
-        </div>
+        <ChatWindowHeader :current-assistant="currentCollection" />
         <div class="chat-message-list">
           <div v-for="msg in currentCollection.chatMessageList" :key="msg.id" class="chat-message">
             <div class="chat-message-avatar">
@@ -218,10 +211,6 @@ const exportChatMessageList = (id: string) => {
         flex-direction: column;
         gap: 15px;
 
-        &:hover {
-          background-color: var(--color-fill-2);
-        }
-
         .collection-body {
           flex-grow: 1;
           display: flex;
@@ -255,7 +244,7 @@ const exportChatMessageList = (id: string) => {
       }
 
       .collection-active {
-        background-color: var(--color-fill-3) !important;
+        background-color: var(--color-fill-3);
       }
     }
   }

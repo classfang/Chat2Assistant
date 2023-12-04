@@ -173,16 +173,16 @@ const exportChatMessageList = () => {
             <a-form-item field="provider" :label="$t('assistantList.provider')">
               <a-select v-model="editForm.provider">
                 <a-option value="OpenAI" @click="() => (editForm.model = '')">{{
-                  $t('bigModelProvider.openAI')
+                  $t('bigModelProvider.OpenAI')
                 }}</a-option>
                 <a-option value="Spark" @click="() => (editForm.model = '')">{{
-                  $t('bigModelProvider.spark')
+                  $t('bigModelProvider.Spark')
                 }}</a-option>
                 <a-option value="ERNIEBot" @click="() => (editForm.model = '')">{{
-                  $t('bigModelProvider.ernieBot')
+                  $t('bigModelProvider.ERNIEBot')
                 }}</a-option>
                 <a-option value="Tongyi" @click="() => (editForm.model = '')">{{
-                  $t('bigModelProvider.tongyi')
+                  $t('bigModelProvider.Tongyi')
                 }}</a-option>
               </a-select>
             </a-form-item>

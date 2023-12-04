@@ -4,6 +4,7 @@ import { onMounted, reactive, ref, toRefs } from 'vue'
 import UserAvatar from '@renderer/components/UserAvatar.vue'
 import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
 import MultipleChoiceConsole from '@renderer/components/chatwindow/MultipleChoiceConsole.vue'
+import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
@@ -207,15 +208,7 @@ onMounted(() => {
 
 <template>
   <div class="chat-window">
-    <div class="chat-window-header drag-area">
-      <div class="assistant-name">{{ currentAssistant?.name }}</div>
-      <div class="assistant-desc">
-        <a-space :size="10">
-          <a-tag>{{ currentAssistant?.provider }}</a-tag>
-          <a-tag>{{ currentAssistant?.model }}</a-tag>
-        </a-space>
-      </div>
-    </div>
+    <ChatWindowHeader :current-assistant="currentAssistant" />
     <div ref="chatMessageListRef" class="chat-message-list">
       <a-dropdown
         v-for="(msg, index) in currentAssistant.chatMessageList"

@@ -19,7 +19,7 @@ const { activeKey } = toRefs(data)
       <a-tab-pane key="1">
         <template #title>
           <div class="tab-title no-drag-area">
-            <div>{{ $t('bigModelProvider.openAI') }}</div>
+            <div>{{ $t('bigModelProvider.OpenAI') }}</div>
             <a-button
               v-if="activeKey === '1'"
               type="text"
@@ -41,7 +41,7 @@ const { activeKey } = toRefs(data)
       <a-tab-pane key="2">
         <template #title>
           <div class="tab-title no-drag-area">
-            <div>{{ $t('bigModelProvider.spark') }}</div>
+            <div>{{ $t('bigModelProvider.Spark') }}</div>
             <a-button
               v-if="activeKey === '2'"
               type="text"
@@ -63,7 +63,7 @@ const { activeKey } = toRefs(data)
       <a-tab-pane key="3">
         <template #title>
           <div class="tab-title no-drag-area">
-            <div>{{ $t('bigModelProvider.ernieBot') }}</div>
+            <div>{{ $t('bigModelProvider.ERNIEBot') }}</div>
             <a-button
               v-if="activeKey === '3'"
               type="text"
@@ -85,7 +85,7 @@ const { activeKey } = toRefs(data)
       <a-tab-pane key="4">
         <template #title>
           <div class="tab-title no-drag-area">
-            <div>{{ $t('bigModelProvider.tongyi') }}</div>
+            <div>{{ $t('bigModelProvider.Tongyi') }}</div>
             <a-button
               v-if="activeKey === '4'"
               type="text"

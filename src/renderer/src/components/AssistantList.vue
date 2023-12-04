@@ -162,16 +162,16 @@ const assistantItemDelete = (id: string) => {
             <a-form-item field="provider" :label="$t('assistantList.provider')">
               <a-select v-model="newForm.provider">
                 <a-option value="OpenAI" @click="() => (newForm.model = '')">{{
-                  $t('bigModelProvider.openAI')
+                  $t('bigModelProvider.OpenAI')
                 }}</a-option>
                 <a-option value="Spark" @click="() => (newForm.model = '')">{{
-                  $t('bigModelProvider.spark')
+                  $t('bigModelProvider.Spark')
                 }}</a-option>
                 <a-option value="ERNIEBot" @click="() => (newForm.model = '')">{{
-                  $t('bigModelProvider.ernieBot')
+                  $t('bigModelProvider.ERNIEBot')
                 }}</a-option>
                 <a-option value="Tongyi" @click="() => (newForm.model = '')">{{
-                  $t('bigModelProvider.tongyi')
+                  $t('bigModelProvider.Tongyi')
                 }}</a-option>
               </a-select>
             </a-form-item>
