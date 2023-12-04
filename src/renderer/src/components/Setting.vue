@@ -234,7 +234,7 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.ernieBot.apiKey') }}</div>
-                <a-input
+                <a-input-password
                   v-model="settingStore.ernieBot.apiKey"
                   size="small"
                   :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.ernieBot.apiKey')"
@@ -260,7 +260,7 @@ onMounted(() => {
               </a-space>
               <a-space direction="vertical" :size="10" fill>
                 <div>{{ $t('setting.tongyi.apiKey') }}</div>
-                <a-input
+                <a-input-password
                   v-model="settingStore.tongyi.apiKey"
                   size="small"
                   :placeholder="$t('common.pleaseEnter') + ' ' + $t('setting.tongyi.apiKey')"
