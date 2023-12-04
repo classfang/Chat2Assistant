@@ -87,7 +87,7 @@ const selectImageRequest = (option: RequestOption) => {
                 v-if="avatarFile && avatarFile.url"
                 class="arco-upload-list-picture custom-upload-avatar"
               >
-                <img :src="avatarFile.url" />
+                <img :src="'file://' + avatarFile.url" />
                 <div class="arco-upload-list-picture-mask">
                   <IconEdit />
                 </div>
