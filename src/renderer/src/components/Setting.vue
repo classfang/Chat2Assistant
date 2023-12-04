@@ -77,7 +77,13 @@ const clearCache = async () => {
 const exportSettingBackup = () => {
   exportTextFile(
     `setting-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
-    JSON.stringify(settingStore)
+    JSON.stringify({
+      app: settingStore.app,
+      openAI: settingStore.openAI,
+      spark: settingStore.spark,
+      ernieBot: settingStore.ernieBot,
+      tongyi: settingStore.tongyi
+    })
   )
 }
 
@@ -85,8 +91,13 @@ const exportDataBackup = () => {
   exportTextFile(
     `data-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
     JSON.stringify({
-      assistantStore,
-      collectionSetStore
+      assistantStore: {
+        assistantList: assistantStore.assistantList,
+        currentAssistantId: assistantStore.currentAssistantId
+      },
+      collectionSetStore: {
+        chatMessageSetList: collectionSetStore.chatMessageSetList
+      }
     })
   )
 }
@@ -331,6 +342,15 @@ onMounted(() => {
                     </a-button>
                   </a-space>
                 </div>
+              </a-space>
+              <a-space direction="vertical" :size="10">
+                <div>{{ $t('setting.backup.cacheBackup') }}</div>
+                <a-button size="mini" @click="openCacheDir()">
+                  <a-space :size="5">
+                    <icon-folder />
+                    <span>{{ $t('setting.app.cache.path') }}</span>
+                  </a-space>
+                </a-button>
               </a-space>
             </a-space>
           </a-tab-pane>

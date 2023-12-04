@@ -115,6 +115,11 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
+// 打开开发者控制台
+ipcMain.handle('openDevTools', () => {
+  mainWindow.webContents.openDevTools()
+})
+
 // 存储相关
 const store = new Store()
 ipcMain.handle('getStoreValue', (_event, key) => {
