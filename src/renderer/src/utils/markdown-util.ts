@@ -21,6 +21,9 @@ clipboard.on('success', () => {
 
 const markdown = new MarkdownIt({
   highlight: (str: string, lang: string) => {
+    if (!lang) {
+      lang = 'text'
+    }
     let codeHtml = `<code class="hljs language-${lang}">${
       hljs.highlight(str, { language: lang }).value
     }</code>`
