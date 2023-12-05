@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
 import OpenAI from 'openai'
-import { encodeChat } from 'gpt-tokenizer'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
@@ -226,7 +226,7 @@ const getBigModelMessages = async () => {
   // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
   while (
     messages.length > (hasInstruction ? 2 : 1) &&
-    encodeChat(messages, 'gpt-4-0314').length > data.currentAssistant.inputMaxTokens
+    getChatTokensLength(messages) > data.currentAssistant.inputMaxTokens
   ) {
     messages.shift()
     if (hasInstruction) {

@@ -8,7 +8,7 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
-import { encodeChat } from 'gpt-tokenizer'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -175,7 +175,7 @@ const getBigModelMessages = () => {
   // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
   while (
     messages.length > (hasInstruction ? 2 : 1) &&
-    encodeChat(messages, 'gpt-4-0314').length > data.currentAssistant.inputMaxTokens
+    getChatTokensLength(messages) > data.currentAssistant.inputMaxTokens
   ) {
     messages.shift()
     if (hasInstruction) {
