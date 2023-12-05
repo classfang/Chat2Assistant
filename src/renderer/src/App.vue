@@ -132,6 +132,7 @@ onMounted(() => {
       <WebApp />
     </div>
 
+    <!-- 全局加载遮罩 -->
     <div v-if="systemStore.globalLoading" class="global-loading">
       <a-spin :size="26" />
     </div>
