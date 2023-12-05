@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, clipboard, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, clipboard, dialog, globalShortcut } from 'electron'
 import { join } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -100,6 +100,12 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+
+  // 注册全局快捷键
+  globalShortcut.register('CommandOrControl+T', () => {
+    console.log('CommandOrControl+T is pressed')
+    mainWindow?.webContents.openDevTools()
   })
 })
 
