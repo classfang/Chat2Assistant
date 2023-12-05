@@ -240,7 +240,7 @@ const exportChatMessageList = () => {
             <!-- 提供商 -->
             <a-form-item field="provider" :label="$t('assistantList.provider')">
               <a-select v-model="editForm.provider">
-                <a-option value="OpenAI">{{ $t('bigModelProvider.openAI') }}</a-option>
+                <a-option value="OpenAI">{{ $t('bigModelProvider.OpenAI') }}</a-option>
               </a-select>
             </a-form-item>
             <!-- 模型 -->
