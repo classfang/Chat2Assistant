@@ -139,6 +139,7 @@ const useBigModel = async (sessionId: string) => {
         systemStore.chatWindowLoading = false
         // 抛出异常防止重连
         if (err instanceof Error) {
+          Message.error(err.message)
           throw err
         }
       }

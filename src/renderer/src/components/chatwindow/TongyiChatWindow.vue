@@ -122,7 +122,7 @@ const useBigModel = async (sessionId: string) => {
         }
         data.currentAssistant.chatMessageList[
           data.currentAssistant.chatMessageList.length - 1
-        ].content = JSON.parse(e.data).output.text ?? ''
+        ].content = JSON.parse(e.data).output?.text ?? ''
         scrollToBottom(chatMessageListRef.value)
       },
       onclose: () => {
@@ -138,6 +138,7 @@ const useBigModel = async (sessionId: string) => {
         systemStore.chatWindowLoading = false
         // 抛出异常防止重连
         if (err instanceof Error) {
+          Message.error(err.message)
           throw err
         }
       }
@@ -179,6 +180,10 @@ const getBigModelMessages = () => {
         content: data.currentAssistant.instruction
       })
     }
+  }
+  // 第一条消息的 role 必须是 system 或者 user
+  while (messages[0].role === 'assistant') {
+    messages.shift()
   }
   return messages
 }
