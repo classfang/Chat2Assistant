@@ -210,6 +210,7 @@ const exportChatMessageList = () => {
                 <a-option value="qwen-turbo">qwen-turbo</a-option>
                 <a-option value="qwen-plus">qwen-plus</a-option>
                 <a-option value="qwen-max">qwen-max</a-option>
+                <a-option value="qwen-vl-plus">qwen-vl-plus</a-option>
               </a-select>
             </a-form-item>
             <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">

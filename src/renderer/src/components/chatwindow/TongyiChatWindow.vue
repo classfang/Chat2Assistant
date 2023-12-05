@@ -16,6 +16,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
+import { getTongyiChatUrl } from '@renderer/utils/tongyi-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -88,62 +89,66 @@ const useBigModel = async (sessionId: string) => {
     return
   }
 
-  fetchEventSource(
-    'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-    {
-      signal: abortCtr.signal,
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${settingStore.tongyi.apiKey}`,
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream'
-      },
-      body: JSON.stringify({
-        model: data.currentAssistant.model,
-        input: {
-          messages: getBigModelMessages()
-        }
-      }),
-      onmessage: (e) => {
-        if (sessionId != data.sessionId) {
-          return
-        }
-        console.log('通义千问大模型回复：', e)
-        if (data.waitAnswer) {
-          data.currentAssistant.chatMessageList.push({
-            id: randomUUID(),
-            type: 'text',
-            role: 'assistant' as ChatRole,
-            content: '',
-            createTime: nowTimestamp()
-          })
-          scrollToBottom(chatMessageListRef.value)
-          data.waitAnswer = false
-        }
+  fetchEventSource(getTongyiChatUrl(data.currentAssistant.model), {
+    signal: abortCtr.signal,
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${settingStore.tongyi.apiKey}`,
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream'
+    },
+    body: JSON.stringify({
+      model: data.currentAssistant.model,
+      input: {
+        messages: getBigModelMessages()
+      }
+    }),
+    onmessage: (e) => {
+      if (sessionId != data.sessionId) {
+        return
+      }
+      console.log('通义千问大模型回复：', e)
+      if (data.waitAnswer) {
+        data.currentAssistant.chatMessageList.push({
+          id: randomUUID(),
+          type: 'text',
+          role: 'assistant' as ChatRole,
+          content: '',
+          createTime: nowTimestamp()
+        })
+        scrollToBottom(chatMessageListRef.value)
+        data.waitAnswer = false
+      }
+      if (data.currentAssistant.model === 'qwen-vl-plus') {
+        data.currentAssistant.chatMessageList[
+          data.currentAssistant.chatMessageList.length - 1
+        ].content = JSON.parse(e.data).output?.choices[0]?.message?.content[0]?.text ?? ''
+      } else {
         data.currentAssistant.chatMessageList[
           data.currentAssistant.chatMessageList.length - 1
         ].content = JSON.parse(e.data).output?.text ?? ''
-        scrollToBottom(chatMessageListRef.value)
-      },
-      onclose: () => {
-        console.log('通义千问大模型关闭连接')
-        // 关闭等待
-        data.waitAnswer = false
-        systemStore.chatWindowLoading = false
-      },
-      onerror: (err: any) => {
-        console.log('通义千问大模型错误：', err)
-        // 关闭等待
-        data.waitAnswer = false
-        systemStore.chatWindowLoading = false
-        // 抛出异常防止重连
-        if (err instanceof Error) {
-          Message.error(err.message)
-          throw err
-        }
+      }
+
+      scrollToBottom(chatMessageListRef.value)
+    },
+    onclose: () => {
+      console.log('通义千问大模型关闭连接')
+      // 关闭等待
+      data.waitAnswer = false
+      systemStore.chatWindowLoading = false
+    },
+    onerror: (err: any) => {
+      console.log('通义千问大模型错误：', err)
+      // 关闭等待
+      data.waitAnswer = false
+      systemStore.chatWindowLoading = false
+      // 抛出异常防止重连
+      if (err instanceof Error) {
+        Message.error(err.message)
+        throw err
       }
     }
-  )
+  })
 }
 
 // 将历史消息处理为大模型需要的结构
@@ -185,6 +190,14 @@ const getBigModelMessages = () => {
   while (messages[0].role === 'assistant') {
     messages.shift()
   }
+
+  // 处理
+  if (data.currentAssistant.model === 'qwen-vl-plus') {
+    return messages.map((msg) => {
+      return { role: msg.role, content: [{ text: msg.content }] }
+    })
+  }
+
   return messages
 }
 
