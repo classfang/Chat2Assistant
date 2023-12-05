@@ -77,13 +77,7 @@ const clearCache = async () => {
 const exportSettingBackup = () => {
   exportTextFile(
     `setting-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
-    JSON.stringify({
-      app: settingStore.app,
-      openAI: settingStore.openAI,
-      spark: settingStore.spark,
-      ernieBot: settingStore.ernieBot,
-      tongyi: settingStore.tongyi
-    })
+    settingStore.getStoreJson
   )
 }
 
@@ -91,13 +85,9 @@ const exportDataBackup = () => {
   exportTextFile(
     `data-${formatDateTime(new Date(), 'YYYYMMDDHHmmss')}.c2a`,
     JSON.stringify({
-      assistantStore: {
-        assistantList: assistantStore.assistantList,
-        currentAssistantId: assistantStore.currentAssistantId
-      },
-      collectionSetStore: {
-        chatMessageSetList: collectionSetStore.chatMessageSetList
-      }
+      userStore: userStore.getStoreJson,
+      assistantStore: assistantStore.getStoreJson,
+      collectionSetStore: collectionSetStore.getStoreJson
     })
   )
 }
@@ -114,29 +104,10 @@ const importSettingBackup = () => {
           'c2a'
         ])
         if (selectFileResult) {
-          let importFlag = false
           systemStore.globalLoading = true
-          const settingBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
-          if ('app' in settingBackup) {
-            settingStore.app = settingBackup.app
-            importFlag = true
-          }
-          if ('openAI' in settingBackup) {
-            settingStore.openAI = settingBackup.openAI
-            importFlag = true
-          }
-          if ('spark' in settingBackup) {
-            settingStore.spark = settingBackup.spark
-            importFlag = true
-          }
-          if ('ernieBot' in settingBackup) {
-            settingStore.ernieBot = settingBackup.ernieBot
-            importFlag = true
-          }
-          if ('tongyi' in settingBackup) {
-            settingStore.tongyi = settingBackup.tongyi
-            importFlag = true
-          }
+          const importFlag = settingStore.setStoreFromJson(
+            new TextDecoder().decode(selectFileResult)
+          )
           if (importFlag) {
             Message.success(t('setting.backup.importSuccess'))
           } else {
@@ -167,23 +138,10 @@ const importDataBackup = () => {
           let importFlag = false
           systemStore.globalLoading = true
           const dataBackup = JSON.parse(new TextDecoder().decode(selectFileResult))
-          if ('assistantStore' in dataBackup) {
-            if ('assistantList' in dataBackup.assistantStore) {
-              assistantStore.assistantList = dataBackup.assistantStore.assistantList
-              importFlag = true
-            }
-            if ('currentAssistantId' in dataBackup.assistantStore) {
-              assistantStore.currentAssistantId = dataBackup.assistantStore.currentAssistantId
-              importFlag = true
-            }
-          }
-          if ('collectionSetStore' in dataBackup) {
-            if ('chatMessageSetList' in dataBackup.collectionSetStore) {
-              collectionSetStore.chatMessageSetList =
-                dataBackup.collectionSetStore.chatMessageSetList
-              importFlag = true
-            }
-          }
+          importFlag = userStore.setStoreFromJson(dataBackup.userStore) || importFlag
+          importFlag = assistantStore.setStoreFromJson(dataBackup.assistantStore) || importFlag
+          importFlag =
+            collectionSetStore.setStoreFromJson(dataBackup.collectionSetStore) || importFlag
           if (importFlag) {
             Message.success(t('setting.backup.importSuccess'))
           } else {

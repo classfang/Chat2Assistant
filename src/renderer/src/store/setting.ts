@@ -26,5 +26,46 @@ export const useSettingStore = defineStore({
       apiKey: ''
     }
   }),
+  getters: {
+    getStoreJson(): string {
+      return JSON.stringify({
+        app: this.app,
+        openAI: this.openAI,
+        spark: this.spark,
+        ernieBot: this.ernieBot,
+        tongyi: this.tongyi
+      })
+    }
+  },
+  actions: {
+    setStoreFromJson(json: string) {
+      let importFlag = false
+      if (!json) {
+        return importFlag
+      }
+      const settingBackup = JSON.parse(json)
+      if (settingBackup.app !== undefined) {
+        this.app = settingBackup.app
+        importFlag = true
+      }
+      if (settingBackup.openAI !== undefined) {
+        this.openAI = settingBackup.openAI
+        importFlag = true
+      }
+      if (settingBackup.spark !== undefined) {
+        this.spark = settingBackup.spark
+        importFlag = true
+      }
+      if (settingBackup.ernieBot !== undefined) {
+        this.ernieBot = settingBackup.ernieBot
+        importFlag = true
+      }
+      if (settingBackup.tongyi !== undefined) {
+        this.tongyi = settingBackup.tongyi
+        importFlag = true
+      }
+      return importFlag
+    }
+  },
   persist: true
 })
