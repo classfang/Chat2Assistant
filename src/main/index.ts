@@ -118,8 +118,14 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+// 退出应用之前（手动关闭一些资源，防止出现意外关闭错误提示）
+app.on('before-quit', async (e) => {
+  e.preventDefault()
+  // 销毁主窗口
+  mainWindow.destroy()
+  // 退出应用
+  app.exit()
+})
 
 // 打开开发者控制台
 ipcMain.handle('openDevTools', () => {
