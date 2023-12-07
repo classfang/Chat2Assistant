@@ -117,7 +117,7 @@ const exportChatMessageList = (id: string) => {
     </div>
     <div class="collection-set-right">
       <template v-if="currentCollection">
-        <ChatWindowHeader :current-assistant="currentCollection" />
+        <ChatWindowHeader :current-chat-message-set="currentCollection" />
         <div class="chat-message-list">
           <div v-for="msg in currentCollection.chatMessageList" :key="msg.id" class="chat-message">
             <div class="chat-message-avatar">

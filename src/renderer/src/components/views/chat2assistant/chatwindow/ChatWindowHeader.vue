@@ -17,6 +17,10 @@ const props = defineProps({
   currentAssistant: {
     type: Object as () => Assistant,
     default: () => {}
+  },
+  currentChatMessageSet: {
+    type: Object as () => ChatMessageSet,
+    default: () => {}
   }
 })
 
@@ -113,18 +117,22 @@ const assistantDelete = () => {
 
 <template>
   <div class="chat-window-header drag-area">
-    <div class="assistant-name">{{ currentAssistant.name }}</div>
+    <div class="assistant-name">{{ currentAssistant?.name || currentChatMessageSet.name }}</div>
     <div class="assistant-desc">
       <a-space :size="10">
-        <a-tag>{{ $t(`bigModelProvider.${currentAssistant.provider}`) }}</a-tag>
-        <a-tag>{{ currentAssistant.model }}</a-tag>
+        <a-tag>{{
+          $t(`bigModelProvider.${currentAssistant?.provider || currentChatMessageSet.provider}`)
+        }}</a-tag>
+        <a-tag>{{ currentAssistant?.model || currentChatMessageSet.model }}</a-tag>
       </a-space>
     </div>
-    <a-popover position="br" trigger="click" :content-style="{ padding: '5px' }">
-      <icon-more
-        class="no-drag-area"
-        style="font-size: 20px; font-weight: 600; flex-shrink: 0; margin-left: auto"
-      />
+    <a-popover
+      v-if="currentAssistant"
+      position="br"
+      trigger="click"
+      :content-style="{ padding: '5px' }"
+    >
+      <icon-more class="no-drag-area" style="font-size: 20px; font-weight: 600; flex-shrink: 0" />
       <template #content>
         <a-space direction="vertical" fill>
           <a-button
@@ -304,6 +312,7 @@ const assistantDelete = () => {
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 15px;
   border-bottom: 1px solid var(--color-border-1);
   box-sizing: border-box;
@@ -312,6 +321,10 @@ const assistantDelete = () => {
   .assistant-name {
     font-size: 16px;
     font-weight: 500;
+  }
+
+  .assistant-desc {
+    margin-left: auto;
   }
 }
 </style>
