@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
 import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
-import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
+import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/big-model/spark-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -310,3 +310,4 @@ onMounted(() => {
 <style lang="less" scoped>
 @import '../../assets/css/chat-window.less';
 </style>
+@renderer/utils/big-model/spark-util

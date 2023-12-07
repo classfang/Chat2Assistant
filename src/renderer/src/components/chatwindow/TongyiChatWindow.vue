@@ -16,7 +16,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
-import { getTongyiChatUrl } from '@renderer/utils/tongyi-util'
+import { getTongyiChatUrl } from '@renderer/utils/big-model/tongyi-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -339,3 +339,4 @@ onMounted(() => {
 <style lang="less" scoped>
 @import '../../assets/css/chat-window.less';
 </style>
+@renderer/utils/big-model/tongyi-util

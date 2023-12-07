@@ -12,7 +12,7 @@ import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
-import { getErnieBotChatUrl } from '@renderer/utils/ernie-bot-util'
+import { getErnieBotChatUrl } from '@renderer/utils/big-model/ernie-bot-util'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
@@ -326,3 +326,4 @@ onMounted(() => {
 <style lang="less" scoped>
 @import '../../assets/css/chat-window.less';
 </style>
+@renderer/utils/big-model/ernie-bot-util

@@ -8,7 +8,6 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
-import OpenAI from 'openai'
 import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
@@ -18,11 +17,8 @@ import { useAssistantStore } from '@renderer/store/assistant'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
-import {
-  readLocalImageBase64,
-  saveFileByPath,
-  saveFileByUrl
-} from '@renderer/utils/main-thread-util'
+import { readLocalImageBase64, saveFileByPath } from '@renderer/utils/main-thread-util'
+import { openaiChat } from '@renderer/utils/big-model/openai-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -117,76 +113,50 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
-  const openai = new OpenAI({
+  openaiChat({
     apiKey: settingStore.openAI.key,
     baseURL: settingStore.openAI.baseUrl,
-    dangerouslyAllowBrowser: true
-  })
-  if (data.currentAssistant.type === 'chat') {
-    // OpenAI对话
-    const stream = await openai.chat.completions.create({
-      messages: (await getBigModelMessages()) as Array<ChatCompletionMessageParam>,
-      model: data.currentAssistant.model,
-      stream: true,
-      max_tokens: data.currentAssistant.maxTokens
-    })
-    if (sessionId != data.sessionId) {
-      return
-    }
-    data.currentAssistant.chatMessageList.push({
-      id: randomUUID(),
-      type: 'text',
-      role: 'assistant' as ChatRole,
-      content: '',
-      createTime: nowTimestamp()
-    })
-    scrollToBottom(chatMessageListRef.value)
-    data.waitAnswer = false
-    for await (const chunk of stream) {
-      if (sessionId != data.sessionId) {
-        return
-      }
-      console.log(`OpenAi【消息】: ${JSON.stringify(chunk.choices[0])}`)
+    type: data.currentAssistant.type,
+    model: data.currentAssistant.model,
+    maxTokens: data.currentAssistant.maxTokens,
+    messages: (await getBigModelMessages()) as ChatCompletionMessageParam[],
+    imagePrompt: question,
+    imageSize: data.currentAssistant.imageSize,
+    checkSession: () => sessionId === data.sessionId,
+    startAnswer: (content) => {
+      data.currentAssistant.chatMessageList.push({
+        id: randomUUID(),
+        type: 'text',
+        role: 'assistant' as ChatRole,
+        content,
+        createTime: nowTimestamp()
+      })
+      scrollToBottom(chatMessageListRef.value)
+      data.waitAnswer = false
+    },
+    appendAnswer: (content) => {
       data.currentAssistant.chatMessageList[
         data.currentAssistant.chatMessageList.length - 1
-      ].content += chunk.choices[0].delta.content ?? ''
+      ].content += content
       scrollToBottom(chatMessageListRef.value)
+    },
+    imageGenerated: (imageUrl) => {
+      data.currentAssistant.chatMessageList.push({
+        id: randomUUID(),
+        type: 'img',
+        role: 'assistant' as ChatRole,
+        content: '',
+        image: imageUrl,
+        createTime: nowTimestamp()
+      })
+      scrollToBottom(chatMessageListRef.value)
+      data.waitAnswer = false
+    },
+    end: () => {
+      // 关闭等待
+      systemStore.chatWindowLoading = false
     }
-  } else if (data.currentAssistant.type === 'drawing') {
-    const imagesResponse = await openai.images.generate({
-      prompt: question,
-      model: data.currentAssistant.model,
-      size: data.currentAssistant.imageSize as
-        | '256x256'
-        | '512x512'
-        | '1024x1024'
-        | '1792x1024'
-        | '1024x1792'
-        | null,
-      response_format: 'url'
-    })
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log(`OpenAi【消息】: ${JSON.stringify(imagesResponse)}`)
-    let imageUrl = imagesResponse.data[0].url ?? ''
-    if (imageUrl) {
-      imageUrl = await saveFileByUrl(imageUrl, `${randomUUID()}.png`)
-    }
-    data.currentAssistant.chatMessageList.push({
-      id: randomUUID(),
-      type: 'img',
-      role: 'assistant' as ChatRole,
-      content: '',
-      image: imageUrl,
-      createTime: nowTimestamp()
-    })
-    scrollToBottom(chatMessageListRef.value)
-    data.waitAnswer = false
-  }
-
-  // 关闭等待
-  systemStore.chatWindowLoading = false
+  })
 }
 
 // 将历史消息处理为大模型需要的结构
