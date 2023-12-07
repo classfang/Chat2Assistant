@@ -14,8 +14,8 @@ const assistantStore = useAssistantStore()
     </div>
     <div class="chat-assistant-right">
       <ChatWindow
-        v-if="assistantStore.getCurrentAssistant"
-        :key="'chat-window-' + assistantStore.getCurrentAssistant.id"
+        v-if="assistantStore.currentAssistantId"
+        :key="'chat-window-' + assistantStore.currentAssistantId"
         class="chat-window"
       />
       <EmptyChatWindow v-else />

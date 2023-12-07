@@ -110,6 +110,12 @@
     "imageSize": "Image Size",
     "search": "Search assistant"
   },
+  "assistantItem": {
+    "content": {
+      "image": "[Image]",
+      "empty": "[No chat]"
+    }
+  },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
     "stop": "Stop",

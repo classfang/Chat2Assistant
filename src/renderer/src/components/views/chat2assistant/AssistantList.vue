@@ -3,14 +3,12 @@ import { reactive, toRefs } from 'vue'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
-import { copyFields, copyObj } from '@renderer/utils/object-util'
+import { copyObj } from '@renderer/utils/object-util'
 import AssistantItem from '@renderer/components/views/chat2assistant/AssistantItem.vue'
-import { useSystemStore } from '@renderer/store/system'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import draggable from 'vuedraggable'
 
-const systemStore = useSystemStore()
 const assistantStore = useAssistantStore()
 const { t } = useI18n()
 
@@ -67,26 +65,6 @@ const newFormTypeChange = () => {
   data.newForm.provider = 'OpenAI'
   data.newForm.model = ''
 }
-
-const assistantItemActive = (assistant: Assistant) => {
-  if (systemStore.chatWindowLoading) {
-    return
-  }
-  assistantStore.currentAssistantId = assistant.id
-}
-
-const assistantItemUpdate = (newAssistant: Assistant) => {
-  const index = assistantStore.assistantList.findIndex((a) => a.id === newAssistant.id)
-  if (index < 0) {
-    return
-  }
-  copyFields(newAssistant, assistantStore.assistantList[index])
-}
-
-const assistantItemDelete = (id: string) => {
-  assistantStore.assistantList = assistantStore.assistantList.filter((a) => a.id != id)
-  assistantStore.currentAssistantId = null
-}
 </script>
 
 <template>
@@ -112,12 +90,7 @@ const assistantItemDelete = (id: string) => {
         <AssistantItem
           v-show="element.name.includes(keyword)"
           :assistant="element"
-          :is-active="assistantStore.currentAssistantId === element.id"
           class="assistant-item"
-          @click="assistantItemActive(element)"
-          @delete="assistantItemDelete(element.id)"
-          @update="assistantItemUpdate"
-          @clear="element.chatMessageList = []"
         />
       </template>
     </draggable>

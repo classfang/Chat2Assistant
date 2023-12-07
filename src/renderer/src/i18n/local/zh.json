@@ -110,6 +110,12 @@
     "imageSize": "图片大小",
     "search": "搜索助手"
   },
+  "assistantItem": {
+    "content": {
+      "image": "[图片]",
+      "empty": "[暂无对话]"
+    }
+  },
   "chatWindow": {
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",
     "stop": "停止",
