@@ -249,7 +249,7 @@ const useBigModel = async (sessionId: string) => {
   }
 
   // 大模型能力调用
-  chat2bigModel(data.currentAssistant.provider, {
+  await chat2bigModel(data.currentAssistant.provider, {
     ...chat2bigModelOption,
     ...otherOption
   })
