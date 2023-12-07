@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ChatWindow from '@renderer/components/views/chat2assistant/chatwindow/ChatWindow.vue'
-import EmptyChatWindow from '@renderer/components/views/chat2assistant/chatwindow/EmptyChatWindow.vue'
-import AssistantList from '@renderer/components/views/chat2assistant/AssistantList.vue'
+import ChatWindow from '@renderer/components/views/chat2assistant/chat-window/ChatWindow.vue'
+import EmptyChatWindow from '@renderer/components/views/chat2assistant/chat-window/EmptyChatWindow.vue'
+import AssistantList from '@renderer/components/views/chat2assistant/assistant-list/AssistantList.vue'
 import { useAssistantStore } from '@renderer/store/assistant'
 
 const assistantStore = useAssistantStore()
