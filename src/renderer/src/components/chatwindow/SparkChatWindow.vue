@@ -15,7 +15,7 @@ import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
-import { chat2spark } from '@renderer/utils/big-model/spark-util'
+import { chat2bigModel } from '@renderer/utils/big-model'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -90,7 +90,7 @@ const useBigModel = async (sessionId: string) => {
 
   // 大模型调用
   // 星火大模型对话
-  chat2spark({
+  chat2bigModel(data.currentAssistant.provider, {
     appId: settingStore.spark.appId,
     secret: settingStore.spark.secret,
     key: settingStore.spark.key,

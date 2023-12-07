@@ -20,7 +20,7 @@ export const getErnieBotChatUrl = (model: string) => {
   }
 }
 
-export const chat2ernieBot = async (option: {
+export interface Chat2ERNIEBotOption {
   apiKey: string
   secretKey: string
   model: string
@@ -30,7 +30,9 @@ export const chat2ernieBot = async (option: {
   startAnswer?: (content: string) => void
   appendAnswer?: (content: string) => void
   end?: (err?: any) => void
-}) => {
+}
+
+export const chat2ernieBot = async (option: Chat2ERNIEBotOption) => {
   const {
     apiKey,
     secretKey,

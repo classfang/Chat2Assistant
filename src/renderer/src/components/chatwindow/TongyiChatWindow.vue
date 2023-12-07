@@ -15,7 +15,7 @@ import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
-import { chat2tongyi } from '@renderer/utils/big-model/tongyi-util'
+import { chat2bigModel } from '@renderer/utils/big-model'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -90,7 +90,7 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
-  chat2tongyi({
+  chat2bigModel(data.currentAssistant.provider, {
     apiKey: settingStore.tongyi.apiKey,
     model: data.currentAssistant.model,
     abortCtr,

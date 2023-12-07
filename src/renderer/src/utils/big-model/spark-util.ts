@@ -44,7 +44,7 @@ export const getSparkWsRequestParam = (
   })
 }
 
-export const chat2spark = async (option: {
+export interface Chat2SparkOption {
   appId: string
   secret: string
   key: string
@@ -54,7 +54,9 @@ export const chat2spark = async (option: {
   startAnswer?: (content: string) => void
   appendAnswer?: (content: string) => void
   end?: () => void
-}) => {
+}
+
+export const chat2spark = async (option: Chat2SparkOption) => {
   const { appId, secret, key, model, messages, checkSession, startAnswer, appendAnswer, end } =
     option
 

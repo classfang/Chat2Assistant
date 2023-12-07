@@ -3,7 +3,7 @@ import { ChatCompletionMessageParam } from 'openai/resources/chat'
 import { saveFileByUrl } from '@renderer/utils/main-thread-util'
 import { randomUUID } from '@renderer/utils/id-util'
 
-export const chat2openai = async (option: {
+export interface Chat2OpenAIOption {
   apiKey: string
   baseURL: string
   type: 'chat' | 'drawing'
@@ -17,7 +17,9 @@ export const chat2openai = async (option: {
   appendAnswer?: (content: string) => void
   imageGenerated?: (imageUrl: string) => void
   end?: () => void
-}) => {
+}
+
+export const chat2openai = async (option: Chat2OpenAIOption) => {
   const {
     apiKey,
     baseURL,

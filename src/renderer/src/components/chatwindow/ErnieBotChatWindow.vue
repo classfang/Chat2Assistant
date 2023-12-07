@@ -15,7 +15,7 @@ import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
-import { chat2ernieBot } from '@renderer/utils/big-model/ernie-bot-util'
+import { chat2bigModel } from '@renderer/utils/big-model'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -91,7 +91,7 @@ const useBigModel = async (sessionId: string) => {
 
   // 大模型调用
   // 文心一言模型对话
-  chat2ernieBot({
+  chat2bigModel(data.currentAssistant.provider, {
     apiKey: settingStore.ernieBot.apiKey,
     secretKey: settingStore.ernieBot.secretKey,
     model: data.currentAssistant.model,

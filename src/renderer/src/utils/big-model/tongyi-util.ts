@@ -16,7 +16,7 @@ export const getTongyiChatUrl = (model: string) => {
   }
 }
 
-export const chat2tongyi = async (option: {
+export interface Chat2TongyiOption {
   apiKey: string
   model: string
   abortCtr: AbortController
@@ -25,7 +25,9 @@ export const chat2tongyi = async (option: {
   startAnswer?: (content: string) => void
   appendAnswer?: (content: string) => void
   end?: (err?: any) => void
-}) => {
+}
+
+export const chat2tongyi = async (option: Chat2TongyiOption) => {
   const { apiKey, model, abortCtr, messages, checkSession, startAnswer, appendAnswer, end } = option
 
   let waitAnswer = true
