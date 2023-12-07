@@ -9,13 +9,13 @@ import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
 import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
-import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/big-model/spark-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
+import { chat2spark } from '@renderer/utils/big-model/spark-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -90,61 +90,35 @@ const useBigModel = async (sessionId: string) => {
 
   // 大模型调用
   // 星火大模型对话
-  const sparkClient = new WebSocket(
-    getSparkWsUrl(data.currentAssistant.model, settingStore.spark.secret, settingStore.spark.key)
-  )
-  sparkClient.onopen = () => {
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log('星火服务器【已连接】')
-    sparkClient.send(
-      getSparkWsRequestParam(
-        settingStore.spark.appId,
-        data.currentAssistant.model,
-        getBigModelMessages()
-      )
-    )
-  }
-  sparkClient.onmessage = (message) => {
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log(`星火服务器【消息】: ${message.data}`)
-    if (data.waitAnswer) {
+  chat2spark({
+    appId: settingStore.spark.appId,
+    secret: settingStore.spark.secret,
+    key: settingStore.spark.key,
+    model: data.currentAssistant.model,
+    messages: getBigModelMessages(),
+    checkSession: () => sessionId === data.sessionId,
+    startAnswer: (content) => {
       data.currentAssistant.chatMessageList.push({
         id: randomUUID(),
         type: 'text',
         role: 'assistant' as ChatRole,
-        content: '',
+        content,
         createTime: nowTimestamp()
       })
       scrollToBottom(chatMessageListRef.value)
       data.waitAnswer = false
+    },
+    appendAnswer: (content) => {
+      data.currentAssistant.chatMessageList[
+        data.currentAssistant.chatMessageList.length - 1
+      ].content += content
+      scrollToBottom(chatMessageListRef.value)
+    },
+    end: () => {
+      data.waitAnswer = false
+      systemStore.chatWindowLoading = false
     }
-    data.currentAssistant.chatMessageList[
-      data.currentAssistant.chatMessageList.length - 1
-    ].content += JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? ''
-    scrollToBottom(chatMessageListRef.value)
-  }
-  sparkClient.onclose = () => {
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log('星火服务器【连接已关闭】')
-    // 关闭等待
-    data.waitAnswer = false
-    systemStore.chatWindowLoading = false
-  }
-  sparkClient.onerror = (e) => {
-    if (sessionId != data.sessionId) {
-      return
-    }
-    console.log('星火服务器【连接错误】', e)
-    // 关闭等待
-    data.waitAnswer = false
-    systemStore.chatWindowLoading = false
-  }
+  })
 }
 
 // 将历史消息处理为大模型需要的结构

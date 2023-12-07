@@ -43,3 +43,62 @@ export const getSparkWsRequestParam = (
     }
   })
 }
+
+export const chat2spark = async (option: {
+  appId: string
+  secret: string
+  key: string
+  model: string
+  messages: BaseMessage[]
+  checkSession?: () => boolean
+  startAnswer?: (content: string) => void
+  appendAnswer?: (content: string) => void
+  end?: () => void
+}) => {
+  const { appId, secret, key, model, messages, checkSession, startAnswer, appendAnswer, end } =
+    option
+
+  let waitAnswer = true
+
+  const sparkClient = new WebSocket(getSparkWsUrl(model, secret, key))
+  sparkClient.onopen = () => {
+    if (checkSession && !checkSession()) {
+      return
+    }
+    console.log('星火服务器【已连接】')
+    sparkClient.send(getSparkWsRequestParam(appId, model, messages))
+  }
+  sparkClient.onmessage = (message) => {
+    if (checkSession && !checkSession()) {
+      return
+    }
+    console.log(`星火服务器【消息】: ${message.data}`)
+    if (waitAnswer) {
+      waitAnswer = false
+      if (startAnswer) {
+        startAnswer('')
+      }
+    }
+    if (appendAnswer) {
+      appendAnswer(JSON.parse(message.data.toString())?.payload?.choices?.text[0]?.content ?? '')
+    }
+  }
+  sparkClient.onclose = () => {
+    if (checkSession && !checkSession()) {
+      return
+    }
+    console.log('星火服务器【连接已关闭】')
+    if (end) {
+      end()
+    }
+  }
+  sparkClient.onerror = (e) => {
+    if (checkSession && !checkSession()) {
+      return
+    }
+    console.log('星火服务器【连接错误】', e)
+    if (end) {
+      end()
+    }
+  }
+}

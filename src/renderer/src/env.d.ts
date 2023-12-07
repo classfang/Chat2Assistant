@@ -33,11 +33,14 @@ interface Assistant {
   chatMessageList: ChatMessage[]
 }
 
-interface ChatMessage {
-  id: string
-  type: ChatMsgType
+interface BaseMessage {
   role: ChatRole
   content: string
+}
+
+interface ChatMessage extends BaseMessage {
+  id: string
+  type: ChatMsgType
   image?: string
   createTime: number
 }

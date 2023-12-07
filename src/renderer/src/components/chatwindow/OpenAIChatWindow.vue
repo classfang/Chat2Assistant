@@ -18,7 +18,7 @@ import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { readLocalImageBase64, saveFileByPath } from '@renderer/utils/main-thread-util'
-import { openaiChat } from '@renderer/utils/big-model/openai-util'
+import { chat2openai } from '@renderer/utils/big-model/openai-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -113,7 +113,7 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
-  openaiChat({
+  chat2openai({
     apiKey: settingStore.openAI.key,
     baseURL: settingStore.openAI.baseUrl,
     type: data.currentAssistant.type,
