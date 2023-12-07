@@ -101,8 +101,16 @@ const exportChatMessageList = () => {
 
 <template>
   <div class="assistant-item" :class="{ 'assistant-item-active': isActive }">
-    <AssistantAvatar :provider="assistant.provider" class="assistant-item-avatar" />
-    <div class="assistant-item-name">{{ assistant.name }}</div>
+    <AssistantAvatar :provider="assistant.provider" :size="35" class="assistant-item-avatar" />
+    <div class="assistant-item-body">
+      <div class="assistant-item-name">{{ assistant.name }}</div>
+      <div class="assistant-item-content">
+        {{
+          assistant.chatMessageList[assistant.chatMessageList.length - 1].content ||
+          (assistant.chatMessageList[assistant.chatMessageList.length - 1].image ? '[图片]' : '')
+        }}
+      </div>
+    </div>
     <a-popover v-if="isActive" position="br" trigger="click" :content-style="{ padding: '5px' }">
       <icon-more style="font-size: 15px; font-weight: 500; flex-shrink: 0" />
       <template #content>
@@ -288,19 +296,35 @@ const exportChatMessageList = () => {
   border-radius: var(--border-radius-small);
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 
   .assistant-item-avatar {
     flex-shrink: 0;
   }
 
-  .assistant-item-name {
+  .assistant-item-body {
+    height: 35px;
     flex-grow: 1;
-    font-size: 15px;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .assistant-item-name {
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .assistant-item-content {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--color-text-3);
+    }
   }
 }
 
