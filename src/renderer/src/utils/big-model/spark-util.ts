@@ -22,7 +22,7 @@ export const getSparkWsUrl = (model: string, apiSecret: string, apiKey: string) 
 export const getSparkWsRequestParam = (
   appId: string,
   model: string,
-  messageList: { role: string; content: string }[]
+  messageList: BaseMessage[]
 ) => {
   return JSON.stringify({
     header: {

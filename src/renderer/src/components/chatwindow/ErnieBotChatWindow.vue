@@ -12,11 +12,10 @@ import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
-import { getErnieBotChatUrl } from '@renderer/utils/big-model/ernie-bot-util'
-import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
+import { chat2ernieBot } from '@renderer/utils/big-model/ernie-bot-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -92,65 +91,39 @@ const useBigModel = async (sessionId: string) => {
 
   // 大模型调用
   // 文心一言模型对话
-  const tokenResp = await fetch(
-    `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${settingStore.ernieBot.apiKey}&client_secret=${settingStore.ernieBot.secretKey}`
-  )
-  const tokenRespJson = await tokenResp.json()
-  const accessToken = tokenRespJson.access_token
-
-  if (sessionId != data.sessionId) {
-    return
-  }
-
-  fetchEventSource(
-    `${getErnieBotChatUrl(data.currentAssistant.model)}?access_token=${accessToken}`,
-    {
-      signal: abortCtr.signal,
-      method: 'POST',
-      body: JSON.stringify({
-        messages: getBigModelMessages(),
-        stream: true
-      }),
-      onmessage: (e) => {
-        if (sessionId != data.sessionId) {
-          return
-        }
-        console.log('文心一言大模型回复：', e)
-        if (data.waitAnswer) {
-          data.currentAssistant.chatMessageList.push({
-            id: randomUUID(),
-            type: 'text',
-            role: 'assistant' as ChatRole,
-            content: '',
-            createTime: nowTimestamp()
-          })
-          scrollToBottom(chatMessageListRef.value)
-          data.waitAnswer = false
-        }
-        data.currentAssistant.chatMessageList[
-          data.currentAssistant.chatMessageList.length - 1
-        ].content += JSON.parse(e.data).result ?? ''
-        scrollToBottom(chatMessageListRef.value)
-      },
-      onclose: () => {
-        console.log('文心一言大模型关闭连接')
-        // 关闭等待
-        data.waitAnswer = false
-        systemStore.chatWindowLoading = false
-      },
-      onerror: (err: any) => {
-        console.log('文心一言大模型错误：', err)
-        // 关闭等待
-        data.waitAnswer = false
-        systemStore.chatWindowLoading = false
-        // 抛出异常防止重连
-        if (err instanceof Error) {
-          Message.error(err.message)
-          throw err
-        }
+  chat2ernieBot({
+    apiKey: settingStore.ernieBot.apiKey,
+    secretKey: settingStore.ernieBot.secretKey,
+    model: data.currentAssistant.model,
+    abortCtr,
+    messages: getBigModelMessages(),
+    checkSession: () => sessionId === data.sessionId,
+    startAnswer: (content) => {
+      data.currentAssistant.chatMessageList.push({
+        id: randomUUID(),
+        type: 'text',
+        role: 'assistant' as ChatRole,
+        content,
+        createTime: nowTimestamp()
+      })
+      scrollToBottom(chatMessageListRef.value)
+      data.waitAnswer = false
+    },
+    appendAnswer: (content) => {
+      data.currentAssistant.chatMessageList[
+        data.currentAssistant.chatMessageList.length - 1
+      ].content += content
+      scrollToBottom(chatMessageListRef.value)
+    },
+    end: (err) => {
+      // 关闭等待
+      data.waitAnswer = false
+      systemStore.chatWindowLoading = false
+      if (err instanceof Error) {
+        Message.error(err.message)
       }
     }
-  )
+  })
 }
 
 // 将历史消息处理为大模型需要的结构
@@ -158,7 +131,7 @@ const getBigModelMessages = () => {
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
   // 将消息历史处理为user和assistant轮流对话
-  let messages = [] as { role: string; content: string }[]
+  let messages: BaseMessage[] = []
   let currentRole = 'user' as 'user' | 'assistant'
   for (let i = data.currentAssistant.chatMessageList.length - 1; i >= 0; i--) {
     const chatMessage = data.currentAssistant.chatMessageList[i]

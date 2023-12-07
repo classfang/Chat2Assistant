@@ -1,10 +1,10 @@
 import { encodeChat } from 'gpt-tokenizer'
 
-export const getChatTokens = (messages: { role: string; content: string }[]) => {
+export const getChatTokens = (messages: BaseMessage[]) => {
   return encodeChat(messages, 'gpt-4-0314')
 }
 
-export const getChatTokensLength = (messages: { role: string; content: string }[]) => {
+export const getChatTokensLength = (messages: BaseMessage[]) => {
   return getChatTokens(messages).length
 }
 
