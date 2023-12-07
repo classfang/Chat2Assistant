@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useSystemStore } from '@renderer/store/system'
 import { onMounted, reactive, ref, toRefs } from 'vue'
-import UserAvatar from '@renderer/components/UserAvatar.vue'
-import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
-import MultipleChoiceConsole from '@renderer/components/chatwindow/MultipleChoiceConsole.vue'
-import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.vue'
+import UserAvatar from '@renderer/components/avatar/UserAvatar.vue'
+import AssistantAvatar from '@renderer/components/avatar/AssistantAvatar.vue'
+import MultipleChoiceConsole from '@renderer/components/views/chat2assistant/chatwindow/MultipleChoiceConsole.vue'
+import ChatWindowHeader from '@renderer/components/views/chat2assistant/chatwindow/ChatWindowHeader.vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
@@ -453,5 +453,5 @@ onMounted(() => {
 </template>
 
 <style lang="less" scoped>
-@import '../../assets/css/chat-window.less';
+@import '../../../../assets/css/chat-window.less';
 </style>

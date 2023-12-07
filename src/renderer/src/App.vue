@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { startDarkThemeListener, changeTheme } from '@renderer/utils/theme-util'
-import UserAvatar from '@renderer/components/UserAvatar.vue'
+import UserAvatar from '@renderer/components/avatar/UserAvatar.vue'
 import Setting from '@renderer/components/Setting.vue'
-import AssistantList from '@renderer/components/AssistantList.vue'
-import WebApp from '@renderer/components/WebApp.vue'
-import CollectionSet from '@renderer/components/CollectionSet.vue'
-import ChatWindow from '@renderer/components/chatwindow/ChatWindow.vue'
-import EmptyChatWindow from '@renderer/components/chatwindow/EmptyChatWindow.vue'
+import WebApp from '@renderer/components/views/WebApp.vue'
+import CollectionSet from '@renderer/components/views/CollectionSet.vue'
 import { useSystemStore } from '@renderer/store/system'
 import { useSettingStore } from '@renderer/store/setting'
-import { useAssistantStore } from '@renderer/store/assistant'
 import { onMounted, reactive, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import Chat2Assistant from '@renderer/components/views/chat2assistant/Chat2Assistant.vue'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
-const assistantStore = useAssistantStore()
 const { locale } = useI18n()
 
 const data = reactive({
@@ -95,17 +91,7 @@ onMounted(() => {
 
     <!-- 多页面 -->
     <div v-show="currentPage === 'chat'" class="app-body">
-      <div class="app-body-left">
-        <AssistantList class="assistant-list" />
-      </div>
-      <div class="app-body-right">
-        <ChatWindow
-          v-if="assistantStore.getCurrentAssistant"
-          :key="'chat-window-' + assistantStore.getCurrentAssistant.id"
-          class="chat-window"
-        />
-        <EmptyChatWindow v-else />
-      </div>
+      <Chat2Assistant />
     </div>
     <div v-show="currentPage === 'collect'" class="app-body">
       <CollectionSet />
@@ -157,32 +143,6 @@ onMounted(() => {
     flex-grow: 1;
     display: flex;
     overflow: hidden;
-    .app-body-left {
-      flex-shrink: 0;
-      width: 250px;
-      height: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--color-border-1);
-      box-sizing: border-box;
-
-      .assistant-list {
-        flex-grow: 1;
-      }
-    }
-
-    .app-body-right {
-      flex-grow: 1;
-      height: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-
-      .chat-window {
-        flex-grow: 1;
-      }
-    }
   }
 
   .global-loading {

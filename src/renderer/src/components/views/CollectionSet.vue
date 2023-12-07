@@ -4,9 +4,9 @@ import { computed, reactive, toRefs } from 'vue'
 import { formatDateTime } from '@renderer/utils/date-util'
 import { Modal } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
-import AssistantAvatar from '@renderer/components/AssistantAvatar.vue'
-import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.vue'
-import UserAvatar from '@renderer/components/UserAvatar.vue'
+import AssistantAvatar from '@renderer/components/avatar/AssistantAvatar.vue'
+import ChatWindowHeader from '@renderer/components/views/chat2assistant/chatwindow/ChatWindowHeader.vue'
+import UserAvatar from '@renderer/components/avatar/UserAvatar.vue'
 import { downloadFile } from '@renderer/utils/download-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
@@ -165,7 +165,7 @@ const exportChatMessageList = (id: string) => {
 </template>
 
 <style lang="less" scoped>
-@import '../assets/css/chat-window.less';
+@import '../../assets/css/chat-window.less';
 
 .collection-set {
   width: 100%;
