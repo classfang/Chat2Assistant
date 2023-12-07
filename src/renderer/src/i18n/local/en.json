@@ -107,7 +107,8 @@
     "type": "Assistant Type",
     "chat": "Chat",
     "drawing": "Drawing",
-    "imageSize": "Image Size"
+    "imageSize": "Image Size",
+    "search": "Search assistant"
   },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",

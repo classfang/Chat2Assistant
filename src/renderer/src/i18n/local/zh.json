@@ -107,7 +107,8 @@
     "type": "助手类型",
     "chat": "对话",
     "drawing": "绘画",
-    "imageSize": "图片大小"
+    "imageSize": "图片大小",
+    "search": "搜索助手"
   },
   "chatWindow": {
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",

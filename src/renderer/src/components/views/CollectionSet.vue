@@ -110,6 +110,9 @@ const exportChatMessageList = (id: string) => {
             </a-popover>
           </div>
         </div>
+        <div v-if="collectionListFilter.length === 0" class="collection-set-list-empty">
+          <a-empty description=" " />
+        </div>
       </div>
     </div>
     <div class="collection-set-right">
@@ -200,6 +203,13 @@ const exportChatMessageList = (id: string) => {
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      .collection-set-list-empty {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
       .collection {
         margin: 0 15px;

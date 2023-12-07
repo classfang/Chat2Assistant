@@ -28,9 +28,10 @@ const newFormDefault = {
 
 const data = reactive({
   newModalVisible: false,
-  newForm: copyObj(newFormDefault)
+  newForm: copyObj(newFormDefault),
+  keyword: ''
 })
-const { newModalVisible, newForm } = toRefs(data)
+const { newModalVisible, newForm, keyword } = toRefs(data)
 
 const handleNewModalBeforeOk = async () => {
   await new Promise<void>((resolve, reject) => {
@@ -91,12 +92,17 @@ const assistantItemDelete = (id: string) => {
 <template>
   <div class="assistant-list">
     <div class="assistant-header drag-area">
+      <a-input-search
+        v-model="keyword"
+        :placeholder="$t('assistantList.search')"
+        class="search-input no-drag-area"
+      />
       <a-button class="assistant-new-btn no-drag-area" @click="newModalVisible = true">
-        <icon-robot-add :size="18" />
-        <span>{{ $t('assistantList.new') }}</span>
+        <icon-robot-add :size="16" />
       </a-button>
     </div>
     <draggable
+      v-if="assistantStore.assistantList.filter((a) => a.name.includes(keyword)).length > 0"
       v-model="assistantStore.assistantList"
       group="people"
       item-key="id"
@@ -104,6 +110,7 @@ const assistantItemDelete = (id: string) => {
     >
       <template #item="{ element }">
         <AssistantItem
+          v-show="element.name.includes(keyword)"
           :assistant="element"
           :is-active="assistantStore.currentAssistantId === element.id"
           class="assistant-item"
@@ -114,6 +121,9 @@ const assistantItemDelete = (id: string) => {
         />
       </template>
     </draggable>
+    <div v-else class="assistant-list-empty">
+      <a-empty description=" " />
+    </div>
 
     <!-- 新增助手Modal -->
     <a-modal
@@ -281,12 +291,21 @@ const assistantItemDelete = (id: string) => {
     gap: 5px;
     align-items: center;
 
-    .assistant-new-btn {
+    .search-input {
       flex-grow: 1;
+      border: none;
+      background-color: var(--color-fill-2);
+    }
+
+    .assistant-new-btn {
+      flex-shrink: 0;
       padding: 10px;
       display: flex;
       align-items: center;
       gap: 5px;
+      height: 30px;
+      width: 30px;
+      padding: 0;
     }
   }
 
@@ -298,6 +317,13 @@ const assistantItemDelete = (id: string) => {
     gap: 10px;
     box-sizing: border-box;
     padding: 0 15px;
+  }
+
+  .assistant-list-empty {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
