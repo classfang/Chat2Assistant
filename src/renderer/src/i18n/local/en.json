@@ -111,21 +111,25 @@
   },
   "chatWindow": {
     "chatInputPlaceholder": "Enter your question here (Shift + Enter line wrap)",
-    "openAIConfgMiss": "OpenAI is not configured",
-    "openAIError": "OpenAI call error, please check your configuration",
-    "sparkConfgMiss": "iFLYTEK Spark is not configured",
-    "sparkError": "iFLYTEK Spark call error, please check your configuration",
-    "ernieBotConfgMiss": "ERNIE Bot is not configured",
-    "ernieBotError": "ERNIE Bot call error, please check your configuration",
-    "tongyiConfgMiss": "Tongyi Qianwen is not configured",
-    "tongyiError": "Tongyi Qianwen call error, please check your configuration",
     "stop": "Stop",
     "send": "Send",
     "selectImage": "Select image",
     "copy": "Copy",
     "multipleChoice": "Multiple choice",
     "selectSuccess": "Added to favorites",
-    "inputTokensLimit": "Input tokens limit"
+    "inputTokensLimit": "Input tokens limit",
+    "configMiss": {
+      "OpenAI": "OpenAI is not configured",
+      "Spark": "iFLYTEK Spark is not configured",
+      "ERNIEBot": "ERNIE Bot is not configured",
+      "Tongyi": "Tongyi Qianwen is not configured"
+    },
+    "error": {
+      "OpenAI": "OpenAI call error, please check your configuration",
+      "Spark": "iFLYTEK Spark call error, please check your configuration",
+      "ERNIEBot": "ERNIE Bot call error, please check your configuration",
+      "Tongyi": "Tongyi Qianwen call error, please check your configuration"
+    }
   },
   "collectionSet": {
     "search": "Search favorites",

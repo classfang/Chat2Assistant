@@ -111,21 +111,25 @@
   },
   "chatWindow": {
     "chatInputPlaceholder": "在此输入你的问题（Shift + Enter 换行）",
-    "openAIConfgMiss": "OpenAI未配置",
-    "openAIError": "OpenAI调用错误，请检查你的配置",
-    "sparkConfgMiss": "星火大模型未配置",
-    "sparkError": "星火大模型调用错误，请检查你的配置",
-    "ernieBotConfgMiss": "文心一言大模型未配置",
-    "ernieBotError": "文心一言大模型调用错误，请检查你的配置",
-    "tongyiConfgMiss": "通义千问大模型未配置",
-    "tongyiError": "通义千问大模型调用错误，请检查你的配置",
     "stop": "停止",
     "send": "发送",
     "selectImage": "选择图片",
     "copy": "复制",
     "multipleChoice": "多选",
     "selectSuccess": "已添加至收藏夹",
-    "inputTokensLimit": "输入Token数超限制"
+    "inputTokensLimit": "输入Token数超限制",
+    "configMiss": {
+      "OpenAI": "OpenAI未配置",
+      "Spark": "星火大模型未配置",
+      "ERNIEBot": "文心一言大模型未配置",
+      "Tongyi": "通义千问大模型未配置"
+    },
+    "error": {
+      "OpenAI": "OpenAI调用错误，请检查你的配置",
+      "Spark": "星火大模型调用错误，请检查你的配置",
+      "ERNIEBot": "文心一言大模型调用错误，请检查你的配置",
+      "Tongyi": "通义千问大模型调用错误，请检查你的配置"
+    }
   },
   "collectionSet": {
     "search": "搜索收藏",
