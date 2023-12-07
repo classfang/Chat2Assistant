@@ -24,8 +24,8 @@ export interface Chat2ERNIEBotOption {
   apiKey: string
   secretKey: string
   model: string
-  abortCtr: AbortController
   messages: BaseMessage[]
+  abortCtr?: AbortController
   checkSession?: () => boolean
   startAnswer?: (content: string) => void
   appendAnswer?: (content: string) => void
@@ -58,7 +58,7 @@ export const chat2ernieBot = async (option: Chat2ERNIEBotOption) => {
   }
 
   fetchEventSource(`${getErnieBotChatUrl(model)}?access_token=${accessToken}`, {
-    signal: abortCtr.signal,
+    signal: abortCtr?.signal,
     method: 'POST',
     body: JSON.stringify({
       messages,

@@ -19,8 +19,8 @@ export const getTongyiChatUrl = (model: string) => {
 export interface Chat2TongyiOption {
   apiKey: string
   model: string
-  abortCtr: AbortController
   messages: BaseMessage[] | { role: ChatRole; content: { text: string }[] }[]
+  abortCtr?: AbortController
   checkSession?: () => boolean
   startAnswer?: (content: string) => void
   appendAnswer?: (content: string) => void
@@ -33,7 +33,7 @@ export const chat2tongyi = async (option: Chat2TongyiOption) => {
   let waitAnswer = true
 
   fetchEventSource(getTongyiChatUrl(model), {
-    signal: abortCtr.signal,
+    signal: abortCtr?.signal,
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
