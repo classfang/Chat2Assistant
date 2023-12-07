@@ -8,7 +8,7 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
-import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { getSparkWsRequestParam, getSparkWsUrl } from '@renderer/utils/spark-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
@@ -44,6 +44,12 @@ const sendQuestion = async (event?: KeyboardEvent) => {
     return
   } else {
     event?.preventDefault()
+  }
+
+  // 检查输入 Token 数
+  if (getContentTokensLength(data.question.trim()) > data.currentAssistant.inputMaxTokens) {
+    Message.error(t('chatWindow.inputTokensLimit'))
+    return
   }
 
   // 大模型调用

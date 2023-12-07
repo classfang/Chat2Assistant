@@ -124,7 +124,8 @@
     "selectImage": "选择图片",
     "copy": "复制",
     "multipleChoice": "多选",
-    "selectSuccess": "已添加至收藏夹"
+    "selectSuccess": "已添加至收藏夹",
+    "inputTokensLimit": "输入Token数超限制"
   },
   "collectionSet": {
     "search": "搜索收藏",

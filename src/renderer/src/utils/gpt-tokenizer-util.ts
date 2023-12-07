@@ -7,3 +7,7 @@ export const getChatTokens = (messages: { role: string; content: string }[]) => 
 export const getChatTokensLength = (messages: { role: string; content: string }[]) => {
   return getChatTokens(messages).length
 }
+
+export const getContentTokensLength = (content: string) => {
+  return getChatTokens([{ role: 'user', content }]).length
+}

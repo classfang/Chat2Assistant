@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
 import OpenAI from 'openai'
-import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
@@ -58,6 +58,12 @@ const sendQuestion = async (event?: KeyboardEvent) => {
     return
   } else {
     event?.preventDefault()
+  }
+
+  // 检查输入 Token 数
+  if (getContentTokensLength(data.question.trim()) > data.currentAssistant.inputMaxTokens) {
+    Message.error(t('chatWindow.inputTokensLimit'))
+    return
   }
 
   // 大模型调用

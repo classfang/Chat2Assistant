@@ -124,7 +124,8 @@
     "selectImage": "Select image",
     "copy": "Copy",
     "multipleChoice": "Multiple choice",
-    "selectSuccess": "Added to favorites"
+    "selectSuccess": "Added to favorites",
+    "inputTokensLimit": "Input tokens limit"
   },
   "collectionSet": {
     "search": "Search favorites",

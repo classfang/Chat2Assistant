@@ -213,7 +213,11 @@ const exportChatMessageList = () => {
                 <a-option value="qwen-vl-plus">qwen-vl-plus</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
+            <a-form-item
+              v-if="editForm.provider === 'OpenAI'"
+              field="maxTokens"
+              :label="$t('assistantList.maxTokens')"
+            >
               <a-input-number
                 v-model="editForm.maxTokens"
                 :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"

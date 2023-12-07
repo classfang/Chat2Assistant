@@ -204,7 +204,11 @@ const assistantItemDelete = (id: string) => {
               </a-select>
             </a-form-item>
             <!-- 生成token限制 -->
-            <a-form-item field="maxTokens" :label="$t('assistantList.maxTokens')">
+            <a-form-item
+              v-if="newForm.provider === 'OpenAI'"
+              field="maxTokens"
+              :label="$t('assistantList.maxTokens')"
+            >
               <a-input-number
                 v-model="newForm.maxTokens"
                 :placeholder="$t('common.pleaseEnter') + ' ' + $t('assistantList.maxTokens')"
