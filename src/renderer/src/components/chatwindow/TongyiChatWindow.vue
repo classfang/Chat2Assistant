@@ -12,11 +12,10 @@ import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
-import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
-import { getTongyiChatUrl } from '@renderer/utils/big-model/tongyi-util'
+import { chat2tongyi } from '@renderer/utils/big-model/tongyi-util'
 
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
@@ -91,67 +90,36 @@ const useBigModel = async (sessionId: string) => {
   scrollToBottom(chatMessageListRef.value)
 
   // 大模型调用
-  if (sessionId != data.sessionId) {
-    return
-  }
-
-  fetchEventSource(getTongyiChatUrl(data.currentAssistant.model), {
-    signal: abortCtr.signal,
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${settingStore.tongyi.apiKey}`,
-      'Content-Type': 'application/json',
-      Accept: 'text/event-stream'
+  chat2tongyi({
+    apiKey: settingStore.tongyi.apiKey,
+    model: data.currentAssistant.model,
+    abortCtr,
+    messages: getBigModelMessages(),
+    checkSession: () => sessionId === data.sessionId,
+    startAnswer: (content) => {
+      data.currentAssistant.chatMessageList.push({
+        id: randomUUID(),
+        type: 'text',
+        role: 'assistant' as ChatRole,
+        content,
+        createTime: nowTimestamp()
+      })
+      scrollToBottom(chatMessageListRef.value)
+      data.waitAnswer = false
     },
-    body: JSON.stringify({
-      model: data.currentAssistant.model,
-      input: {
-        messages: getBigModelMessages()
-      }
-    }),
-    onmessage: (e) => {
-      if (sessionId != data.sessionId) {
-        return
-      }
-      console.log('通义千问大模型回复：', e)
-      if (data.waitAnswer) {
-        data.currentAssistant.chatMessageList.push({
-          id: randomUUID(),
-          type: 'text',
-          role: 'assistant' as ChatRole,
-          content: '',
-          createTime: nowTimestamp()
-        })
-        scrollToBottom(chatMessageListRef.value)
-        data.waitAnswer = false
-      }
-      if (data.currentAssistant.model === 'qwen-vl-plus') {
-        data.currentAssistant.chatMessageList[
-          data.currentAssistant.chatMessageList.length - 1
-        ].content = JSON.parse(e.data).output?.choices[0]?.message?.content[0]?.text ?? ''
-      } else {
-        data.currentAssistant.chatMessageList[
-          data.currentAssistant.chatMessageList.length - 1
-        ].content = JSON.parse(e.data).output?.text ?? ''
-      }
-
+    appendAnswer: (content) => {
+      data.currentAssistant.chatMessageList[
+        data.currentAssistant.chatMessageList.length - 1
+      ].content = content
       scrollToBottom(chatMessageListRef.value)
     },
-    onclose: () => {
-      console.log('通义千问大模型关闭连接')
-      // 关闭等待
-      data.waitAnswer = false
-      systemStore.chatWindowLoading = false
-    },
-    onerror: (err: any) => {
-      console.log('通义千问大模型错误：', err)
+    end: (err) => {
       // 关闭等待
       data.waitAnswer = false
       systemStore.chatWindowLoading = false
       // 抛出异常防止重连
       if (err instanceof Error) {
         Message.error(err.message)
-        throw err
       }
     }
   })
@@ -162,7 +130,7 @@ const getBigModelMessages = () => {
   // 是否存在指令
   const hasInstruction = data.currentAssistant.instruction.trim() != ''
 
-  const messages = data.currentAssistant.chatMessageList
+  const messages: BaseMessage[] = data.currentAssistant.chatMessageList
     .map((m) => {
       return {
         role: m.role,
