@@ -1,4 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { CommonChatOption } from '.'
 
 export const getTongyiChatUrl = (model: string) => {
   switch (model) {
@@ -16,19 +17,13 @@ export const getTongyiChatUrl = (model: string) => {
   }
 }
 
-export interface Chat2TongyiOption {
-  apiKey: string
-  model: string
-  messages: BaseMessage[] | { role: ChatRole; content: { text: string }[] }[]
-  abortCtr?: AbortController
-  checkSession?: () => boolean
-  startAnswer?: (content: string) => void
-  appendAnswer?: (content: string) => void
-  end?: (err?: any) => void
-}
-
-export const chat2tongyi = async (option: Chat2TongyiOption) => {
+export const chat2tongyi = async (option: CommonChatOption) => {
   const { apiKey, model, abortCtr, messages, checkSession, startAnswer, appendAnswer, end } = option
+
+  if (!apiKey || !messages) {
+    console.log('chat2tongyi params miss')
+    return
+  }
 
   let waitAnswer = true
 

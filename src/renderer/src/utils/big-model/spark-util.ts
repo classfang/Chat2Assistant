@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js'
+import { CommonChatOption } from '.'
 
 export const getSparkHostUrl = (model: string) => {
   return `wss://spark-api.xf-yun.com/${model}/chat`
@@ -44,25 +45,27 @@ export const getSparkWsRequestParam = (
   })
 }
 
-export interface Chat2SparkOption {
-  appId: string
-  secret: string
-  key: string
-  model: string
-  messages: BaseMessage[]
-  checkSession?: () => boolean
-  startAnswer?: (content: string) => void
-  appendAnswer?: (content: string) => void
-  end?: () => void
-}
+export const chat2spark = async (option: CommonChatOption) => {
+  const {
+    appId,
+    apiKey,
+    secretKey,
+    model,
+    messages,
+    checkSession,
+    startAnswer,
+    appendAnswer,
+    end
+  } = option
 
-export const chat2spark = async (option: Chat2SparkOption) => {
-  const { appId, secret, key, model, messages, checkSession, startAnswer, appendAnswer, end } =
-    option
+  if (!appId || !apiKey || !secretKey || !messages) {
+    console.log('chat2spark params miss')
+    return
+  }
 
   let waitAnswer = true
 
-  const sparkClient = new WebSocket(getSparkWsUrl(model, secret, key))
+  const sparkClient = new WebSocket(getSparkWsUrl(model, secretKey, apiKey))
   sparkClient.onopen = () => {
     if (checkSession && !checkSession()) {
       return

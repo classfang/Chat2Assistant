@@ -1,25 +1,9 @@
 import OpenAI from 'openai'
-import { ChatCompletionMessageParam } from 'openai/resources/chat'
 import { saveFileByUrl } from '@renderer/utils/main-thread-util'
 import { randomUUID } from '@renderer/utils/id-util'
+import { CommonChatOption } from '.'
 
-export interface Chat2OpenAIOption {
-  apiKey: string
-  baseURL: string
-  type: 'chat' | 'drawing'
-  model: string
-  maxTokens: number
-  messages?: ChatCompletionMessageParam[]
-  imagePrompt?: string
-  imageSize?: string
-  checkSession?: () => boolean
-  startAnswer?: (content: string) => void
-  appendAnswer?: (content: string) => void
-  imageGenerated?: (imageUrl: string) => void
-  end?: () => void
-}
-
-export const chat2openai = async (option: Chat2OpenAIOption) => {
+export const chat2openai = async (option: CommonChatOption) => {
   const {
     apiKey,
     baseURL,
@@ -35,6 +19,11 @@ export const chat2openai = async (option: Chat2OpenAIOption) => {
     imageGenerated,
     end
   } = option
+
+  if (!apiKey || !baseURL || !type || !maxTokens) {
+    console.log('chat2openai params miss')
+    return
+  }
 
   const openai = new OpenAI({
     apiKey,

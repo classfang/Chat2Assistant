@@ -92,8 +92,8 @@ const useBigModel = async (sessionId: string) => {
   // 星火大模型对话
   chat2bigModel(data.currentAssistant.provider, {
     appId: settingStore.spark.appId,
-    secret: settingStore.spark.secret,
-    key: settingStore.spark.key,
+    secretKey: settingStore.spark.secret,
+    apiKey: settingStore.spark.key,
     model: data.currentAssistant.model,
     messages: getBigModelMessages(),
     checkSession: () => sessionId === data.sessionId,

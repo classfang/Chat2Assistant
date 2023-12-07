@@ -1,4 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { CommonChatOption } from '.'
 
 export const getErnieBotChatUrl = (model: string) => {
   switch (model) {
@@ -20,19 +21,7 @@ export const getErnieBotChatUrl = (model: string) => {
   }
 }
 
-export interface Chat2ERNIEBotOption {
-  apiKey: string
-  secretKey: string
-  model: string
-  messages: BaseMessage[]
-  abortCtr?: AbortController
-  checkSession?: () => boolean
-  startAnswer?: (content: string) => void
-  appendAnswer?: (content: string) => void
-  end?: (err?: any) => void
-}
-
-export const chat2ernieBot = async (option: Chat2ERNIEBotOption) => {
+export const chat2ernieBot = async (option: CommonChatOption) => {
   const {
     apiKey,
     secretKey,
@@ -44,6 +33,11 @@ export const chat2ernieBot = async (option: Chat2ERNIEBotOption) => {
     appendAnswer,
     end
   } = option
+
+  if (!apiKey || !secretKey || !messages) {
+    console.log('chat2ernieBot params miss')
+    return
+  }
 
   let waitAnswer = true
 
