@@ -92,12 +92,8 @@ const assistantItemDelete = (id: string) => {
   <div class="assistant-list">
     <div class="assistant-header drag-area">
       <a-button class="assistant-new-btn no-drag-area" @click="newModalVisible = true">
-        <template #icon>
-          <icon-plus />
-        </template>
-        <template #default>
-          <span>{{ $t('assistantList.new') }}</span>
-        </template>
+        <icon-robot-add :size="18" />
+        <span>{{ $t('assistantList.new') }}</span>
       </a-button>
     </div>
     <draggable
@@ -288,6 +284,9 @@ const assistantItemDelete = (id: string) => {
     .assistant-new-btn {
       flex-grow: 1;
       padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
   }
 
