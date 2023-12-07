@@ -19,22 +19,35 @@ import { scrollToBottom } from '@renderer/utils/element-util'
 import { saveFileByPath } from '@renderer/utils/main-thread-util'
 import { CommonChatOption, chat2bigModel } from '@renderer/utils/big-model'
 
+// store
 const systemStore = useSystemStore()
 const settingStore = useSettingStore()
 const assistantStore = useAssistantStore()
+
+// i18n
 const { t } = useI18n()
 
+// 元素 ref
 const chatMessageListRef = ref()
 
+// 阻断控制
 const abortCtr = new AbortController()
 
+// 数据绑定
 const data = reactive({
+  // 用于判断是否切换聊天窗口
   sessionId: randomUUID(),
+  // 当前的助手
   currentAssistant: assistantStore.getCurrentAssistant,
+  // 输入的问题
   question: '',
+  // 上传图片选择
   selectImageList: [] as FileItem[],
+  // 判断大模型是否已经回答
   waitAnswer: false,
+  // 是否打开多选
   multipleChoiceFlag: false,
+  // 多选消息列表
   multipleChoiceList: [] as string[]
 })
 const {
@@ -46,6 +59,7 @@ const {
   multipleChoiceList
 } = toRefs(data)
 
+// 发送提问
 const sendQuestion = async (event?: KeyboardEvent) => {
   // 加载中、内容为空、输入法回车，不发送消息
   if (systemStore.chatWindowLoading || !data.question.trim() || event?.isComposing) {
@@ -74,6 +88,7 @@ const sendQuestion = async (event?: KeyboardEvent) => {
   }
 }
 
+// 使用大模型
 const useBigModel = async (sessionId: string) => {
   // 检查大模型配置
   let configErrorFalg = false
@@ -116,6 +131,7 @@ const useBigModel = async (sessionId: string) => {
   let questionImage = ''
   if (data.selectImageList[0]) {
     const imagePath = data.selectImageList[0].file?.path
+    // 只有 gpt-4-vision-preview 模型支持，将图片本地链接保存
     if (data.currentAssistant.model === 'gpt-4-vision-preview' && imagePath) {
       questionImage = await saveFileByPath(
         imagePath,
@@ -125,6 +141,7 @@ const useBigModel = async (sessionId: string) => {
     data.selectImageList = []
   }
 
+  // 用户消息追加
   data.currentAssistant.chatMessageList.push({
     id: randomUUID(),
     type: 'text',
@@ -133,10 +150,9 @@ const useBigModel = async (sessionId: string) => {
     image: questionImage,
     createTime: nowTimestamp()
   })
-
   scrollToBottom(chatMessageListRef.value)
 
-  // 大模型调用
+  // 大模型通用选项
   const chat2bigModelOption: CommonChatOption = {
     model: data.currentAssistant.model,
     instruction: data.currentAssistant.instruction,
@@ -160,6 +176,8 @@ const useBigModel = async (sessionId: string) => {
       systemStore.chatWindowLoading = false
     }
   }
+
+  // 各家大模型特有选项
   let otherOption = {}
   switch (data.currentAssistant.provider) {
     case 'OpenAI':
@@ -170,13 +188,13 @@ const useBigModel = async (sessionId: string) => {
         maxTokens: data.currentAssistant.maxTokens,
         imagePrompt: question,
         imageSize: data.currentAssistant.imageSize,
-        appendAnswer: (content) => {
+        appendAnswer: (content: string) => {
           data.currentAssistant.chatMessageList[
             data.currentAssistant.chatMessageList.length - 1
           ].content += content
           scrollToBottom(chatMessageListRef.value)
         },
-        imageGenerated: (imageUrl) => {
+        imageGenerated: (imageUrl: string) => {
           data.currentAssistant.chatMessageList.push({
             id: randomUUID(),
             type: 'img',
@@ -195,7 +213,7 @@ const useBigModel = async (sessionId: string) => {
         appId: settingStore.spark.appId,
         secretKey: settingStore.spark.secret,
         apiKey: settingStore.spark.key,
-        appendAnswer: (content) => {
+        appendAnswer: (content: string) => {
           data.currentAssistant.chatMessageList[
             data.currentAssistant.chatMessageList.length - 1
           ].content += content
@@ -208,7 +226,7 @@ const useBigModel = async (sessionId: string) => {
         apiKey: settingStore.ernieBot.apiKey,
         secretKey: settingStore.ernieBot.secretKey,
         abortCtr: abortCtr,
-        appendAnswer: (content) => {
+        appendAnswer: (content: string) => {
           data.currentAssistant.chatMessageList[
             data.currentAssistant.chatMessageList.length - 1
           ].content += content
@@ -220,7 +238,7 @@ const useBigModel = async (sessionId: string) => {
       otherOption = {
         apiKey: settingStore.tongyi.apiKey,
         abortCtr,
-        appendAnswer: (content) => {
+        appendAnswer: (content: string) => {
           data.currentAssistant.chatMessageList[
             data.currentAssistant.chatMessageList.length - 1
           ].content = content
@@ -229,12 +247,15 @@ const useBigModel = async (sessionId: string) => {
       }
       break
   }
+
+  // 大模型能力调用
   chat2bigModel(data.currentAssistant.provider, {
     ...chat2bigModelOption,
     ...otherOption
   })
 }
 
+// 手动结束回答
 const stopAnswer = () => {
   data.sessionId = randomUUID()
   systemStore.chatWindowLoading = false
@@ -242,6 +263,7 @@ const stopAnswer = () => {
   abortCtr.abort()
 }
 
+// 自定义图片上传
 const selectImageRequest = (option: RequestOption) => {
   const { fileItem, onSuccess } = option
   data.selectImageList = [fileItem]
@@ -252,6 +274,7 @@ const selectImageRequest = (option: RequestOption) => {
   }
 }
 
+// 多选选择事件
 const multipleChoiceChange = (id: string) => {
   if (data.multipleChoiceList.includes(id)) {
     data.multipleChoiceList = data.multipleChoiceList.filter((i) => i != id)
@@ -260,6 +283,7 @@ const multipleChoiceChange = (id: string) => {
   }
 }
 
+// 开启多选
 const multipleChoiceOpen = (id: string) => {
   if (systemStore.chatWindowLoading) {
     return
@@ -268,11 +292,13 @@ const multipleChoiceOpen = (id: string) => {
   multipleChoiceChange(id)
 }
 
+// 关闭多选
 const multipleChoiceClose = () => {
   data.multipleChoiceList = []
   data.multipleChoiceFlag = false
 }
 
+// 挂载完毕
 onMounted(() => {
   scrollToBottom(chatMessageListRef.value)
 })
@@ -280,21 +306,28 @@ onMounted(() => {
 
 <template>
   <div class="chat-window">
+    <!-- 头部 -->
     <ChatWindowHeader :current-assistant="currentAssistant" />
+
+    <!-- 消息列表 -->
     <div ref="chatMessageListRef" class="chat-message-list">
+      <!-- 右键点击菜单 -->
       <a-dropdown
         v-for="(msg, index) in currentAssistant.chatMessageList"
         :key="msg.id"
         :align-point="true"
         trigger="contextMenu"
       >
+        <!-- 消息块 -->
         <div class="chat-message">
+          <!-- 多选框 -->
           <a-checkbox
             v-if="multipleChoiceFlag"
             class="chat-message-checkbox"
             :default-checked="multipleChoiceList.includes(msg.id)"
             @change="multipleChoiceChange(msg.id)"
           />
+          <!-- 消息头像 -->
           <div class="chat-message-avatar">
             <UserAvatar v-if="msg.role === 'user'" :size="30" />
             <AssistantAvatar
@@ -303,8 +336,11 @@ onMounted(() => {
               :size="30"
             />
           </div>
+          <!-- 消息内容 -->
           <div class="chat-message-content select-text">
+            <!-- 用户消息：文本内容 -->
             <div v-if="msg.role === 'user'">{{ msg.content }}</div>
+            <!-- 大模型消息：markdown 内容 -->
             <div
               v-else-if="msg.role === 'assistant'"
               class="chat-message-md"
@@ -316,6 +352,7 @@ onMounted(() => {
                 )
               "
             ></div>
+            <!-- 消息内容携带的图片 -->
             <a-image
               v-if="msg.image"
               class="chat-message-img"
@@ -335,6 +372,7 @@ onMounted(() => {
             </a-image>
           </div>
         </div>
+        <!-- 右键菜单内容 -->
         <template #content>
           <a-doption @click="clipboardWriteText(msg.content)">{{
             $t('chatWindow.copy')
@@ -344,6 +382,7 @@ onMounted(() => {
           }}</a-doption>
         </template>
       </a-dropdown>
+      <!-- 等待回答占位显示 -->
       <div v-if="waitAnswer" class="chat-message">
         <div class="chat-message-avatar">
           <AssistantAvatar :provider="currentAssistant.provider" :size="30" />
@@ -353,7 +392,9 @@ onMounted(() => {
         </div>
       </div>
     </div>
+    <!-- 输入框区域 -->
     <div class="chat-input">
+      <!-- 文本域 -->
       <a-textarea
         v-model="question"
         class="chat-input-textarea"
@@ -365,7 +406,9 @@ onMounted(() => {
         allow-clear
         @keydown.enter="sendQuestion"
       />
+      <!-- 输入框区域底部 -->
       <div class="chat-input-bottom">
+        <!-- 图片选择：暂只支持 gpt-4-vision-preview -->
         <div
           v-if="currentAssistant.model === 'gpt-4-vision-preview'"
           class="chat-input-select-image"
@@ -381,18 +424,21 @@ onMounted(() => {
             </template>
           </a-upload>
         </div>
+        <!-- 发送消息按钮 -->
         <a-button v-if="!systemStore.chatWindowLoading" size="small" @click="sendQuestion()">
           <a-space :size="5">
             <icon-send :size="15" />
             <span>{{ $t('chatWindow.send') }}</span>
           </a-space>
         </a-button>
+        <!-- 停止回答按钮 -->
         <a-button v-if="systemStore.chatWindowLoading" size="small" @click="stopAnswer()">
           <a-space :size="5">
             <icon-record-stop :size="15" />
             <span>{{ $t('chatWindow.stop') }}</span>
           </a-space>
         </a-button>
+        <!-- 底部多选操作区域 -->
         <transition name="slide2top">
           <MultipleChoiceConsole
             v-if="multipleChoiceFlag"
