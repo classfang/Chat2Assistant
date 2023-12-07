@@ -1,5 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { CommonChatOption } from '.'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 
 export const getTongyiChatUrl = (model: string) => {
   switch (model) {
@@ -18,7 +19,19 @@ export const getTongyiChatUrl = (model: string) => {
 }
 
 export const chat2tongyi = async (option: CommonChatOption) => {
-  const { apiKey, model, abortCtr, messages, checkSession, startAnswer, appendAnswer, end } = option
+  const {
+    model,
+    instruction,
+    inputMaxTokens,
+    contextSize,
+    apiKey,
+    abortCtr,
+    messages,
+    checkSession,
+    startAnswer,
+    appendAnswer,
+    end
+  } = option
 
   if (!apiKey || !messages) {
     console.log('chat2tongyi params miss')
@@ -38,7 +51,7 @@ export const chat2tongyi = async (option: CommonChatOption) => {
     body: JSON.stringify({
       model,
       input: {
-        messages
+        messages: await getTongyiMessages(messages, instruction, inputMaxTokens, contextSize, model)
       }
     }),
     onmessage: (e) => {
@@ -79,4 +92,59 @@ export const chat2tongyi = async (option: CommonChatOption) => {
       }
     }
   })
+}
+
+export const getTongyiMessages = async (
+  chatMessageList: ChatMessage[],
+  instruction: string,
+  inputMaxTokens: number,
+  contextSize: number,
+  model: string
+) => {
+  // 是否存在指令
+  const hasInstruction = instruction.trim() != ''
+
+  const messages: BaseMessage[] = chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - contextSize)
+
+  // 增加指令
+  if (hasInstruction) {
+    messages.unshift({
+      role: 'system',
+      content: instruction
+    })
+  }
+  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
+  while (
+    messages.length > (hasInstruction ? 2 : 1) &&
+    getChatTokensLength(messages) > inputMaxTokens
+  ) {
+    messages.shift()
+    if (hasInstruction) {
+      messages.shift()
+      messages.unshift({
+        role: 'system',
+        content: instruction
+      })
+    }
+  }
+  // 第一条消息的 role 必须是 system 或者 user
+  while (messages[0].role === 'assistant') {
+    messages.shift()
+  }
+
+  // 处理
+  if (model === 'qwen-vl-plus') {
+    return messages.map((msg) => {
+      return { role: msg.role, content: [{ text: msg.content }] }
+    })
+  }
+
+  return messages
 }

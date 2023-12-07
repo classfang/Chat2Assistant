@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js'
 import { CommonChatOption } from '.'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 
 export const getSparkHostUrl = (model: string) => {
   return `wss://spark-api.xf-yun.com/${model}/chat`
@@ -47,10 +48,13 @@ export const getSparkWsRequestParam = (
 
 export const chat2spark = async (option: CommonChatOption) => {
   const {
+    model,
+    instruction,
+    inputMaxTokens,
+    contextSize,
     appId,
     apiKey,
     secretKey,
-    model,
     messages,
     checkSession,
     startAnswer,
@@ -66,12 +70,18 @@ export const chat2spark = async (option: CommonChatOption) => {
   let waitAnswer = true
 
   const sparkClient = new WebSocket(getSparkWsUrl(model, secretKey, apiKey))
-  sparkClient.onopen = () => {
+  sparkClient.onopen = async () => {
     if (checkSession && !checkSession()) {
       return
     }
     console.log('星火服务器【已连接】')
-    sparkClient.send(getSparkWsRequestParam(appId, model, messages))
+    sparkClient.send(
+      getSparkWsRequestParam(
+        appId,
+        model,
+        await getSparkMessages(messages, instruction, inputMaxTokens, contextSize)
+      )
+    )
   }
   sparkClient.onmessage = (message) => {
     if (checkSession && !checkSession()) {
@@ -106,4 +116,35 @@ export const chat2spark = async (option: CommonChatOption) => {
       end()
     }
   }
+}
+
+export const getSparkMessages = async (
+  chatMessageList: ChatMessage[],
+  instruction: string,
+  inputMaxTokens: number,
+  contextSize: number
+) => {
+  // 是否存在指令
+  const hasInstruction = instruction.trim() != ''
+
+  const messages = chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - contextSize)
+
+  // 增加指令
+  if (hasInstruction) {
+    chatMessageList[chatMessageList.length - 1].content = `${instruction}\n${
+      chatMessageList[chatMessageList.length - 1].content
+    }`
+  }
+  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
+  while (messages.length > 1 && getChatTokensLength(messages) > inputMaxTokens) {
+    messages.shift()
+  }
+  return messages
 }

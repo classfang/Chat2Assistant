@@ -8,16 +8,15 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { FileItem, Message, RequestOption } from '@arco-design/web-vue'
-import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { downloadFile } from '@renderer/utils/download-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { clipboardWriteText } from '@renderer/utils/main-thread-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
-import { readLocalImageBase64, saveFileByPath } from '@renderer/utils/main-thread-util'
+import { saveFileByPath } from '@renderer/utils/main-thread-util'
 import { chat2bigModel } from '@renderer/utils/big-model'
 
 const systemStore = useSystemStore()
@@ -119,7 +118,10 @@ const useBigModel = async (sessionId: string) => {
     type: data.currentAssistant.type,
     model: data.currentAssistant.model,
     maxTokens: data.currentAssistant.maxTokens,
-    messages: (await getBigModelMessages()) as ChatCompletionMessageParam[],
+    messages: data.currentAssistant.chatMessageList,
+    instruction: data.currentAssistant.instruction,
+    inputMaxTokens: data.currentAssistant.inputMaxTokens,
+    contextSize: data.currentAssistant.contextSize,
     imagePrompt: question,
     imageSize: data.currentAssistant.imageSize,
     checkSession: () => sessionId === data.sessionId,
@@ -157,63 +159,6 @@ const useBigModel = async (sessionId: string) => {
       systemStore.chatWindowLoading = false
     }
   })
-}
-
-// 将历史消息处理为大模型需要的结构
-const getBigModelMessages = async () => {
-  // 是否是图片问题
-  const lastChatMessage =
-    data.currentAssistant.chatMessageList[data.currentAssistant.chatMessageList.length - 1]
-  if (lastChatMessage.image) {
-    const imageBase64Data = await readLocalImageBase64(lastChatMessage.image)
-    return [
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: lastChatMessage.content },
-          {
-            type: 'image_url',
-            image_url: `data:image/jpg;base64,${imageBase64Data}`
-          }
-        ]
-      }
-    ]
-  }
-
-  // 是否存在指令
-  const hasInstruction = data.currentAssistant.instruction.trim() != ''
-
-  const messages = data.currentAssistant.chatMessageList
-    .map((m) => {
-      return {
-        role: m.role,
-        content: m.content
-      }
-    })
-    .slice(-1 - data.currentAssistant.contextSize)
-
-  // 增加指令
-  if (hasInstruction) {
-    messages.unshift({
-      role: 'system',
-      content: data.currentAssistant.instruction
-    })
-  }
-  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
-  while (
-    messages.length > (hasInstruction ? 2 : 1) &&
-    getChatTokensLength(messages) > data.currentAssistant.inputMaxTokens
-  ) {
-    messages.shift()
-    if (hasInstruction) {
-      messages.shift()
-      messages.unshift({
-        role: 'system',
-        content: data.currentAssistant.instruction
-      })
-    }
-  }
-  return messages
 }
 
 const stopAnswer = () => {

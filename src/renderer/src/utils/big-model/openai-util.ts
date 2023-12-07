@@ -1,14 +1,19 @@
 import OpenAI from 'openai'
-import { saveFileByUrl } from '@renderer/utils/main-thread-util'
+import { readLocalImageBase64, saveFileByUrl } from '@renderer/utils/main-thread-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { CommonChatOption } from '.'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { ChatCompletionMessageParam } from 'openai/resources/chat'
 
 export const chat2openai = async (option: CommonChatOption) => {
   const {
+    model,
+    instruction,
+    inputMaxTokens,
+    contextSize,
     apiKey,
     baseURL,
     type,
-    model,
     maxTokens,
     messages,
     imagePrompt,
@@ -33,7 +38,12 @@ export const chat2openai = async (option: CommonChatOption) => {
   if (type === 'chat' && messages) {
     // OpenAI对话
     const stream = await openai.chat.completions.create({
-      messages,
+      messages: (await getOpenAIMessages(
+        messages,
+        instruction,
+        inputMaxTokens,
+        contextSize
+      )) as ChatCompletionMessageParam[],
       model,
       stream: true,
       max_tokens: maxTokens
@@ -75,4 +85,64 @@ export const chat2openai = async (option: CommonChatOption) => {
   if (end) {
     end()
   }
+}
+
+export const getOpenAIMessages = async (
+  chatMessageList: ChatMessage[],
+  instruction: string,
+  inputMaxTokens: number,
+  contextSize: number
+) => {
+  // 是否是图片问题
+  const lastChatMessage = chatMessageList[chatMessageList.length - 1]
+  if (lastChatMessage.image) {
+    const imageBase64Data = await readLocalImageBase64(lastChatMessage.image)
+    return [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: lastChatMessage.content },
+          {
+            type: 'image_url',
+            image_url: `data:image/jpg;base64,${imageBase64Data}`
+          }
+        ]
+      }
+    ]
+  }
+
+  // 是否存在指令
+  const hasInstruction = instruction.trim() != ''
+
+  const messages = chatMessageList
+    .map((m) => {
+      return {
+        role: m.role,
+        content: m.content
+      }
+    })
+    .slice(-1 - contextSize)
+
+  // 增加指令
+  if (hasInstruction) {
+    messages.unshift({
+      role: 'system',
+      content: instruction
+    })
+  }
+  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
+  while (
+    messages.length > (hasInstruction ? 2 : 1) &&
+    getChatTokensLength(messages) > inputMaxTokens
+  ) {
+    messages.shift()
+    if (hasInstruction) {
+      messages.shift()
+      messages.unshift({
+        role: 'system',
+        content: instruction
+      })
+    }
+  }
+  return messages
 }

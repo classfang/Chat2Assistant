@@ -14,8 +14,11 @@ export interface CommonChatOption {
   baseURL?: string
   type?: 'chat' | 'drawing'
   model: string
+  instruction: string
+  inputMaxTokens: number
+  contextSize: number
   maxTokens?: number
-  messages?: any[]
+  messages?: ChatMessage[]
   imagePrompt?: string
   imageSize?: string
   abortCtr?: AbortController

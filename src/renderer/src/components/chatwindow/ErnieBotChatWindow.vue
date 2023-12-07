@@ -8,7 +8,7 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
-import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -96,7 +96,10 @@ const useBigModel = async (sessionId: string) => {
     secretKey: settingStore.ernieBot.secretKey,
     model: data.currentAssistant.model,
     abortCtr,
-    messages: getBigModelMessages(),
+    messages: data.currentAssistant.chatMessageList,
+    instruction: data.currentAssistant.instruction,
+    inputMaxTokens: data.currentAssistant.inputMaxTokens,
+    contextSize: data.currentAssistant.contextSize,
     checkSession: () => sessionId === data.sessionId,
     startAnswer: (content) => {
       data.currentAssistant.chatMessageList.push({
@@ -124,47 +127,6 @@ const useBigModel = async (sessionId: string) => {
       }
     }
   })
-}
-
-// 将历史消息处理为大模型需要的结构
-const getBigModelMessages = () => {
-  // 是否存在指令
-  const hasInstruction = data.currentAssistant.instruction.trim() != ''
-  // 将消息历史处理为user和assistant轮流对话
-  let messages: BaseMessage[] = []
-  let currentRole = 'user' as 'user' | 'assistant'
-  for (let i = data.currentAssistant.chatMessageList.length - 1; i >= 0; i--) {
-    const chatMessage = data.currentAssistant.chatMessageList[i]
-    if (currentRole === chatMessage.role) {
-      messages.unshift({
-        role: chatMessage.role,
-        content: chatMessage.content
-      })
-      currentRole = currentRole === 'user' ? 'assistant' : 'user'
-    }
-  }
-  messages = messages.slice(-1 - data.currentAssistant.contextSize)
-  // 必须user开头user结尾
-  if (messages[0].role === 'assistant') {
-    messages.shift()
-  }
-  // 增加指令
-  if (hasInstruction) {
-    data.currentAssistant.chatMessageList[
-      data.currentAssistant.chatMessageList.length - 1
-    ].content = `${data.currentAssistant.instruction}\n${
-      data.currentAssistant.chatMessageList[data.currentAssistant.chatMessageList.length - 1]
-        .content
-    }`
-  }
-  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
-  while (
-    messages.length > 1 &&
-    getChatTokensLength(messages) > data.currentAssistant.inputMaxTokens
-  ) {
-    messages.shift()
-  }
-  return messages
 }
 
 const stopAnswer = () => {

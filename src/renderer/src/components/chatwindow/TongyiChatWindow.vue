@@ -8,7 +8,7 @@ import ChatWindowHeader from '@renderer/components/chatwindow/ChatWindowHeader.v
 import { useI18n } from 'vue-i18n'
 import { useSettingStore } from '@renderer/store/setting'
 import { Message } from '@arco-design/web-vue'
-import { getChatTokensLength, getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
+import { getContentTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
@@ -94,7 +94,10 @@ const useBigModel = async (sessionId: string) => {
     apiKey: settingStore.tongyi.apiKey,
     model: data.currentAssistant.model,
     abortCtr,
-    messages: getBigModelMessages(),
+    messages: data.currentAssistant.chatMessageList,
+    instruction: data.currentAssistant.instruction,
+    inputMaxTokens: data.currentAssistant.inputMaxTokens,
+    contextSize: data.currentAssistant.contextSize,
     checkSession: () => sessionId === data.sessionId,
     startAnswer: (content) => {
       data.currentAssistant.chatMessageList.push({
@@ -123,56 +126,6 @@ const useBigModel = async (sessionId: string) => {
       }
     }
   })
-}
-
-// 将历史消息处理为大模型需要的结构
-const getBigModelMessages = () => {
-  // 是否存在指令
-  const hasInstruction = data.currentAssistant.instruction.trim() != ''
-
-  const messages: BaseMessage[] = data.currentAssistant.chatMessageList
-    .map((m) => {
-      return {
-        role: m.role,
-        content: m.content
-      }
-    })
-    .slice(-1 - data.currentAssistant.contextSize)
-
-  // 增加指令
-  if (hasInstruction) {
-    messages.unshift({
-      role: 'system',
-      content: data.currentAssistant.instruction
-    })
-  }
-  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
-  while (
-    messages.length > (hasInstruction ? 2 : 1) &&
-    getChatTokensLength(messages) > data.currentAssistant.inputMaxTokens
-  ) {
-    messages.shift()
-    if (hasInstruction) {
-      messages.shift()
-      messages.unshift({
-        role: 'system',
-        content: data.currentAssistant.instruction
-      })
-    }
-  }
-  // 第一条消息的 role 必须是 system 或者 user
-  while (messages[0].role === 'assistant') {
-    messages.shift()
-  }
-
-  // 处理
-  if (data.currentAssistant.model === 'qwen-vl-plus') {
-    return messages.map((msg) => {
-      return { role: msg.role, content: [{ text: msg.content }] }
-    })
-  }
-
-  return messages
 }
 
 const stopAnswer = () => {

@@ -1,5 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { CommonChatOption } from '.'
+import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'
 
 export const getErnieBotChatUrl = (model: string) => {
   switch (model) {
@@ -23,9 +24,12 @@ export const getErnieBotChatUrl = (model: string) => {
 
 export const chat2ernieBot = async (option: CommonChatOption) => {
   const {
+    model,
+    instruction,
+    inputMaxTokens,
+    contextSize,
     apiKey,
     secretKey,
-    model,
     abortCtr,
     messages,
     checkSession,
@@ -55,7 +59,7 @@ export const chat2ernieBot = async (option: CommonChatOption) => {
     signal: abortCtr?.signal,
     method: 'POST',
     body: JSON.stringify({
-      messages,
+      messages: await getERNIEBotMessages(messages, instruction, inputMaxTokens, contextSize),
       stream: true
     }),
     onmessage: (e) => {
@@ -90,4 +94,43 @@ export const chat2ernieBot = async (option: CommonChatOption) => {
       }
     }
   })
+}
+
+export const getERNIEBotMessages = async (
+  chatMessageList: ChatMessage[],
+  instruction: string,
+  inputMaxTokens: number,
+  contextSize: number
+) => {
+  // 是否存在指令
+  const hasInstruction = instruction.trim() != ''
+  // 将消息历史处理为user和assistant轮流对话
+  let messages: BaseMessage[] = []
+  let currentRole = 'user' as 'user' | 'assistant'
+  for (let i = chatMessageList.length - 1; i >= 0; i--) {
+    const chatMessage = chatMessageList[i]
+    if (currentRole === chatMessage.role) {
+      messages.unshift({
+        role: chatMessage.role,
+        content: chatMessage.content
+      })
+      currentRole = currentRole === 'user' ? 'assistant' : 'user'
+    }
+  }
+  messages = messages.slice(-1 - contextSize)
+  // 必须user开头user结尾
+  if (messages[0].role === 'assistant') {
+    messages.shift()
+  }
+  // 增加指令
+  if (hasInstruction) {
+    chatMessageList[chatMessageList.length - 1].content = `${instruction}\n${
+      chatMessageList[chatMessageList.length - 1].content
+    }`
+  }
+  // 使用'gpt-4-0314'模型估算Token，如果超出了上限制则移除上下文一条消息
+  while (messages.length > 1 && getChatTokensLength(messages) > inputMaxTokens) {
+    messages.shift()
+  }
+  return messages
 }
