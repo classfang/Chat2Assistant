@@ -7,15 +7,6 @@ declare module '*.vue' {
   export default component
 }
 
-declare global {
-  import { ElectronAPI } from '@electron-toolkit/preload'
-  interface Window {
-    electron: ElectronAPI
-    api: unknown
-  }
-  export default Window
-}
-
 type BigModelProvider = 'OpenAI' | 'Spark' | 'ERNIEBot' | 'Tongyi'
 type AssistantType = 'chat' | 'drawing'
 type ChatMsgType = 'text' | 'img'
