@@ -16,11 +16,6 @@ declare global {
   export default Window
 }
 
-declare module 'gpt-tokenizer' {
-  const encodeChat
-  export { encodeChat }
-}
-
 type BigModelProvider = 'OpenAI' | 'Spark' | 'ERNIEBot' | 'Tongyi'
 type AssistantType = 'chat' | 'drawing'
 type ChatMsgType = 'text' | 'img'
