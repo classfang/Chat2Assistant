@@ -134,7 +134,7 @@ const assistantDelete = () => {
     >
       <icon-more
         :class="{ 'no-drag-area': !systemStore.chatWindowLoading }"
-        style="font-size: 20px; font-weight: 600; flex-shrink: 0"
+        style="font-size: 24px; flex-shrink: 0"
       />
       <template #content>
         <a-space direction="vertical" fill>
