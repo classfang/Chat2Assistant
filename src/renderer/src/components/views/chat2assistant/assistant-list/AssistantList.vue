@@ -272,7 +272,6 @@ const newFormTypeChange = () => {
 
     .assistant-new-btn {
       flex-shrink: 0;
-      padding: 10px;
       display: flex;
       align-items: center;
       gap: 5px;
