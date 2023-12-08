@@ -16,11 +16,9 @@ export const startDarkThemeListener = () => {
   handleColorSchemeChange(darkThemeMq)
 
   // 添加移除事件监听的方法
-  const stopDarkThemeListener = () => {
+  return () => {
     darkThemeMq.removeEventListener('change', handleColorSchemeChange)
   }
-
-  return stopDarkThemeListener
 }
 
 export const changeTheme = (isDark: boolean) => {
