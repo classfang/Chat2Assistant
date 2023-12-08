@@ -25,3 +25,17 @@ export const readLocalImageBase64 = async (path: string) => {
 export const clipboardWriteText = async (text: string) => {
   return await window.electron.ipcRenderer.invoke('clipboardWriteText', text)
 }
+
+export const clearCacheFiles = async (images: string[]) => {
+  return await window.electron.ipcRenderer.invoke('clearCacheFiles', images)
+}
+
+export const selectFileAndRead = async (filters: string[]) => {
+  return await window.electron.ipcRenderer.invoke('selectFileAndRead', filters)
+}
+
+export const onMainWindowFocus = (action: () => void) => {
+  window.electron.ipcRenderer.on('main-window-focus', () => {
+    action()
+  })
+}

@@ -21,13 +21,11 @@ export const formatDateTime = (date: Date, format?: string) => {
   const seconds = String(date.getSeconds()).padStart(2, '0')
 
   // 替换格式字符串中的占位符
-  const formattedDateTime = format
+  return format
     .replace('YYYY', fullYear)
     .replace('MM', month)
     .replace('DD', day)
     .replace('HH', hours)
     .replace('mm', minutes)
     .replace('ss', seconds)
-
-  return formattedDateTime
 }

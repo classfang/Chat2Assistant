@@ -203,7 +203,7 @@ ipcMain.handle('clipboardWriteText', (_event, text: string) => {
 })
 
 // 清理缓存
-ipcMain.handle('clearCache', (_event, images: string[]) => {
+ipcMain.handle('clearCacheFiles', (_event, images: string[]) => {
   if (images.length === 0) {
     return
   }

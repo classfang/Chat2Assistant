@@ -4,7 +4,7 @@ import { useSystemStore } from '@renderer/store/system'
 import { reactive, toRefs } from 'vue'
 import { FileItem, RequestOption } from '@arco-design/web-vue'
 import { randomUUID } from '@renderer/utils/id-util'
-import { saveFileByPath } from '@renderer/utils/main-thread-util'
+import { saveFileByPath } from '@renderer/utils/ipc-util'
 
 const userStore = useUserStore()
 const systemStore = useSystemStore()

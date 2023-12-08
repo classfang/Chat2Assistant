@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { readLocalImageBase64, saveFileByUrl } from '@renderer/utils/main-thread-util'
+import { readLocalImageBase64, saveFileByUrl } from '@renderer/utils/ipc-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { CommonChatOption } from '.'
 import { getChatTokensLength } from '@renderer/utils/gpt-tokenizer-util'

@@ -14,9 +14,9 @@ import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
-import { clipboardWriteText } from '@renderer/utils/main-thread-util'
+import { clipboardWriteText } from '@renderer/utils/ipc-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
-import { saveFileByPath } from '@renderer/utils/main-thread-util'
+import { saveFileByPath } from '@renderer/utils/ipc-util'
 import { CommonChatOption, chat2bigModel } from '@renderer/utils/big-model'
 
 // store

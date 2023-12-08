@@ -3,7 +3,14 @@ import { useSettingStore } from '@renderer/store/setting'
 import { onMounted, reactive, toRefs } from 'vue'
 import { useSystemStore } from '@renderer/store/system'
 import { openInBrowser } from '@renderer/utils/window-util'
-import { openCacheDir, setProxy, getAppVersion } from '@renderer/utils/main-thread-util'
+import {
+  openCacheDir,
+  setProxy,
+  getAppVersion,
+  clearCacheFiles,
+  selectFileAndRead,
+  onMainWindowFocus
+} from '@renderer/utils/ipc-util'
 import { useAssistantStore } from '@renderer/store/assistant'
 import { useCollectionSetStore } from '@renderer/store/collection-set'
 import { Message, Modal } from '@arco-design/web-vue'
@@ -23,14 +30,15 @@ const data = reactive({
   modalVisible: false,
   appVersion: '0.0.0',
   newVersionFlag: false,
-  clearCacheFalg: false
+  clearCacheFlag: false
 })
-const { modalVisible, appVersion, newVersionFlag, clearCacheFalg } = toRefs(data)
+const { modalVisible, appVersion, newVersionFlag, clearCacheFlag } = toRefs(data)
 
 const checkNewVersion = () => {
   fetch('https://api.github.com/repos/classfang/Chat2Assistant/releases/latest')
     .then((res) => res.json())
     .then((json) => {
+      console.log('github app version', json.name)
       if (json.name) {
         const appVersionArray = data.appVersion.split('.')
         const newVersionArray = json.name.split('.')
@@ -44,11 +52,11 @@ const checkNewVersion = () => {
 }
 
 // 清理缓存（图片）
-const clearCache = async () => {
-  if (data.clearCacheFalg) {
+const clearCacheHandle = async () => {
+  if (data.clearCacheFlag) {
     return
   }
-  data.clearCacheFalg = true
+  data.clearCacheFlag = true
 
   // 用户头像、所有对话记录图片、收藏中的图片
   const images: string[] = []
@@ -69,8 +77,8 @@ const clearCache = async () => {
       }
     })
   )
-  await window.electron.ipcRenderer.invoke('clearCache', images)
-  data.clearCacheFalg = false
+  await clearCacheFiles(images)
+  data.clearCacheFlag = false
   Message.success(t('setting.app.cache.clearSuccess'))
 }
 
@@ -100,9 +108,7 @@ const importSettingBackup = () => {
     cancelText: t('common.cancel'),
     onOk: async () => {
       try {
-        const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
-          'c2a'
-        ])
+        const selectFileResult = await selectFileAndRead(['c2a'])
         if (selectFileResult) {
           systemStore.globalLoading = true
           const importFlag = settingStore.setStoreFromJson(
@@ -131,9 +137,7 @@ const importDataBackup = () => {
     cancelText: t('common.cancel'),
     onOk: async () => {
       try {
-        const selectFileResult = await window.electron.ipcRenderer.invoke('selectFileAndRead', [
-          'c2a'
-        ])
+        const selectFileResult = await selectFileAndRead(['c2a'])
         if (selectFileResult) {
           let importFlag = false
           systemStore.globalLoading = true
@@ -163,7 +167,7 @@ onMounted(() => {
     checkNewVersion()
   })
   // 每次获得焦点检查最新版本
-  window.electron.ipcRenderer.on('main-window-focus', () => {
+  onMainWindowFocus(() => {
     checkNewVersion()
   })
   setProxy(settingStore.app.proxy)
@@ -225,7 +229,7 @@ onMounted(() => {
                         <span>{{ $t('setting.app.cache.path') }}</span>
                       </a-space>
                     </a-button>
-                    <a-button size="mini" :loading="clearCacheFalg" @click="clearCache()">
+                    <a-button size="mini" :loading="clearCacheFlag" @click="clearCacheHandle()">
                       <a-space :size="5">
                         <icon-delete />
                         <span>{{ $t('setting.app.cache.clear') }}</span>
