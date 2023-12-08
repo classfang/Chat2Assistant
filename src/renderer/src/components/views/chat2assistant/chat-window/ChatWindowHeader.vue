@@ -132,7 +132,10 @@ const assistantDelete = () => {
       trigger="click"
       :content-style="{ padding: '5px' }"
     >
-      <icon-more class="no-drag-area" style="font-size: 20px; font-weight: 600; flex-shrink: 0" />
+      <icon-more
+        :class="{ 'no-drag-area': !systemStore.chatWindowLoading }"
+        style="font-size: 20px; font-weight: 600; flex-shrink: 0"
+      />
       <template #content>
         <a-space direction="vertical" fill>
           <a-button
