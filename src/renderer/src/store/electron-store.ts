@@ -11,16 +11,16 @@ const electronStore = {
     return strData ? JSON.parse(strData) : []
   },
   setStr: async (key: string, value: string): Promise<void> => {
-    await window.electron.ipcRenderer.invoke('setStoreValue', key, value)
+    await window.electron.ipcRenderer.invoke('set-store-value', key, value)
   },
   getStr: async (key: string): Promise<string> => {
-    return await window.electron.ipcRenderer.invoke('getStoreValue', key)
+    return await window.electron.ipcRenderer.invoke('get-store-value', key)
   },
   getStrSync: (key: string): string => {
-    return window.electron.ipcRenderer.sendSync('getStoreValueSync', key)
+    return window.electron.ipcRenderer.sendSync('get-store-value-sync', key)
   },
   delete: async (key: string): Promise<void> => {
-    await window.electron.ipcRenderer.invoke('deleteStoreValue', key)
+    await window.electron.ipcRenderer.invoke('delete-store-value', key)
   }
 }
 

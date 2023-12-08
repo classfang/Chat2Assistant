@@ -128,32 +128,45 @@ app.on('before-quit', async (e) => {
 })
 
 // 打开开发者控制台
-ipcMain.handle('openDevTools', () => {
+ipcMain.handle('open-dev-tools', () => {
   mainWindow.webContents.openDevTools()
+})
+
+// 开始Dock栏图标跳动
+ipcMain.handle('start-dock-bounce', () => {
+  // 获得焦点时不跳动
+  if (!mainWindow.isFocused()) {
+    app.dock.bounce('informational')
+  }
+})
+
+// 停止Dock栏图标跳动
+ipcMain.handle('stop-dock-bounce', () => {
+  app.dock.bounce('none')
 })
 
 // 存储相关
 const store = new Store()
-ipcMain.handle('getStoreValue', (_event, key) => {
+ipcMain.handle('get-store-value', (_event, key) => {
   return store.get(key)
 })
-ipcMain.on('getStoreValueSync', (event, key) => {
+ipcMain.on('get-store-value-sync', (event, key) => {
   event.returnValue = store.get(key)
 })
-ipcMain.handle('setStoreValue', (_event, key, value) => {
+ipcMain.handle('set-store-value', (_event, key, value) => {
   store.set(key, value)
 })
-ipcMain.handle('deleteStoreValue', (_event, key) => {
+ipcMain.handle('delete-store-value', (_event, key) => {
   store.delete(key)
 })
 
 // 获取版本信息
-ipcMain.handle('getAppVersion', () => {
+ipcMain.handle('get-app-version', () => {
   return app.getVersion()
 })
 
 // 保存网络文件
-ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) => {
+ipcMain.handle('save-file-by-url', async (_event, url: string, fileName: string) => {
   creatTempPath()
   // 请求文件
   const fetchResp = await fetch(url)
@@ -170,7 +183,7 @@ ipcMain.handle('saveFileByUrl', async (_event, url: string, fileName: string) =>
 })
 
 // 保存本地文件
-ipcMain.handle('saveFileByPath', async (_event, path: string, fileName: string) => {
+ipcMain.handle('save-file-by-path', async (_event, path: string, fileName: string) => {
   creatTempPath()
   const filePath = join(tempPath, fileName)
   fs.copyFileSync(path, filePath)
@@ -179,12 +192,12 @@ ipcMain.handle('saveFileByPath', async (_event, path: string, fileName: string) 
 })
 
 // 打开缓存目录
-ipcMain.handle('openCacheDir', () => {
+ipcMain.handle('open-cache-dir', () => {
   shell.openPath(tempPath)
 })
 
 // 读取本地图片为base64字符串
-ipcMain.handle('readLocalImageBase64', (_event, path: string) => {
+ipcMain.handle('read-local-image-base64', (_event, path: string) => {
   // 读取图片文件
   const data = fs.readFileSync(path)
   // 将图片数据转换为Base64
@@ -193,17 +206,17 @@ ipcMain.handle('readLocalImageBase64', (_event, path: string) => {
 })
 
 // 设置代理地址
-ipcMain.handle('setProxy', (_event, proxyUrl: string) => {
+ipcMain.handle('set-proxy', (_event, proxyUrl: string) => {
   mainWindow?.webContents.session.setProxy({ proxyRules: proxyUrl })
 })
 
 // 复制文本到剪贴板
-ipcMain.handle('clipboardWriteText', (_event, text: string) => {
+ipcMain.handle('clipboard-write-text', (_event, text: string) => {
   clipboard.writeText(text)
 })
 
 // 清理缓存
-ipcMain.handle('clearCacheFiles', (_event, images: string[]) => {
+ipcMain.handle('clear-cache-files', (_event, images: string[]) => {
   if (images.length === 0) {
     return
   }
@@ -220,7 +233,7 @@ ipcMain.handle('clearCacheFiles', (_event, images: string[]) => {
 })
 
 // 选择文件并读取内容
-ipcMain.handle('selectFileAndRead', (_event, extensions = ['*']) => {
+ipcMain.handle('select-file-and-read', (_event, extensions = ['*']) => {
   const result = dialog.showOpenDialogSync(mainWindow, {
     properties: ['openFile'],
     filters: [{ name: 'Select File', extensions }]

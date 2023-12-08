@@ -14,7 +14,7 @@ import { nowTimestamp } from '@renderer/utils/date-util'
 import { randomUUID } from '@renderer/utils/id-util'
 import { renderMarkdown } from '@renderer/utils/markdown-util'
 import { useAssistantStore } from '@renderer/store/assistant'
-import { clipboardWriteText } from '@renderer/utils/ipc-util'
+import { clipboardWriteText, startDockBounce } from '@renderer/utils/ipc-util'
 import { scrollToBottom } from '@renderer/utils/element-util'
 import { saveFileByPath } from '@renderer/utils/ipc-util'
 import { CommonChatOption, chat2bigModel } from '@renderer/utils/big-model'
@@ -174,6 +174,8 @@ const useBigModel = async (sessionId: string) => {
     end: () => {
       // 关闭等待
       systemStore.chatWindowLoading = false
+      // dock栏跳动
+      startDockBounce()
     }
   }
 
