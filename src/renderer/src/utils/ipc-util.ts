@@ -2,10 +2,6 @@ export const startDockBounce = async () => {
   return await window.electron.ipcRenderer.invoke('start-dock-bounce')
 }
 
-export const stopDockBounce = async () => {
-  return await window.electron.ipcRenderer.invoke('stop-dock-bounce')
-}
-
 export const openCacheDir = async () => {
   return await window.electron.ipcRenderer.invoke('open-cache-dir')
 }

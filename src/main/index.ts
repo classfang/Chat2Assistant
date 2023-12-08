@@ -140,11 +140,6 @@ ipcMain.handle('start-dock-bounce', () => {
   }
 })
 
-// 停止Dock栏图标跳动
-ipcMain.handle('stop-dock-bounce', () => {
-  app.dock.bounce('none')
-})
-
 // 存储相关
 const store = new Store()
 ipcMain.handle('get-store-value', (_event, key) => {
