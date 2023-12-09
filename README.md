@@ -1,3 +1,5 @@
+<h1>This project stopped maintenance, new project address: https://github.com/classfang/AIHub</h1>
+
 <h1 align="center">Chat2Assistant</h1>
 <h4 align="center">
 An assistant-centered ChatGPT electron client with a minimalist interface will support more models in the future✨
