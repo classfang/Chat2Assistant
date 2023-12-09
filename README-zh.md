@@ -1,3 +1,5 @@
+<h1>本项目停止维护，新项目地址：https://github.com/classfang/AIHub</h1>
+
 <h1 align="center">Chat2Assistant</h1>
 <h4 align="center">
 一款以助手为中心的 ChatGPT Electron客户端，具有极简的界面，将在未来支持更多模型✨✨
